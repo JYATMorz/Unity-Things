@@ -10,17 +10,21 @@ namespace ScriptTest.NPC
     public class TemplateNPC
     {
         public int Health { get; private set; } = 100;
-        public int Speed { get; private set; } = 100;
+        public int Speed { get; private set; } = 10;
         public int Weight { get; private set; } = 50;
 
         protected int _reviveChance = 0;
+        protected int _initHealth = 100;
         protected bool _isDead = false;
 
-        public TemplateNPC(int health, int speed, int weight)
+        public TemplateNPC() {}
+        public TemplateNPC(int health, int speed, int weight, int revive)
         {
             Health = health;
             Speed = speed;
             Weight = weight;
+            this._initHealth = health;
+            this._reviveChance = revive;
         }
 
         public void ReceiveDamage(int damage)
@@ -36,64 +40,92 @@ namespace ScriptTest.NPC
             {
                 this._isDead = true;
                 Console.WriteLine("No revive chance, Time to die.");
-                // Unity remove this object
+                // tell Unity remove this object
             } else
             {
                 this._isDead = false;
                 this._reviveChance --;
-                Health = 100;
-                Console.WriteLine("I'm back. I can do this all day.");
+                Health = this._initHealth;
+                Console.WriteLine($"I'm back with {this._initHealth} HP. I can do this all day.");
             }
         }
 
-        public void Shoot<T, U>(ref T weapon, ref U ammo)
-        {
-            if (!this._isDead)
-            {
-                weapon.WeaponInfo();
-                weapon.ShootBullet(ammo);
-            }
-        }
-
-        protected static Type RandomWeaponType()
+        protected static TemplateWeapon RandomWeaponType()
         {
             Random dice = new Random();
-            string weaponType = "TemplateWeapon";
             switch (dice.Next(6))
             {
                 case 0:
                 case 1:
-                    weaponType = "Pistol";
-                    break;
+                    return new Pistol();
                 case 2:
-                    weaponType = "Rifle";
-                    break;
+                    return new Rifle();
                 case 3:
-                    weaponType = "Shotgun";
-                    break;
+                    return new Shotgun();
                 case 4:
                 case 5:
-                    weaponType = "LightBlade";
-                    break;
+                    return new Grenade();
                 default:
-                    weaponType = "TemplateWeapon";
-                    break;
+                    return new TemplateWeapon();
             }
-            // Type t = Type.GetType(weaponType);
-            Type t = Type.GetType("Pistol");
-            return t;
+        }
+
+        protected static TemplateAmmo RandomAmmoType()
+        {
+            Random dice = new Random();
+            switch (dice.Next(4))
+            {
+                case 0:
+                case 1:
+                    return new CommonBullet();
+                case 2:
+                    return new LaserBeam();
+                case 3:
+                    return new ExplosivePayload();
+                default:
+                    return new TemplateAmmo();
+            }
         }
     }
 
     public class BadGuy: TemplateNPC
     {
-        private TemplateWeapon _weapon 
-            = Activator.CreateInstance(base.RandomWeaponType(), 5, 500, 1) as TemplateWeapon;
-        private CommonBullet _bullet = new CommonBullet(500, 10, 5);
+        private int _seekRange = 20;
+        private TemplateWeapon _weapon = TemplateNPC.RandomWeaponType();
+        private TemplateAmmo _bullet = TemplateNPC.RandomAmmoType();
 
-        public BadGuy(int health, int speed, int weight): base(health, speed, weight)
+        public BadGuy(): this(50, 10, 50, 0) {}
+        public BadGuy(int health, int speed, int weight, int revive): base(health, speed, weight, revive)
         {
-            this._reviveChance = 1;
+            // Do Something special here if necessary
+        }
+
+        public void NPCShoot(int[] enemyPosition)
+        {
+            if (!this._isDead)
+            {
+                _weapon.WeaponInfo();
+                _weapon.ShootBullet(ref _bullet);
+                // need to control aim according to input enemy position{x,y,z}
+                // transform the angle of weapon object
+                // and call weapon.ShootBullet to fire bullet(s)
+            }
+        }
+
+        public void SeekEnemy(int[] enemyPosition)
+        {
+            // take enemy position{x,y,z} as input
+            // compute the straight distance between enemy and this
+            // move to ideal distance (_seekDistance), accept tolerance +-5
+        }
+    }
+
+    public class GoodGuy: TemplateNPC
+    {
+        public GoodGuy(): this(100, 15, 40, 3) {}
+        public GoodGuy() (int health, int speed, int weight, int revive): base(health, speed, weight, revive)
+        {
+            // Do Something special here if necessary
         }
     }
 }
