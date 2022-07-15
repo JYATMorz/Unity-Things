@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using ScriptTest.Ammo;
-
 namespace ScriptTest.Weapon
 {
     public class TemplateWeapon
@@ -29,27 +27,19 @@ namespace ScriptTest.Weapon
                               $"Bullet Per Shot: {BulletPerShot}\n-------");
         }
 
-        public virtual void BulletInfo()
+        public void ShootBullet<T>(ref T ammo)
         {
-            Console.WriteLine("Empty Bullet Info:");
+            // spawn bullet in Unity according to given ammo
+            // may require more input
+            ammo.AmmoInfo();
         }
     }
 
     public class Pistol: TemplateWeapon
     {
-        private CommonBullet _bulletType = new CommonBullet(5,5,5);
-
         public Pistol(int degree, int rate, int shot): base(degree, rate, shot)
         {
             Name = "Pistol";
-        }
-
-        public override void BulletInfo()
-        {
-            Console.WriteLine("Show Bullet Info:");
-            Console.WriteLine("-----------------");
-            _bulletType.AmmoInfo();
-            Console.WriteLine("-----------------");
         }
     }
 }
