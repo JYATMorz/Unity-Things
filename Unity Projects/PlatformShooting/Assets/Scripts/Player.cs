@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float jumpAcc = 10f;
-    public float moveSpd = 5f;
 
     private Rigidbody _playerBody;
+    private float _speedScaler = 5f;
     private bool _jumpPressed = false;
-    private float _horizontalInput;
+    private bool _isGrounded = true;
     private int _doubleJump = 2;
+    private float _horizontalInput;
 
     // Start is called before the first frame update
     void Start()
@@ -21,10 +21,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && (_isGrounded || (_doubleJump > 0)))
         {
             _jumpPressed = true;
-            _doubleJump--;
         }
 
         _horizontalInput = Input.GetAxis("Horizontal");
@@ -32,15 +31,25 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (_jumpPressed && (_doubleJump > 0))
+        if (_jumpPressed)
         {
-            _playerBody.AddForce(Vector3.up * jumpAcc, ForceMode.Impulse);
+            _playerBody.AddForce(Vector3.up * _speedScaler, ForceMode.VelocityChange);
 
+            _doubleJump --;
             _jumpPressed = false;
         }
 
-        _playerBody.AddForce(_horizontalInput * moveSpd, 0, 0, ForceMode.VelocityChange);
-
+        _playerBody.velocity = new Vector3(_horizontalInput * _speedScaler, _playerBody.velocity.y, 0);
     }
 
+    void OnCollisionEnter(Collision other) {
+        _isGrounded = true;
+        _doubleJump = 2;
+
+        // if (_playerBody.velocity.y > 10) Debug.Log($"Vertical Velocity: {_playerBody.velocity.y}");
+    }
+
+    void OnCollisionExit(Collision other) {
+        _isGrounded = false;
+    }
 }
