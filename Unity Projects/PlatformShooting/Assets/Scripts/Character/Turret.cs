@@ -4,14 +4,13 @@ public class Turret : MonoBehaviour
 {
     public GameObject player;
 
-    private Rigidbody attacker = null;
-
     private readonly string _bulletTag = "Bullet";
     private readonly float _seekInterval = 1f;
+    private readonly int _seekDistance = 20;
+    private readonly int _shootRange = 10;
 
-    private int _seekDistance;
+    private Rigidbody attacker = null;
     private bool _seekConfirm = false;
-    private int _shootRange;
 
     void FixedUpdate()
     {
@@ -33,7 +32,7 @@ public class Turret : MonoBehaviour
         if (attacker == null) target = player;
         else target = attacker.gameObject;
 
-        if (Vector3.Distance(target.transform.position, transform.position)) // Do you find attacker in seek distance?
+        if (Vector3.Distance(target.transform.position, transform.position) < _seekDistance) // Do you find attacker in seek distance?
         {
             _seekConfirm = true;
             BarrelAimTarget(target);

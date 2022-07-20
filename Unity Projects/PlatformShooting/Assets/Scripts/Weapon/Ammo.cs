@@ -6,9 +6,11 @@ public class Ammo : MonoBehaviour
     private int _bounceCountLeft = 2;
 
     public readonly int ammoDamage = 15;
+    public readonly int ammoSpeed = 20;
+    public readonly float ammoInterval = 0.2f;
 
-    private readonly int _ammoDamage = 15;
-    private readonly string _characterColliderTag = "Character";
+    private const string _characterTag = "Character";
+    private const string _floorTag = "Floor";
 
     void OnCollisionEnter(Collision other) {
 
@@ -16,22 +18,35 @@ public class Ammo : MonoBehaviour
 
         if (_bounceCountLeft > 0)
         {
-            if (contact.tag == _characterColliderTag)
+            if (contact.tag == _characterTag)
             {
                 Destroy(gameObject);
             }
 
             _bounceCountLeft--;
         } else Destroy(gameObject);
+    }
+
+    void OnCollisionStay(Collision other)
+    {
+        if (other.gameObject.tag == _floorTag)
+        {
+            Invoke("StuckInWall", 1f);
+        }
 
     }
 
     void OnDestroy() {
         // Create Explosion Effect
-        Debug.Log("GG");
+
         // Quaternion rot = Quaternion.FromToRotation(Vector3.up, contact.normal);
         // Vector3 pos = contact.point;
         // Instantiate(explosionPrefab, pos, rot);
         // Destroy(gameObject);
+    }
+
+    private void StuckInWall()
+    {
+        Destroy(gameObject);
     }
 }

@@ -1,18 +1,17 @@
 using UnityEngine;
 
-public class Character : MonoBehaviour
+public class Player : MonoBehaviour
 {
     private readonly float _speedScaler = 5f;
-    private readonly float _bulletSpeed = 20f;
-    private readonly float _shootInterval = 0.2f;
     private readonly int _initHealth = 100;
-    private readonly string _bulletTag = "Bullet";
-    private readonly string _floorTag = "Floor";
 
-    public HealthBar healthBar;
+    private const string _bulletTag = "Bullet";
+    private const string _floorTag = "Floor";
+
     public Camera mainCamera;
     public Rigidbody ammoPrefab;
-
+    
+    private HealthBar _healthBar;
     private Rigidbody _characterBody;
     private Rigidbody _barrelRotationCenter;
     private Vector3 _rotateVector;
@@ -23,13 +22,16 @@ public class Character : MonoBehaviour
     private int _currentHealth;
     private float _xAxisInputScaler;
     
+    void Awake()
+    {
+        _characterBody = GetComponent<Rigidbody>();
+        _barrelRotationCenter = GetComponentsInChildren<Rigidbody>()[1];
+    }
 
     void Start()
     {
         _currentHealth = _initHealth;
-        healthBar.SetMaxHealth(_initHealth);
-        _characterBody = GetComponent<Rigidbody>();
-        _barrelRotationCenter = GetComponentInChildren<Rigidbody>()
+        _healthBar = GetComponentInChildren<HealthBar>();
     }
 
     void Update()
@@ -41,12 +43,6 @@ public class Character : MonoBehaviour
 
         _xAxisInputScaler = Input.GetAxis("Horizontal");
 
-        // Health Bar Check, should replace it with message receiver
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            ReceiveDamage(10);
-        }
-
         if (Input.GetKey(KeyCode.Mouse0) && !_isShot)
         {
             Transform _barrelTransform = _barrelRotationCenter.transform;
@@ -55,9 +51,11 @@ public class Character : MonoBehaviour
                 // create fog at barrel to hide distance between ammo
 
                 Rigidbody newAmmo = Instantiate(ammoPrefab, _barrelRotationCenter.position + _barrelTransform.up * 0.55f, _barrelRotationCenter.rotation, _barrelTransform);
-                newAmmo.AddForce(_barrelTransform.up * _bulletSpeed, ForceMode.VelocityChange);
+                Ammo ammoScript = newAmmo.GetComponent<Ammo>();
+
+                newAmmo.AddForce(_barrelTransform.up * ammoScript.ammoSpeed, ForceMode.VelocityChange);
                 _isShot = true;
-                Invoke("ResetShootInterval", _shootInterval);
+                Invoke("ResetShootInterval", ammoScript.ammoInterval);
             } else
             {
                 Debug.Log("Shooting Dead Zone! Need More Notification Here!");
@@ -101,12 +99,14 @@ public class Character : MonoBehaviour
                 TouchGround();
                 break;
         }
-        Debug.Log(other.contactCount);
     }
 
     void OnCollisionExit(Collision other)
     {
-        _isGrounded = false;
+        if (other.gameObject.tag == _floorTag)
+        {
+            _isGrounded = false;
+        }
     }
 
     private void TouchGround()
@@ -121,20 +121,18 @@ public class Character : MonoBehaviour
 
         if (_currentHealth <= 0)
         {
-            healthBar.SetHealthValue(0)
+            _healthBar.SetHealthValue(0);
             ZeroHealth();
         } else
         {
-            healthBar.SetHealthValue(_currentHealth);
+            _healthBar.SetHealthValue(_currentHealth / (float)_initHealth);
         }
     }
 
     private void ZeroHealth()
     {
         // Maybe player can revive with special effect
-
-        // !!! Move Camera Outside the Player before try to kill player !!!
-        // Destroy(gameObject);
+        Destroy(gameObject);
         Debug.Log("You are dead.");
     }
 
