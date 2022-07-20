@@ -27,8 +27,7 @@ public class Barrel : MonoBehaviour
                 newAmmo.AddForce(transform.up * _bulletSpeed, ForceMode.VelocityChange);
                 _isShot = true;
                 Invoke("ResetShootInterval", _shootInterval);
-            }
-            else
+            } else
             {
                 Debug.Log("Shooting Dead Zone! Need More Notification Here!");
             }
