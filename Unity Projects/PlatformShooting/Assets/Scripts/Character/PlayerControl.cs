@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class PlayerControl : MonoBehaviour
 {
     private readonly float _speedScaler = 5f;
     private readonly int _initHealth = 100;
@@ -9,13 +9,11 @@ public class Player : MonoBehaviour
     private const string _floorTag = "Floor";
 
     public Camera mainCamera;
-    public Rigidbody ammoPrefab;
     
     private HealthBar _healthBar;
     private Rigidbody _characterBody;
     private Rigidbody _barrelRotationCenter;
     private Vector3 _rotateVector;
-    private bool _isShot = false;
     private bool _jumpPressed = false;
     private bool _isGrounded = true;
     private int _doubleJump = 2;
@@ -42,8 +40,6 @@ public class Player : MonoBehaviour
         }
 
         _xAxisInputScaler = Input.GetAxis("Horizontal");
-
-        if (Input.GetKey(KeyCode.Mouse0) && !_isShot) BarrelShoot()
     
     }
 
@@ -117,29 +113,5 @@ public class Player : MonoBehaviour
         // Maybe player can revive with special effect
         Destroy(gameObject);
         Debug.Log("You are dead.");
-    }
-
-    private void BarrelShoot()
-    {
-        Transform _barrelTransform = _barrelRotationCenter.transform;
-        if (Vector3.Angle(Vector3.up, _barrelTransform.up) <= 135)
-        {
-            // create fog at barrel to hide distance between ammo
-
-            Rigidbody newAmmo = Instantiate(ammoPrefab, _barrelRotationCenter.position + _barrelTransform.up * 0.55f, _barrelRotationCenter.rotation, _barrelTransform);
-            Ammo ammoScript = newAmmo.GetComponent<Ammo>();
-
-            newAmmo.AddForce(_barrelTransform.up * ammoScript.ammoSpeed, ForceMode.VelocityChange);
-            _isShot = true;
-            Invoke("ResetShootInterval", ammoScript.ammoInterval);
-        } else
-        {
-            Debug.Log("Shooting Dead Zone! Need More Notification Here!");
-        }
-    }
-
-    private void ResetShootInterval()
-    {
-        _isShot = false;
     }
 }

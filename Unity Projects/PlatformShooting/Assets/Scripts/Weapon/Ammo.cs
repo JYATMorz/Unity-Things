@@ -4,6 +4,7 @@ public class Ammo : MonoBehaviour
 {
 
     private int _bounceCountLeft = 2;
+    private float _stuckTime = 0f;
 
     public readonly int ammoDamage = 15;
     public readonly int ammoSpeed = 20;
@@ -11,6 +12,8 @@ public class Ammo : MonoBehaviour
 
     private const string _characterTag = "Character";
     private const string _floorTag = "Floor";
+
+    private readonly float _stuckLimit = 1f;
 
     void OnCollisionEnter(Collision other) {
 
@@ -24,16 +27,22 @@ public class Ammo : MonoBehaviour
             }
 
             _bounceCountLeft--;
+            _stuckTime = Time.time;
         } else Destroy(gameObject);
     }
 
     void OnCollisionStay(Collision other)
     {
-        if (other.gameObject.tag == _floorTag)
+        if ((Time.time - _stuckTime) >= _stuckLimit))
         {
-            Invoke("StuckInWall", 1f);
+            Destroy(gameObject);
         }
 
+    }
+
+    void OnCollisionExit(Collision other)
+    {
+        _stuckTime = 0f;
     }
 
     void OnDestroy() {
