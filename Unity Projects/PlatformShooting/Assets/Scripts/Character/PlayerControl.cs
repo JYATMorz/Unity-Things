@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    private readonly float _speedScaler = 5f;
-    private readonly int _initHealth = 100;
-
+    private const float _speedScaler = 5f;
+    private const float _jumpScaler = 25f;
+    private const int _initHealth = 100;
     private const string _bulletTag = "Bullet";
     private const string _floorTag = "Floor";
 
@@ -47,7 +47,7 @@ public class PlayerControl : MonoBehaviour
     {
         if (_jumpPressed)
         {
-            _characterBody.AddForce(Vector3.up * _speedScaler, ForceMode.Impulse);
+            _characterBody.AddForce(Vector3.up * _jumpScaler, ForceMode.Impulse);
 
             _doubleJump --;
             _jumpPressed = false;
@@ -65,24 +65,19 @@ public class PlayerControl : MonoBehaviour
     {
         GameObject collideObj = other.gameObject;
 
-        switch (collideObj.tag)
+        if (collideObj.CompareTag(_bulletTag))
         {
-            case _bulletTag:
-                Ammo ammoScript = collideObj.GetComponent<Ammo>();
-                ReceiveDamage(ammoScript.ammoDamage);
-                break;
-            case _floorTag:
-                TouchGround();
-                break;
-            default:
-                TouchGround();
-                break;
+            CommonBullet ammoScript = collideObj.GetComponent<CommonBullet>();
+            ReceiveDamage(ammoScript.ammoDamage);
+        } else // only _floorTag now
+        {
+            TouchGround();
         }
     }
 
-    void OnCollisionExit(Collision other) // Something new here. If succeed, change other Collision in Player.cs and Ammo.cs
+    void OnCollisionExit(Collision other)
     {
-        if (other.CompareTag(_floorTag))
+        if (other.gameObject.CompareTag(_floorTag))
         {
             _isGrounded = false;
         }

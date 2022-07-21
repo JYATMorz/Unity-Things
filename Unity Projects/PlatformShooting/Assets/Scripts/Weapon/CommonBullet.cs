@@ -1,14 +1,12 @@
 using UnityEngine;
 
-public class Ammo : MonoBehaviour
+public class CommonBullet : MonoBehaviour
 {
 
     private int _bounceCountLeft = 2;
     private float _stuckTime = 0f;
 
     public readonly int ammoDamage = 15;
-    public readonly int ammoSpeed = 20;
-    public readonly float ammoInterval = 0.2f;
 
     private const string _characterTag = "Character";
     private const string _floorTag = "Floor";
@@ -21,26 +19,24 @@ public class Ammo : MonoBehaviour
 
         if (_bounceCountLeft > 0)
         {
-            if (contact.tag == _characterTag)
-            {
-                Destroy(gameObject);
-            }
-
             _bounceCountLeft--;
+            if (contact.CompareTag(_characterTag)) Destroy(gameObject);
+
             _stuckTime = Time.time;
+
         } else Destroy(gameObject);
     }
 
-    void OnCollisionStay(Collision other)
+    void OnCollisionStay()
     {
-        if ((Time.time - _stuckTime) >= _stuckLimit))
+        if ((Time.time - _stuckTime) >= _stuckLimit)
         {
             Destroy(gameObject);
         }
 
     }
 
-    void OnCollisionExit(Collision other)
+    void OnCollisionExit()
     {
         _stuckTime = 0f;
     }

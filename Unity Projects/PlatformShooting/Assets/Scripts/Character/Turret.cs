@@ -5,20 +5,23 @@ public class Turret : MonoBehaviour
     public GameObject player;
     public Rigidbody ammoPrefab;
 
-    private readonly string _bulletTag = "Bullet";
-    private readonly float _shootInterval = 0.5f;
-    private readonly float _seekInterval = 1f;
-    private readonly int _seekRange = 20;
-    private readonly int _shootRange = 10;
-    private readonly int _initHealth = 100;
+    private const string _bulletTag = "Bullet";
+    private const float _shootInterval = 0.5f;
+    private const float _seekInterval = 1f;
+    private const int _seekRange = 20;
+    private const int _shootRange = 10;
+    private const int _initHealth = 100;
+    private const int _ammoSpeed = 20;
 
     private Rigidbody attacker = null;
     private Rigidbody _barrelRotationCenter;
     private HealthBar _healthBar;
+    private GameObject _aimTarget = null;
     private bool _targetConfirm = false;
     private bool _keepShooting = false;
-    private bool _isShot = false;
     private int _currentHealth;
+    private int _barrelRotateSpeed = 45;
+
 
     void Awake()
     {
@@ -30,45 +33,50 @@ public class Turret : MonoBehaviour
         _currentHealth = _initHealth;
         _healthBar = GetComponentInChildren<HealthBar>();
         InvokeRepeating("SeekAttacker", 1f, _seekInterval);
-        InvokeRepeating("RegenerateHealth", 1f, 1f);
-    }
-
-    void Update()
-    {
-        // if (_targetConfirm && IsInvoking("SeekAttacker")) CancelInvoke("SeekAttacker");
-        // if (!_targetConfirm && !IsInvoking("SeekAttacker")) InvokeRepeating("SeekAttacker", 0.5f, _seekInterval);
+        InvokeRepeating("RegenerateHealth", 1f, 0.5f);
     }
 
     void FixedUpdate()
     {
-        if (!_targetConfirm && !_keepShooting) BarrelIdle();
-        else if (_targetConfirm) BarrelAimTarget(target);
+        if (!_targetConfirm) BarrelIdle();
+        else if (_targetConfirm) BarrelAimTarget(_aimTarget);
     }
 
     void OnCollisionEnter(Collision other)
     {
-        if (other.CompareTag(_bulletTag))
+        if (other.gameObject.CompareTag(_bulletTag))
         {
-            attacker = other.GetComponentInParent<Rigidbody>();
-            Debug.Log(attacker.name);
+            Rigidbody suspect = other.gameObject.GetComponentsInParent<Rigidbody>()[2];
+            if (suspect.name != gameObject.name) attacker = suspect;
 
-            Ammo ammoScript = other.gameObject.GetComponentInChildren<Ammo>();
+            CommonBullet ammoScript = other.gameObject.GetComponentInChildren<CommonBullet>();
             ReceiveDamage(ammoScript.ammoDamage);
         }
     }
 
     private void SeekAttacker()
     {
-        GameObject target;
+        // Who should I attack now?
         if ((player == null) && (attacker == null))
         {
             _targetConfirm = false;
             _keepShooting = false;
+            if (IsInvoking("BarrelShoot")) CancelInvoke("BarrelShoot");
             return;
-        } else if (attacker == null) target = player;
-        else target = attacker.gameObject;
+        } else if (attacker == null) _aimTarget = player;
+        else _aimTarget = attacker.gameObject;
 
-        float _targetDistanceSqr = (target.transform.position - transform.position).sqrMagnitude;
+        // Any obstacle between me and target?
+        if (Physics.Linecast(_barrelRotationCenter.position, _aimTarget.transform.position, LayerMask.GetMask("Floor")))
+        {
+            _targetConfirm = false;
+            _keepShooting = false;
+            if (IsInvoking("BarrelShoot")) CancelInvoke("BarrelShoot");
+            return;
+        }
+
+        // Are we close enough?
+        float _targetDistanceSqr = (_aimTarget.transform.position - transform.position).sqrMagnitude;
         if (!_keepShooting && (_targetDistanceSqr < _shootRange * _shootRange))
         {
             _targetConfirm = true;
@@ -86,8 +94,11 @@ public class Turret : MonoBehaviour
 
     private void BarrelAimTarget(GameObject target)
     {
-        _barrelRotationCenter.rotation =
-            Quaternion.FromToRotation(Vector3.up, target.transform.position - _barrelRotationCenter.position);
+        if (target)
+        {
+            _barrelRotationCenter.rotation =
+                Quaternion.FromToRotation(Vector3.up, target.transform.position - _barrelRotationCenter.position);
+        }
 
         if (_keepShooting && !IsInvoking("BarrelShoot"))
             InvokeRepeating("BarrelShoot", _shootInterval, _shootInterval);
@@ -96,7 +107,8 @@ public class Turret : MonoBehaviour
 
     private void BarrelIdle()
     {
-        Quaternion deltaRotation = Quaternion.Euler(0, 0, 30 * Time.fixedDeltaTime);
+        if (Quaternion.Angle(Quaternion.identity, _barrelRotationCenter.rotation) > 105) _barrelRotateSpeed *= -1;
+        Quaternion deltaRotation = Quaternion.Euler(0, 0, _barrelRotateSpeed * Time.fixedDeltaTime);
         _barrelRotationCenter.MoveRotation(_barrelRotationCenter.rotation * deltaRotation);
     }
 
@@ -107,10 +119,10 @@ public class Turret : MonoBehaviour
         {
             // create fog at barrel to hide distance between ammo
 
-            Rigidbody newAmmo = Instantiate(ammoPrefab, _barrelRotationCenter.position + _barrelTransform.up * 0.55f, _barrelRotationCenter.rotation, _barrelTransform);
-            Ammo ammoScript = newAmmo.GetComponent<Ammo>();
+            Rigidbody newAmmo = Instantiate(ammoPrefab, 
+                _barrelRotationCenter.position + _barrelTransform.up * 0.55f, _barrelRotationCenter.rotation, _barrelTransform);
 
-            newAmmo.AddForce(_barrelTransform.up * ammoScript.ammoSpeed, ForceMode.VelocityChange);
+            newAmmo.AddForce(_barrelTransform.up * _ammoSpeed, ForceMode.VelocityChange);
         }
     }
 
@@ -132,11 +144,14 @@ public class Turret : MonoBehaviour
     {
         // Maybe player can revive with special effect
         Destroy(gameObject);
-        Debug.Log("You are dead.");
     }
 
     private void RegenerateHealth()
     {
-        if (_currentHealth < _initHealth) _currentHealth++;
+        if (_currentHealth < _initHealth)
+        {
+            _currentHealth++;
+            _healthBar.SetHealthValue(_currentHealth / (float)_initHealth);
+        }
     }
 }

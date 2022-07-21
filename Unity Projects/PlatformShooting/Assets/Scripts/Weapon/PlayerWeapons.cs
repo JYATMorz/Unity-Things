@@ -4,6 +4,9 @@ public class PlayerWeapons : MonoBehaviour
 {
     public Rigidbody ammoPrefab;
 
+    private const int _ammoSpeed = 20;
+    private const float _ammoInterval = 0.2f;
+
     private Rigidbody _barrelRotationCenter;
     private bool _isShot = false;
 
@@ -14,7 +17,7 @@ public class PlayerWeapons : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.Mouse0) && !_isShot) BarrelShoot()
+        if (Input.GetKey(KeyCode.Mouse0) && !_isShot) BarrelShoot();
     
     }
 
@@ -27,11 +30,10 @@ public class PlayerWeapons : MonoBehaviour
 
             Rigidbody newAmmo = Instantiate(ammoPrefab, 
                 _barrelRotationCenter.position + _barrelTransform.up * 0.55f, _barrelRotationCenter.rotation, _barrelTransform);
-            Ammo ammoScript = newAmmo.GetComponent<Ammo>();
 
-            newAmmo.AddForce(_barrelTransform.up * ammoScript.ammoSpeed, ForceMode.VelocityChange);
+            newAmmo.AddForce(_barrelTransform.up * _ammoSpeed, ForceMode.VelocityChange);
             _isShot = true;
-            Invoke("ResetShootInterval", ammoScript.ammoInterval);
+            Invoke("ResetShootInterval", _ammoInterval);
         } else
         {
             Debug.Log("Shooting Dead Zone! Need More Notification Here!");
