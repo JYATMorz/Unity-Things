@@ -20,7 +20,11 @@ public class CommonBullet : MonoBehaviour
         if (_bounceCountLeft > 0)
         {
             _bounceCountLeft--;
-            if (contact.CompareTag(_characterTag)) Destroy(gameObject);
+            if (contact.CompareTag(_characterTag))
+            {
+                Destroy(gameObject);
+                contact.SendMessage("ReceiveDamage", ammoDamage);
+            }
 
             _stuckTime = Time.time;
 
