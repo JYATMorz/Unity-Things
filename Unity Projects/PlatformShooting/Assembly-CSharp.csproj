@@ -37,14 +37,17 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Others\MainCamera.cs" />
-     <Compile Include="Assets\Scripts\Character\PlayerControl.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\PlayerControl.cs" />
      <Compile Include="Assets\Scripts\Others\HealthBar.cs" />
-     <Compile Include="Assets\Scripts\Weapon\CommonBullet.cs" />
-     <Compile Include="Assets\Scripts\Weapon\EnemyWeapons.cs" />
-     <Compile Include="Assets\Scripts\Character\EnemyControl.cs" />
-     <Compile Include="Assets\Scripts\Weapon\PlayerWeapons.cs" />
-     <Compile Include="Assets\Scripts\Character\Turret.cs" />
+     <Compile Include="Assets\Scripts\AmmoTypes\TemplateBullet.cs" />
+     <Compile Include="Assets\Scripts\WeaponControl\EnemyWeapons.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\EnemyControl.cs" />
+     <Compile Include="Assets\Scripts\WeaponControl\PlayerWeapons.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\Turret.cs" />
      <Compile Include="Assets\Scripts\Others\BillboardCanvas.cs" />
+     <Compile Include="Assets\Scripts\AmmoTypes\Grenade.cs" />
+     <Compile Include="Assets\Scripts\AmmoTypes\Laser.cs" />
+     <Compile Include="Assets\Scripts\AmmoTypes\Explosive.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.4f1c1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

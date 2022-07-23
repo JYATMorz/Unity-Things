@@ -1,19 +1,20 @@
 using UnityEngine;
 
-public class CommonBullet : MonoBehaviour
+public class TemplateBullet : MonoBehaviour
 {
 
-    private int _bounceCountLeft = 2;
+    private int _bounceCountLeft = 4;
     private float _stuckTime = 0f;
 
     public readonly int ammoDamage = 15;
 
     private const string _characterTag = "Character";
     private const string _floorTag = "Floor";
+    private const float _stuckLimit = 1f;
 
-    private readonly float _stuckLimit = 1f;
-
-    void OnCollisionEnter(Collision other) {
+    void OnCollisionEnter(Collision other)
+    {
+        // TODO: Add smoke (particle) effect when collides
 
         GameObject contact = other.gameObject;
 
@@ -22,13 +23,13 @@ public class CommonBullet : MonoBehaviour
             _bounceCountLeft--;
             if (contact.CompareTag(_characterTag))
             {
-                Destroy(gameObject);
+                WaitToDestroy();
                 contact.SendMessage("ReceiveDamage", ammoDamage);
             }
 
             _stuckTime = Time.time;
 
-        } else Destroy(gameObject);
+        } else WaitToDestroy();
     }
 
     void OnCollisionStay()
@@ -45,17 +46,12 @@ public class CommonBullet : MonoBehaviour
         _stuckTime = 0f;
     }
 
-    void OnDestroy() {
-        // Create Explosion Effect
-
-        // Quaternion rot = Quaternion.FromToRotation(Vector3.up, contact.normal);
-        // Vector3 pos = contact.point;
-        // Instantiate(explosionPrefab, pos, rot);
-        // Destroy(gameObject);
-    }
-
-    private void StuckInWall()
+    private void WaitToDestroy()
     {
-        Destroy(gameObject);
+        GetComponent<Rigidbody>().useGravity = false;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Renderer>().enabled = false;
+        GetComponent<Collider>().enabled = false;
+        Destroy(gameObject, 0.25f);
     }
 }

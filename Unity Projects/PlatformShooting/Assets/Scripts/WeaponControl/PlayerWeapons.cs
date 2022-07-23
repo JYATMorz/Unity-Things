@@ -26,7 +26,7 @@ public class PlayerWeapons : MonoBehaviour
         Transform _barrelTransform = _barrelRotationCenter.transform;
         if (Vector3.Angle(Vector3.up, _barrelTransform.up) <= 135)
         {
-            // create fog at barrel to hide distance between ammo
+            // TODO: create fog at barrel to hide distance between ammo
 
             Rigidbody newAmmo = Instantiate(ammoPrefab, 
                 _barrelRotationCenter.position + _barrelTransform.up * 0.55f, _barrelRotationCenter.rotation, _barrelTransform);

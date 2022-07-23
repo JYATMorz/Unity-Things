@@ -65,11 +65,7 @@ public class PlayerControl : MonoBehaviour
     {
         GameObject collideObj = other.gameObject;
 
-        if (collideObj.CompareTag(_bulletTag))
-        {
-            CommonBullet ammoScript = collideObj.GetComponent<CommonBullet>();
-            ReceiveDamage(ammoScript.ammoDamage);
-        } else // only _floorTag now
+        if (!collideObj.CompareTag(_bulletTag)) // only _floorTag now
         {
             TouchGround();
         }
@@ -105,7 +101,7 @@ public class PlayerControl : MonoBehaviour
 
     private void ZeroHealth()
     {
-        // Maybe player can revive with special effect
+        // TODO: Maybe player can revive with special effect
         Destroy(gameObject);
         Debug.Log("You are dead.");
     }

@@ -49,8 +49,6 @@ public class Turret : MonoBehaviour
             Rigidbody suspect = other.gameObject.GetComponentsInParent<Rigidbody>()[2];
             if (suspect.name != gameObject.name) attacker = suspect;
 
-            CommonBullet ammoScript = other.gameObject.GetComponentInChildren<CommonBullet>();
-            ReceiveDamage(ammoScript.ammoDamage);
         }
     }
 
@@ -117,7 +115,7 @@ public class Turret : MonoBehaviour
         Transform _barrelTransform = _barrelRotationCenter.transform;
         if (Vector3.Angle(Vector3.up, _barrelTransform.up) <= 105)
         {
-            // create fog at barrel to hide distance between ammo
+            // TODO: create fog at barrel to hide distance between ammo
 
             Rigidbody newAmmo = Instantiate(ammoPrefab, 
                 _barrelRotationCenter.position + _barrelTransform.up * 0.55f, _barrelRotationCenter.rotation, _barrelTransform);
@@ -142,7 +140,7 @@ public class Turret : MonoBehaviour
 
     private void ZeroHealth()
     {
-        // Maybe player can revive with special effect
+        // TODO: Do turrets have to disappear?
         Destroy(gameObject);
     }
 
