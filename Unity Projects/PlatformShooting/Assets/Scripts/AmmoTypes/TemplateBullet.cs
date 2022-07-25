@@ -4,18 +4,16 @@ public class TemplateBullet : MonoBehaviour
 {
     public GameObject bulletImpact;
 
-    public readonly int ammoDamage = 15;
-
+    private const int _ammoDamage = 15;
     private const string _characterTag = "Character";
     private const string _floorTag = "Floor";
-    private const float _stuckLimit = 1f;
 
     void OnCollisionEnter(Collision other)
     {
         GameObject contact = other.gameObject;
         if (contact.CompareTag(_characterTag))
         {
-            contact.SendMessage("ReceiveDamage", ammoDamage);
+            contact.SendMessage("ReceiveDamage", _ammoDamage);
         }
         Destroy(gameObject);
     }

@@ -65,9 +65,13 @@ public class PlayerControl : MonoBehaviour
     {
         GameObject collideObj = other.gameObject;
 
-        if (!collideObj.CompareTag(_bulletTag)) // only _floorTag now
+        if (collideObj.CompareTag(_floorTag))
         {
             TouchGround();
+
+            // Touch down damage
+            float speedSquare = other.relativeVelocity.sqrMagnitude;
+            if (speedSquare > 25) ReceiveDamage(Mathf.Ceil(speedSquare / 5f));
         }
     }
 

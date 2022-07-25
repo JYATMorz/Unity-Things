@@ -26,14 +26,13 @@ public class EnemyControl : MonoBehaviour
     private bool _revengeMode = false;
     private int _playerLayer;
     private int _floorLayer;
-    private int _weaponType;
+    private string _ammoType = "CommonBullet"; // TODO: Randomly select the weapon
     private float _rotateSpeed = _barrelRotateSpeed;
 
     void Awake()
     {
         _characterBody = GetComponent<Rigidbody>();
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
-        _weaponType = Random.Range(0, 2); // TODO: Update the limit when the num of bullet types is confirmed
     }
 
     void Start()
@@ -73,7 +72,11 @@ public class EnemyControl : MonoBehaviour
                     // TODO: Show the difference when in revenge mode
                 }
             }
-
+        } else if (collideObj.CompareTag(_floorTag))
+        {
+            // Touch down damage
+            float speedSquare = other.relativeVelocity.sqrMagnitude;
+            if (speedSquare > 25) ReceiveDamage(Mathf.Ceil(speedSquare / 5f));
         }
     }
 
@@ -117,7 +120,7 @@ public class EnemyControl : MonoBehaviour
 
         if (AimAtTarget())
         {
-            if (!ObstacleBetween(Target.transform.position)) gameObject.SendMessage("BarrelShoot", _weaponType);
+            if (!ObstacleBetween(Target.transform.position)) gameObject.SendMessage("BarrelShoot", _ammoType);
             else gameObject.SendMessage("StopShoot");
         } else gameObject.SendMessage("StopShoot");
     }

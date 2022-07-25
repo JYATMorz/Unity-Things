@@ -17,7 +17,7 @@ public class EnemyWeapons : MonoBehaviour {
         _shootSmoke = GetComponentInChildren<VisualEffect>();
     }
 
-    private void BarrelShoot(int weaponType)
+    private void BarrelShoot(string weaponType)
     {
         // TODO: use WeaponType to decide ammo/weapon type
 
