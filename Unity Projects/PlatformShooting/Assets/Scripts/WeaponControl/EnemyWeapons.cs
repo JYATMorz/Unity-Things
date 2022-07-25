@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class EnemyWeapons : MonoBehaviour {
     
@@ -8,10 +9,12 @@ public class EnemyWeapons : MonoBehaviour {
     private const float _ammoInterval = 0.5f;
 
     private Rigidbody _barrelShaft;
+    private VisualEffect _shootSmoke;
 
     void Awake()
     {
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
+        _shootSmoke = GetComponentInChildren<VisualEffect>();
     }
 
     private void BarrelShoot(int weaponType)
@@ -32,11 +35,11 @@ public class EnemyWeapons : MonoBehaviour {
         if (Vector3.Angle(Vector3.up, _barrelTransform.up) <= 135)
         {
             // TODO: create fog at barrel to hide distance between ammo
-
+            // TODO: It play at start, fix it
+            _shootSmoke.Play();
             // TODO: Add randomness when setting the launch angle
             Rigidbody newAmmo = Instantiate(ammoPrefab, 
                 _barrelShaft.position + _barrelTransform.up * 0.55f, _barrelShaft.rotation, _barrelTransform);
-
             newAmmo.AddForce(_barrelTransform.up * _ammoSpeed, ForceMode.VelocityChange);
         } else
         {

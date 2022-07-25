@@ -37,16 +37,16 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Others\MainCamera.cs" />
+     <Compile Include="Assets\Scripts\AmmoTypes\Laser.cs" />
+     <Compile Include="Assets\Scripts\AmmoTypes\Grenade.cs" />
+     <Compile Include="Assets\Scripts\WeaponControl\EnemyWeapons.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\EnemyControl.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\Turret.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\PlayerControl.cs" />
      <Compile Include="Assets\Scripts\Others\HealthBar.cs" />
      <Compile Include="Assets\Scripts\AmmoTypes\TemplateBullet.cs" />
-     <Compile Include="Assets\Scripts\WeaponControl\EnemyWeapons.cs" />
-     <Compile Include="Assets\Scripts\CharacterControl\EnemyControl.cs" />
      <Compile Include="Assets\Scripts\WeaponControl\PlayerWeapons.cs" />
-     <Compile Include="Assets\Scripts\CharacterControl\Turret.cs" />
      <Compile Include="Assets\Scripts\Others\BillboardCanvas.cs" />
-     <Compile Include="Assets\Scripts\AmmoTypes\Grenade.cs" />
-     <Compile Include="Assets\Scripts\AmmoTypes\Laser.cs" />
      <Compile Include="Assets\Scripts\AmmoTypes\Explosive.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.4f1c1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
@@ -290,6 +290,21 @@
     </Reference>
     <Reference Include="UnityEditor.UnityConnectModule">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.4f1c1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Unsafe">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\PackageCache\com.unity.burst@1.6.5\Unity.Burst.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Cecil.Mdb">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\PackageCache\com.unity.burst@1.6.5\Unity.Burst.CodeGen\Unity.Burst.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Cecil.Pdb">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\PackageCache\com.unity.burst@1.6.5\Unity.Burst.CodeGen\Unity.Burst.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Cecil">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\PackageCache\com.unity.burst@1.6.5\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Cecil.Rocks">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\PackageCache\com.unity.burst@1.6.5\Unity.Burst.CodeGen\Unity.Burst.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\PackageCache\com.unity.visualscripting@1.7.8\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
@@ -666,11 +681,11 @@
     <Reference Include="System.Xml.Serialization">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.4f1c1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.Flow.Editor">
-        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.VSCode.Editor">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Shaders">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
@@ -681,8 +696,65 @@
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.VisualScripting.State.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Searcher.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.ProBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UI">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Rider.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.EditorCoroutines.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ShaderGraph.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Mathematics.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Flow.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualEffectGraph.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualEffectGraph.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="PPv2URPConverters">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder.AddOns.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.ProBuilder.AddOns.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualEffectGraph.Runtime">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualEffectGraph.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
@@ -693,29 +765,20 @@
     <Reference Include="Unity.TextMeshPro">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.State.Editor">
-        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
+    <Reference Include="Unity.Burst.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
-        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
-        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
+    <Reference Include="Unity.ProBuilder.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.ProBuilder.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Flow">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor.UI">
-        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.PlasticSCM.Editor">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Rider.Editor">
-        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Services.Core">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
@@ -723,11 +786,20 @@
     <Reference Include="Unity.VisualScripting.Core">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.EditorCoroutines.Editor">
-        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
+    <Reference Include="Unity.Mathematics">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Services.Core.Analytics">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder.AssetIdRemapUtility">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.ProBuilder.AssetIdRemapUtility.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Shared.Editor">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
@@ -738,8 +810,14 @@
     <Reference Include="Unity.Timeline.Editor">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.State">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
