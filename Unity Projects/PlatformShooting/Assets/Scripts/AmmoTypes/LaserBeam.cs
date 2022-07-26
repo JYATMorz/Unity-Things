@@ -11,11 +11,8 @@ using System.Collections;
 public class LaserBeam : MonoBehaviour
 {
     // TODO: VFX Effect for Laser
-    private VisualEffect _laserImpact;
-    private VisualEffect _laserDestroy;
-    private VisualEffect _laserCharge;
-
-    private readonly float _shootTime;
+    public VisualEffect _laserImpact;
+    public VisualEffect _laserDestroy;
 
     private const int _ammoDamage = 10;
     private const float _lifeTime = 10f;
@@ -37,14 +34,10 @@ public class LaserBeam : MonoBehaviour
         // TODO: Add sci-fi (particle) effect when collides
     }
 
-    void OnDestroy()
-    {
-        // TODO: Add sci-fi (particle) dead effect when destroy
-    }
-
     IEnumerator LifeTimeOver(float lifeTime)
     {
         yield return new WaitForSeconds(lifeTime);
+        // TODO: Add sci-fi (particle) dead effect when destroy
         Destroy(gameObject);
     }
 }
