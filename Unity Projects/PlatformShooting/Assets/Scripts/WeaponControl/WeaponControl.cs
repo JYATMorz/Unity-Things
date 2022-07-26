@@ -3,26 +3,27 @@ using UnityEngine.VFX;
 using System.Collections;
 using AmmoType;
 
-public class EnemyControl : MonoBehaviour {
+public class WeaponControl : MonoBehaviour {
     
-    private AmmoType _commonBullet = new AmmoType(20, 0.5f, 0.5f);
-    private AmmoType _laserBeam = new AmmoType(100, 1f, 0f);
-    private AmmoType _grenadeLauncher = new AmmoType(10, 0.8f, 2f);
-    private AmmoType _explosivePayload = new AmmoType(25, 0.5f, 1f);
+    private AmmoData _commonBullet = new(20, 0.5f, 0.5f);
+    private AmmoData _laserBeam = new(100, 1f, 0f);
+    private AmmoData _grenadeLauncher = new(10, 0.8f, 2f);
+    private AmmoData _explosivePayload = new(25, 0.5f, 1f);
     private Rigidbody _barrelShaft;
     private VisualEffect _shootSmoke;
     private bool _fireConfirm = false;
 
-    public GameObject bulletPrefab;
-    public GameObject laserPrefab;
-    public GameObject grenadePrefab;
-    public GameObject explosivePrefab;
+    public Rigidbody bulletPrefab;
+    public Rigidbody laserPrefab;
+    public Rigidbody grenadePrefab;
+    public Rigidbody explosivePrefab;
 
     void Awake()
     {
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
-        // TODO: Use different effect for each AmmoType
+        // TODO: Use different effect for each AmmoType, Use name to distinguish laser from others
         _shootSmoke = GetComponentInChildren<VisualEffect>();
+        // Debug.Log(_shootSmoke.name);
 
         // Assign different prefab to each weapon type
         _commonBullet.AmmoPrefab = bulletPrefab;
@@ -33,15 +34,18 @@ public class EnemyControl : MonoBehaviour {
 
     private void BarrelShoot(string ammoType)
     {
-        _fireConfirm = true;
-        StartCoroutine(RepeatShooting(SwitchAmmo(ammoType)));
+        if (!_fireConfirm)
+        {
+            _fireConfirm = true;
+            StartCoroutine(RepeatShooting(SwitchAmmo(ammoType)));
+        }
     }
     private void StopShoot()
     {
         _fireConfirm = false;
     }
 
-    private void ShootOnce(AmmoType ammoType)
+    private void ShootOnce(AmmoData ammoType)
     {
         Transform _barrelTransform = _barrelShaft.transform;
         if (Vector3.Angle(Vector3.up, _barrelTransform.up) <= 135)
@@ -64,7 +68,7 @@ public class EnemyControl : MonoBehaviour {
         }
     }
 
-    IEnumerator RepeatShooting(AmmoType ammoType)
+    IEnumerator RepeatShooting(AmmoData ammoType)
     {
         while(_fireConfirm)
         {
@@ -73,7 +77,7 @@ public class EnemyControl : MonoBehaviour {
         }
     }
 
-    private AmmoType SwitchAmmo(string typeName)
+    private AmmoData SwitchAmmo(string typeName)
     {
         switch (typeName)
         {

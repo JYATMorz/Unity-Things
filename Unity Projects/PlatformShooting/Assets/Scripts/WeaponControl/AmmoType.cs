@@ -3,20 +3,22 @@ using UnityEngine.VFX;
 
 namespace AmmoType
 {
-    public struct AmmoType
+    public struct AmmoData
     {
-        public Rigidbody AmmoPrefab { get; private set; } = null;
-        public VisualEffect ShootEffect { get; private set; } = null;
+        public Rigidbody AmmoPrefab { get; set; }
+        public VisualEffect ShootEffect { get; set; }
 
-        public int AmmoSpeed { get; init; } = 20;
-        public float FireInterval { get; init; } = 0.5f;
-        public float AmmoSpread { get; init; } = 0f;
+        public int AmmoSpeed { get; private set; }
+        public float FireInterval { get; private set; }
+        public float AmmoSpread { get; private set; }
 
-        public AmmoType(int speed, float interval, float spread)
+        public AmmoData(int speed, float interval, float spread)
         {
             AmmoSpeed = speed;
             FireInterval = interval;
             AmmoSpread = spread;
+            AmmoPrefab = null;
+            ShootEffect = null;
         }
 
         public override string ToString()

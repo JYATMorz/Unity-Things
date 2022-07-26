@@ -2,6 +2,8 @@
 
 // TODO: possible use case: NPC can indirectly aim player / Charge Effect?
 
+// TODO: !!! USE CCD SPECULATIVE !!!
+
 using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;

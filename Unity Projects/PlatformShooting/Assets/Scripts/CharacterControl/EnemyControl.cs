@@ -76,7 +76,7 @@ public class EnemyControl : MonoBehaviour
         {
             // Touch down damage
             float speedSquare = other.relativeVelocity.sqrMagnitude;
-            if (speedSquare > 25) ReceiveDamage(Mathf.Ceil(speedSquare / 5f));
+            if (speedSquare > 100) ReceiveDamage(Mathf.CeilToInt(speedSquare / 10f));
         }
     }
 
