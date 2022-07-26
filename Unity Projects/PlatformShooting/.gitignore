@@ -76,8 +76,6 @@ crashlytics-build.properties
 !/Assets
 /Assets/*
 !/Assets/Scripts
-!PlatformShooting.sln
 !omnisharp.json
-!Assembly-CSharp.csproj
 !.gitignore
 !.editorconfig
