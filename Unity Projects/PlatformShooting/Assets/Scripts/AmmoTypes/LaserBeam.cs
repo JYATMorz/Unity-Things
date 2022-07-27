@@ -17,7 +17,6 @@ public class LaserBeam : MonoBehaviour
     private const int _ammoDamage = 10;
     private const float _lifeTime = 10f;
     private const string _characterTag = "Character";
-    private const string _floorTag = "Floor";
 
     void Start()
     {

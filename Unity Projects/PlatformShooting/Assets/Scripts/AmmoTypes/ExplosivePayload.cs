@@ -2,7 +2,6 @@
 
 using UnityEngine;
 using UnityEngine.VFX;
-using System.Collections;
 
 public class ExplosivePayload : MonoBehaviour
 {
@@ -10,17 +9,19 @@ public class ExplosivePayload : MonoBehaviour
     public VisualEffect _payloadImpact;
 
     private const int _ammoDamage = 10;
-    private const int _explosionRadius = 2;
-    private const string _characterTag = "Character";
-    private const string _floorTag = "Floor";
+    private const float _explosionRadius = 2f;
 
-    void OnCollisionEnter(Collision other)
+    private int _characterLayer;
+    private int _floorLayer;
+
+    void Start()
     {
-        GameObject contact = other.gameObject;
-        if (contact.CompareTag(_characterTag))
-        {
-            contact.SendMessage("ReceiveDamage", _ammoDamage);
-        }
+        _characterLayer = LayerMask.GetMask("Player", "Character");
+        _floorLayer = LayerMask.GetMask("Floor");
+    }
+
+    void OnCollisionEnter()
+    {
         SmallExplosion();
         Destroy(gameObject);
     }

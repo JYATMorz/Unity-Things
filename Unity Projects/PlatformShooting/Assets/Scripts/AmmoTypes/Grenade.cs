@@ -13,19 +13,22 @@ public class Grenade : MonoBehaviour
     public VisualEffect _grenadeDestroy;
 
     private const int _ammoDamage = 20;
-    private const int _explosionRadius = 5;
+    private const float _explosionRadius = 5f;
     private const float _lifeTime = 4f;
-    private const string _characterTag = "Character";
-    private const string _floorTag = "Floor";
+
+    private int _characterLayer;
+    private int _floorLayer;
 
     void Start()
     {
+        _characterLayer = LayerMask.GetMask("Player", "Character");
+        _floorLayer = LayerMask.GetMask("Floor");
         StartCoroutine(LifeTimeOver(_lifeTime));
     }
 
     void OnCollisionEnter()
     {
-        // TODO: Add explosion (particle) effect when collides
+        // TODO: Add hit (particle) effect when collides
     }
 
     IEnumerator LifeTimeOver(float lifeTime)
@@ -38,12 +41,17 @@ public class Grenade : MonoBehaviour
     private void HugeExplosion()
     {
         // TODO: Do damage & explosion force here
-        /*
-            if character in explosion radius (Physics.OverlapSphereNonAlloc):
-                get characters rigidbody, foreach loop
-                character.rigidbody.addExplosionForce((float)_ammoDamage, transform.position, (float)_explosionRadius, ForceMode.Impulse)
-                character.SendMessage("ReceiveDamage", damage*Mathf.Clamp01(1-distance(character<-->explosion)/_explosionRadius))
-        */
+        foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
+        {
+            // TODO: If explosion can hurt character
+            if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
+            {
+                character.SendMessage("ReceiveDamage", _ammoDamage * (1 - Vector3.Distance(transform.position, character.transform.position) / _explosionRadius));
+                character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0, ForceMode.Impulse);
+            }
+            
+        }
+
         // TODO: Add explosion (particle) dead effect when destroy
     }
 }
