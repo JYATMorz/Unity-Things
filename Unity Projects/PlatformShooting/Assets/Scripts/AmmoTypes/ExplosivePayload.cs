@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
 
-public class LaserBeam : MonoBehaviour
+public class ExplosivePayload : MonoBehaviour
 {
     // TODO: VFX Effect for Laser
     public VisualEffect _payloadImpact;

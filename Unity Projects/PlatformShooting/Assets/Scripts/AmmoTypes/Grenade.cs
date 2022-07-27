@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
 
-public class LaserBeam : MonoBehaviour
+public class Grenade : MonoBehaviour
 {
     // TODO: VFX Effect for Laser
     public VisualEffect _grenadeImpact;
