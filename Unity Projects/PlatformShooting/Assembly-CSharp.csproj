@@ -37,6 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Others\MainCamera.cs" />
+     <Compile Include="Assets\Scripts\Others\ForceElevator.cs" />
      <Compile Include="Assets\Scripts\AmmoTypes\Grenade.cs" />
      <Compile Include="Assets\Scripts\WeaponControl\EnemyWeapons.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\EnemyControl.cs" />
@@ -46,6 +47,7 @@
      <Compile Include="Assets\Scripts\AmmoTypes\ExplosivePayload.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\PlayerControl.cs" />
      <Compile Include="Assets\Scripts\Others\HealthBar.cs" />
+     <Compile Include="Assets\Scripts\Others\BrickElevator.cs" />
      <Compile Include="Assets\Scripts\AmmoTypes\TemplateBullet.cs" />
      <Compile Include="Assets\Scripts\WeaponControl\PlayerWeapons.cs" />
      <Compile Include="Assets\Scripts\Others\BillboardCanvas.cs" />
