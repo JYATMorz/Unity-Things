@@ -15,7 +15,12 @@ public class BrickElevator : MonoBehaviour
     private bool _isParking = false;
     private bool _isWaiting = false;
     private float _parkSpeed = 0f;
+    private Rigidbody brickRB;
 
+    void Start()
+    {
+        brickRB = GetComponent<Rigidbody>();
+    }
 
     void Update()
     {
@@ -41,25 +46,25 @@ public class BrickElevator : MonoBehaviour
 
     private void MoveElevator()
     {
-        if (_goUpward) transform.position += new Vector3(0, _moveSpeed * Time.deltaTime, 0);
-        else transform.position -= new Vector3(0, _moveSpeed * Time.deltaTime, 0);
+        if (_goUpward) brickRB.position += new Vector3(0, _moveSpeed * Time.deltaTime, 0);
+        else brickRB.position -= new Vector3(0, _moveSpeed * Time.deltaTime, 0);
     }
 
     private void ParkElevator()
     {
         if (_goUpward)
         {
-            float newPosition = Mathf.SmoothDamp(transform.position.y, _targetTopPosition, ref _parkSpeed, smoothTime);
-            transform.position = new Vector3(transform.position.x, newPosition, transform.position.z);
+            float newPosition = Mathf.SmoothDamp(transform.position.y, _targetTopPosition, ref _parkSpeed, _parkTime);
+            brickRB.position = new Vector3(transform.position.x, newPosition, transform.position.z);
 
             Debug.Log(_parkSpeed);
         } else
         {
-            float newPosition = Mathf.SmoothDamp(transform.position.y, _targetDownPosition, ref _parkSpeed, smoothTime);
-            transform.position = new Vector3(transform.position.x, newPosition, transform.position.z);
+            float newPosition = Mathf.SmoothDamp(transform.position.y, _targetDownPosition, ref _parkSpeed, _parkTime);
+            brickRB.position = new Vector3(transform.position.x, newPosition, transform.position.z);
         }
 
-        if ((Mathf.abs(transform.position.y - _targetTopPosition) < 0.01f) || (Mathf.abs(transform.position.y - _targetDownPosition) < 0.01f))
+        if ((Mathf.Abs(transform.position.y - _targetTopPosition) < 0.01f) || (Mathf.Abs(transform.position.y - _targetDownPosition) < 0.01f))
         {
             _isWaiting = true;
             StartCoroutine(WaitBeforeMove());
