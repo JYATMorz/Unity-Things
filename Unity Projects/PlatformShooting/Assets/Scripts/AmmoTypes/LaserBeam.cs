@@ -6,17 +6,19 @@
 
 using UnityEngine;
 using UnityEngine.VFX;
+using System;
 using System.Collections;
 
 public class LaserBeam : MonoBehaviour
 {
     // TODO: VFX Effect for Laser
-    public VisualEffect _laserImpact;
-    public VisualEffect _laserDestroy;
+    public VisualEffect laserImpact;
+    public VisualEffect laserDestroy;
 
     private const int _ammoDamage = 10;
     private const float _lifeTime = 10f;
-    private const string _characterTag = "Character";
+
+    private readonly string[] _characterTag = { "Neutral", "RedTeam", "BlueTeam" };
 
     void Start()
     {
@@ -26,17 +28,17 @@ public class LaserBeam : MonoBehaviour
     void OnCollisionEnter(Collision other)
     {
         GameObject contact = other.gameObject;
-        if (contact.CompareTag(_characterTag))
+        if (Array.Exists(_characterTag, tag => tag == contact.tag))
         {
             contact.SendMessage("ReceiveDamage", _ammoDamage);
         }
-        // TODO: Add sci-fi (particle) effect when collides
+        // TODO: Add sci-fi effect when collides
     }
 
     IEnumerator LifeTimeOver(float lifeTime)
     {
         yield return new WaitForSeconds(lifeTime);
-        // TODO: Add sci-fi (particle) dead effect when destroy
+        // TODO: Add sci-fi dead effect when destroy
         Destroy(gameObject);
     }
 }

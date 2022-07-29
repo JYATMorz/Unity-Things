@@ -1,17 +1,18 @@
 using UnityEngine;
+using System;
 
 public class TemplateBullet : MonoBehaviour
 {
     public GameObject bulletImpact;
 
     private const int _ammoDamage = 15;
-    private const string _characterTag = "Character";
-    private const string _floorTag = "Floor";
+
+    private readonly string[] _characterTag = { "Neutral", "RedTeam", "BlueTeam" };
 
     void OnCollisionEnter(Collision other)
     {
         GameObject contact = other.gameObject;
-        if (contact.CompareTag(_characterTag))
+        if (Array.Exists(_characterTag, tag => tag == contact.tag))
         {
             contact.SendMessage("ReceiveDamage", _ammoDamage);
         }

@@ -8,21 +8,23 @@ using System.Collections;
 
 public class Grenade : MonoBehaviour
 {
-    // TODO: VFX Effect for Laser
-    public VisualEffect _grenadeImpact;
-    public VisualEffect _grenadeDestroy;
+    // TODO: Leave explosion particle on the floor
+    public GameObject explosionEffect;
+    // TODO: Smoke impact effect
+    public VisualEffect hitEffect;
 
     private const int _ammoDamage = 20;
     private const float _explosionRadius = 5f;
     private const float _lifeTime = 4f;
+    private const string _deadTag = "Dead";
 
     private int _characterLayer;
     private int _floorLayer;
 
     void Start()
     {
-        _characterLayer = LayerMask.GetMask("Player", "Character");
-        _floorLayer = LayerMask.GetMask("Floor");
+        _characterLayer = LayerMask.GetMask("Neutral", "BlueTeam", "RedTeam", "Dead");
+        _floorLayer = LayerMask.GetMask("Floor", "Elevator");
         StartCoroutine(LifeTimeOver(_lifeTime));
     }
 
@@ -46,8 +48,11 @@ public class Grenade : MonoBehaviour
             // TODO: If explosion can hurt character
             if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
             {
-                character.SendMessage("ReceiveDamage",
-                    _ammoDamage * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius)));
+                if (!character.CompareTag(_deadTag))
+                {
+                    character.SendMessage("ReceiveDamage", Mathf.FloorToInt(_ammoDamage
+                        * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius))));
+                }
                 character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0, ForceMode.Impulse);
             }
             
