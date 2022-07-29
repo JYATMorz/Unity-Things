@@ -1,0 +1,29 @@
+Goal: Kill all enemy team members, neutral character don't count.
+    => GameObject.FindWithTag(tag_BlueTeam) == null || GameObject.FindWithTag(tag_RedTeam)
+
+Tag / Layer:
+    Neutral, RedTeam, BlueTeam, Floor, Elevator, Bullet(, Dead).
+
+Default Tag / Layer: Neutral
+Player: BlueTeam
+1 Specific Character: RedTeam
+
+Seek Target (Using LayerMask):
+    Neutral => None => Wander Around
+    RedTeam / BlueTeam => Neutral (20%) || BlueTeam / RedTeam (80%) => Attack Process
+
+Set / Get Tag:
+    gameObject.tag = "tagName";
+Set / Get Layer:
+    gameObject.layer = LayerMask.NameToLayer("layerName");
+Set / Get Material:
+    GetComponent<Render>().material = m_materialName
+                            || Material.Lerp(m_StartMaterial, m_EndMaterial, t);
+
+Tag / Layer Order (Change By Killed):
+    Neutral => RedTeam / BlueTeam => Dead
+
+Neutral Character:
+    WanderAround / RevengeMode
+Team Character:
+    WanderAround / SeekAndAttack
