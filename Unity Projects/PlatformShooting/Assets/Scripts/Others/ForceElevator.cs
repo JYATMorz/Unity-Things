@@ -13,12 +13,12 @@ public class ForceElevator : MonoBehaviour
         // liftEffect.Play();
     }
 
-    void OnTriggerExit(Collider other) {
+    void OnTriggerExit() {
         // liftEffect.Stop();
     }
 
     void OnTriggerStay(Collider other)
     {
-        other.attachedRigidbody.AddExplosionForce(_liftForce * 0.5f, transform.position, _liftDistance, _liftForce);
+        other.attachedRigidbody.AddExplosionForce(_liftForce * 0.25f, transform.position, _liftDistance, _liftForce);
     }
 }
