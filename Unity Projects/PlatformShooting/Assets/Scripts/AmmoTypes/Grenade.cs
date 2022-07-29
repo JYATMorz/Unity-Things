@@ -46,7 +46,8 @@ public class Grenade : MonoBehaviour
             // TODO: If explosion can hurt character
             if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
             {
-                character.SendMessage("ReceiveDamage", _ammoDamage * (1 - Vector3.Distance(transform.position, character.transform.position) / _explosionRadius));
+                character.SendMessage("ReceiveDamage",
+                    _ammoDamage * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius)));
                 character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0, ForceMode.Impulse);
             }
             
