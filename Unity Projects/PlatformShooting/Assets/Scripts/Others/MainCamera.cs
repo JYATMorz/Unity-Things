@@ -13,6 +13,9 @@ public class MainCamera : MonoBehaviour
         {
             transform.position = player.position + _cameraOffset;
             transform.LookAt(player);
+        } else
+        {
+            // TODO: transfer player to another alive team member, move camera smoothly
         }
     }
 }
