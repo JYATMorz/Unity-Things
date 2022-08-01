@@ -19,6 +19,6 @@ public class ForceElevator : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        other.attachedRigidbody.AddExplosionForce(_liftForce * 0.25f, transform.position, _liftDistance, _liftForce);
+        other.attachedRigidbody.AddExplosionForce(-_liftForce * 0.25f, transform.position, _liftDistance, _liftForce);
     }
 }

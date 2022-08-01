@@ -7,29 +7,30 @@ public class EnemyControl : MonoBehaviour
     private const int _maxPlayerNum = 2;
     private const int _initHealth = 50;
     private const int _barrelRotateSpeed = 45;
-    private const string _bulletTag = "Bullet";
-    private const float _seekRange = 20f;
     private const float _seekInterval = 1f;
+    private const float _seekRange = 30f;
     private const float _shootRange = 10f;
-    private const float _revengeLimit = 5f;
     private const float _speedScaler = 5f;
+    private const string _bulletTag = "Bullet";
+    private const string _neutralTag = "Neutral";
+    private const string _blueTeamTag = "BlueTeam";
+    private const string _redTeamTag = "RedTeam";
 
+    private readonly Vector3 _nullTargetPosition = new(0, 100, 0);
     private readonly string[] _floorTag = { "Floor", "Elevator" };
     private readonly string[] _ammoTypes = 
         { "CommonBullet", "LaserBeam", "GrenadeLauncher", "ExplosivePayload" };
 
     private GameObject _targetCharacter = null;
+    private Vector3 _targetPosition;
     private HealthBar _healthBar;
     private Rigidbody _characterBody;
     private Rigidbody _barrelShaft;
-    private Rigidbody _suspectTarget;
     private Quaternion _deltaRotation;
-    private bool _revengeMode = false;
+    private bool _chaseMode = false;
     private int _currentHealth = _initHealth;
-    private int _playerLayer;
     private int _floorLayer;
-    private int _redTeamLayer;
-    private int _blueTeamLayer;
+    private int _avoidLayer;
     private int _neutralLayer;
     private int _deadLayer;
     private int _enemyLayer = -1;
@@ -39,7 +40,7 @@ public class EnemyControl : MonoBehaviour
     [SerializeField]
     private bool _isNeutral = true;
 
-    public float attackAspiration = 0.6f;
+    public float attackWillingness = 0.6f;
     // TODO: attach public material variable here.
 
     void Awake()
@@ -47,10 +48,8 @@ public class EnemyControl : MonoBehaviour
         _characterBody = GetComponent<Rigidbody>();
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
 
-        _playerLayer = LayerMask.GetMask("Player");
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
-        _redTeamLayer = LayerMask.NameToLayer("RedTeam");
-        _blueTeamLayer = LayerMask.NameToLayer("BlueTeam");
+        _avoidLayer = _floorLayer;
         _neutralLayer = LayerMask.NameToLayer("Neutral");
         _deadLayer = LayerMask.NameToLayer("Dead");
 
@@ -62,18 +61,35 @@ public class EnemyControl : MonoBehaviour
         _healthBar = GetComponentInChildren<HealthBar>();
 
         if (_isNeutral) gameObject.layer = _neutralLayer;
+        else
+        {
+            if (CompareTag(_redTeamTag))
+            {
+                SwitchLayer(_redTeamTag, _blueTeamTag);
+                // TODO: Change material here.
+            } else if (CompareTag(_blueTeamTag))
+            {
+                SwitchLayer(_blueTeamTag, _redTeamTag);
+                // TODO: Change material here.
+            } else Debug.Log("???");
+        }
 
-        StartCoroutine(SeekPlayer());
+        StartCoroutine(SeekEnemy());
         StartCoroutine(WanderAround());
     }
 
     void FixedUpdate()
     {
-        // TODO: Control Movement Here
+        if (_targetCharacter != null && !ObstacleBetween(_targetCharacter.transform.position))
+            _targetPosition = _targetCharacter.transform.position;
 
         // Control Barrel Here
         if (_targetCharacter == null) BarrelIdle();
-        else BarrelAim();
+        else
+        {
+            BarrelAim();
+            if (_chaseMode) ChaseTarget();
+        }
     }
 
     void OnCollisionEnter(Collision other) 
@@ -82,45 +98,13 @@ public class EnemyControl : MonoBehaviour
 
         if (contact.CompareTag(_bulletTag))
         {
-            _suspectTarget = contact.GetComponentsInParent<Rigidbody>()[2];
-            if (_suspectTarget.name != gameObject.name)
-            {
-                if (TargetInRange(_suspectTarget.transform.position, _seekRange))
-                {
-                    _targetCharacter = _suspectTarget.gameObject;
-                    _revengeMode = true;
-                    _enemyLayer = _targetCharacter.layer;
-                    Invoke("ContinueRevenge", _revengeLimit);
-                }
-            }
+            SwitchTarget(contact.GetComponentsInParent<Rigidbody>()[2]);
+
         } else if (Array.Exists(_floorTag, tag => tag == contact.tag))
         {
             // Touch down damage
             float speedSquare = other.relativeVelocity.sqrMagnitude;
             if (speedSquare > 100) ReceiveDamage(Mathf.CeilToInt(speedSquare / 10f));
-        }
-    }
-
-    private IEnumerator SeekPlayer()
-    {
-        while (true)
-        {
-            if (!_revengeMode)
-            {
-                Collider[] playerCollidersFound = new Collider[_maxPlayerNum];
-                int playerCount = Physics.OverlapSphereNonAlloc(transform.position, _seekRange, playerCollidersFound, _playerLayer);
-                
-                if (playerCount > 0)
-                {
-                    _targetCharacter = playerCollidersFound[UnityEngine.Random.Range(0, playerCount - 1)].gameObject;
-                    // Can I see the target? 
-                    if (ObstacleBetween(_targetCharacter.transform.position)) _targetCharacter = null;
-                } else
-                {
-                    _targetCharacter = null;
-                }
-            }
-            yield return new WaitForSeconds(_seekInterval);
         }
     }
 
@@ -130,17 +114,73 @@ public class EnemyControl : MonoBehaviour
         {
             if(!_isNeutral)
             {
-                Collider[] targetsInRange = Physics.OverlapSphere(transform.position, _seekRange, _enemyLayer);
-                foreach (Collider target in targetsInRange)
+                if (_targetCharacter == null) SearchTarget();
+                else
                 {
-                    if ((UnityEngine.Random.value < attackAspiration) && ObstacleBetween(target.transform.position))
-                    {
-                        _targetCharacter = target.gameObject;
-                        break;
-                    }
+                    if (!TargetInRange(_targetPosition, _seekRange)) ResetTargetCharacter();
+                    else if (ObstacleBetween(_targetPosition)) _chaseMode = true;
                 }
             }
             yield return new WaitForSeconds(_seekInterval);
+        }
+    }
+
+    private void SearchTarget()
+    {
+        foreach (Collider target in Physics.OverlapSphere(transform.position, _seekRange, _enemyLayer))
+        {
+            if ((UnityEngine.Random.value < attackWillingness) && !ObstacleBetween(target.transform.position))
+            {
+                _targetCharacter = target.gameObject;
+                break;
+            }
+        }
+    }
+
+    private void SwitchTarget(Rigidbody suspect)
+    {
+        Vector3 suspectPosition = suspect.position;
+
+        if (_isNeutral)
+        {
+            if (_targetCharacter == null)
+            {
+                _targetCharacter = suspect.gameObject;
+            }
+            else if (_targetCharacter.CompareTag(_neutralTag))
+            {
+                if (suspect.CompareTag(_neutralTag))
+                    _targetCharacter = (UnityEngine.Random.value < 0.2f) ? suspect.gameObject : _targetCharacter;
+                else 
+                    _targetCharacter = suspect.gameObject;
+            } else
+            {
+                if (!suspect.CompareTag(_neutralTag))
+                {
+                    if (!TargetInRange(_targetPosition, _seekRange))
+                    {
+                        _targetCharacter = suspect.gameObject;
+                    } else if (!TargetInRange(_targetPosition, _shootRange))
+                    {
+                        if (ObstacleBetween(_targetPosition)) _targetCharacter = suspect.gameObject;
+                        else _targetCharacter = (UnityEngine.Random.value < 0.3f) ? suspect.gameObject : _targetCharacter;
+                    }
+                }
+            }
+        } else
+        {
+            if (_targetCharacter == null) _targetCharacter = CompareTag(suspect.tag) ? null : suspect.gameObject;
+            else
+            {
+                if (!suspect.CompareTag(_neutralTag))
+                {
+                    if (_targetCharacter.CompareTag(_neutralTag)) _targetCharacter = suspect.gameObject;
+                    else 
+                        _targetCharacter = 
+                            ((suspectPosition - transform.position).sqrMagnitude < 4 * (_targetPosition - transform.position).sqrMagnitude)
+                            ? suspect.gameObject : _targetCharacter;
+                }
+            }
         }
     }
 
@@ -156,14 +196,33 @@ public class EnemyControl : MonoBehaviour
 
     private void BarrelAim()
     {
-        Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, (_targetCharacter.transform.position - _barrelShaft.position).normalized);
+        Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, (_targetPosition - _barrelShaft.position).normalized);
         _barrelShaft.rotation = Quaternion.RotateTowards(_barrelShaft.rotation, targetRotation, 3 * _barrelRotateSpeed * Time.fixedDeltaTime);
 
-        if (AimAtTarget())
+        if (!_chaseMode && AimAtTarget())
         {
-            if (!ObstacleBetween(_targetCharacter.transform.position)) gameObject.SendMessage("BarrelShoot", _ammoType);
+            if (!ObstacleBetween(_targetPosition, _avoidLayer)) gameObject.SendMessage("BarrelShoot", _ammoType);
             else gameObject.SendMessage("StopShoot");
         } else gameObject.SendMessage("StopShoot");
+    }
+
+    private void ChaseTarget()
+    {
+        if (_targetPosition == null || _targetPosition == _nullTargetPosition) Debug.Log("Why there is no target position?");
+        else
+        {
+            float xDirection = Mathf.Sign((_targetPosition - _characterBody.position).x);
+            if (Mathf.Abs((_targetPosition - _characterBody.position).x) > 1)
+            {
+                // TODO: Apply NavMesh AI
+                _characterBody.MovePosition(_characterBody.position + new Vector3(xDirection * _speedScaler, 0, 0));
+            } else
+            {
+                _chaseMode = false;
+                if (ObstacleBetween(_targetCharacter.transform.position))
+                    ResetTargetCharacter();
+            }
+        }
     }
 
     private bool TargetInRange(Vector3 targetPosition, float range)
@@ -172,25 +231,15 @@ public class EnemyControl : MonoBehaviour
         else return false;
     }
 
-    private bool ObstacleBetween(Vector3 targetPosition)
+    private bool ObstacleBetween(Vector3 targetPosition, int layer = -1)
     {
-        return Physics.Linecast(_barrelShaft.position, targetPosition, _floorLayer);
+        if (layer == -1) layer = _floorLayer;
+        return Physics.Linecast(_barrelShaft.position, targetPosition, layer);
     }
 
     private bool AimAtTarget()
     {
         return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, _targetCharacter.layer);
-    }
-
-    private void ContinueRevenge()
-    {
-        // TODO: edit to accept enemy layer
-        if ((_targetCharacter != null) && (ObstacleBetween(_targetCharacter.transform.position) || !TargetInRange(_targetCharacter.transform.position, _seekRange)))
-        {
-            _revengeMode = false;
-            _targetCharacter = null;
-        }
-        if (_targetCharacter == null) _revengeMode = false;
     }
 
     private void ReceiveDamage(int damage)
@@ -207,16 +256,7 @@ public class EnemyControl : MonoBehaviour
         }
     }
 
-    private void ZeroHealth()
-    {
-        SwitchTeamStatus();
-        if (!_isNeutral) 
-        {
-            Debug.Log("A character is dead.");
-        } else _currentHealth = _initHealth;
-    }
-
-   private void SwitchTeamStatus()
+   private void ZeroHealth()
     {
         if (!_isNeutral)
         {
@@ -227,21 +267,26 @@ public class EnemyControl : MonoBehaviour
             // TODO: enable character to rotate freely, need to check z value after death
             _characterBody.detectCollisions = false;
             _characterBody.freezeRotation = false;
+
+            Debug.Log("A character is dead.");
             return;
         }
 
-        _isNeutral = false;
         if (_targetCharacter!=null)
         {
-            if (_targetCharacter.layer == _blueTeamLayer)
+            _isNeutral = false;
+            _currentHealth = _initHealth;
+            _healthBar.SetHealthValue(1f);
+
+            if (_targetCharacter.CompareTag(_blueTeamTag))
             {
-                gameObject.layer = _redTeamLayer;
-                gameObject.tag = "RedTeam";
+                gameObject.tag = _redTeamTag;
+                SwitchLayer(_redTeamTag, _blueTeamTag);
                 // TODO: Change material here.
-            } else if (_targetCharacter.layer == _redTeamLayer)
+            } else if (_targetCharacter.CompareTag(_redTeamTag))
             {
-                gameObject.layer = _blueTeamLayer;
-                gameObject.tag = "BlueTeam";
+                gameObject.tag = _blueTeamTag;
+                SwitchLayer(_blueTeamTag, _redTeamTag);
                 // TODO: Change material here.
             }
         } else Debug.Log("Target is null when changing team!");
@@ -249,16 +294,28 @@ public class EnemyControl : MonoBehaviour
 
     private IEnumerator WanderAround()
     {
-        // TODO: Temperate solution for movement
         while (true)
         {
-            if ((_targetCharacter == null) && !_revengeMode)
+            if ((_targetCharacter == null) && !_chaseMode)
             {
-                _characterBody.AddForce(new Vector3((UnityEngine.Random.value - 0.5f) * _speedScaler, 0, 0), ForceMode.Impulse);
+                _characterBody.velocity = new Vector3(Mathf.PingPong(Time.time, _speedScaler * 2) - _speedScaler, 0, 0);
             } else _characterBody.velocity = Vector3.zero;
 
-            yield return new WaitForSeconds(_seekInterval);
+            yield return new WaitForFixedUpdate();
         }
+    }
+
+    private void ResetTargetCharacter()
+    {
+        _targetCharacter = null;
+        _targetPosition = _nullTargetPosition;
+    }
+
+    private void SwitchLayer(string teamTag, string enemyTag)
+    {
+        gameObject.layer = LayerMask.NameToLayer(teamTag);
+        _avoidLayer = LayerMask.GetMask(teamTag, "Floor", "Elevator");
+        _enemyLayer = LayerMask.GetMask(enemyTag, "Neutral");
     }
 }
 

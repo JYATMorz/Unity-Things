@@ -23,7 +23,6 @@ public class WeaponControl : MonoBehaviour {
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
         // TODO: Use different effect for each AmmoType, Use name to distinguish laser from others
         _shootSmoke = GetComponentInChildren<VisualEffect>();
-        // Debug.Log(_shootSmoke.name);
 
         // Assign different prefab to each weapon type
         _commonBullet.AmmoPrefab = bulletPrefab;
@@ -51,8 +50,6 @@ public class WeaponControl : MonoBehaviour {
         if (Vector3.Angle(Vector3.up, _barrelTransform.up) <= 135)
         {
             // Create fog at barrel to hide distance between ammo
-            // TODO: It play at start, fix it
-            // TODO: You can disable the play on awake by changing the "Initial Event Name" field to empty.
             _shootSmoke.Play();
 
             // Prepare a Selected Ammo to shoot.
@@ -77,14 +74,11 @@ public class WeaponControl : MonoBehaviour {
         }
     }
 
-    private AmmoData SwitchAmmo(string typeName)
+    private AmmoData SwitchAmmo(string typeName) => typeName switch
     {
-        switch (typeName)
-        {
-            case "LaserBeam": return _laserBeam;
-            case "GrenadeLauncher" : return _grenadeLauncher;
-            case "ExplosivePayload" : return _explosivePayload;
-            default: return _commonBullet;
-        }
-    }
+        "LaserBeam" => _laserBeam,
+        "GrenadeLauncher" => _grenadeLauncher,
+        "ExplosivePayload" => _explosivePayload,
+        _ => _commonBullet,
+    };
 }

@@ -17,12 +17,17 @@ public class Grenade : MonoBehaviour
     private const float _explosionRadius = 5f;
     private const float _lifeTime = 4f;
     private const string _deadTag = "Dead";
+    private const string _neutralTag = "Neutral";
 
     private int _characterLayer;
     private int _floorLayer;
+    private string _ownerTag;
 
     void Start()
     {
+        _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
+        Debug.Log(_ownerTag);
+
         _characterLayer = LayerMask.GetMask("Neutral", "BlueTeam", "RedTeam", "Dead");
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
         StartCoroutine(LifeTimeOver(_lifeTime));
@@ -42,13 +47,11 @@ public class Grenade : MonoBehaviour
 
     private void HugeExplosion()
     {
-        // TODO: Do damage & explosion force here
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
         {
-            // TODO: If explosion can hurt character
             if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
             {
-                if (!character.CompareTag(_deadTag))
+                if (_ownerTag != _neutralTag || !character.CompareTag(_neutralTag) || !character.CompareTag(_deadTag))
                 {
                     character.SendMessage("ReceiveDamage", Mathf.FloorToInt(_ammoDamage
                         * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius))));
