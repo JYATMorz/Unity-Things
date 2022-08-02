@@ -15,7 +15,6 @@ public class TemplateBullet : MonoBehaviour
     void Start()
     {
         _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
-        Debug.Log(_ownerTag);
     }
 
     void OnCollisionEnter(Collision other)

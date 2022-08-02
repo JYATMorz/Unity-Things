@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using System;
 using System.Collections;
 
@@ -29,7 +30,6 @@ public class CharacterControl : MonoBehaviour
     private Quaternion _deltaRotation;
     private bool _chaseMode = false;
     private bool _jumpPressed = false;
-    private bool _isGrounded = true;
     private int _doubleJump = 2;
     private int _currentHealth = _initHealth;
     private int _floorLayer;
@@ -46,6 +46,7 @@ public class CharacterControl : MonoBehaviour
     private bool _isPlayer = false;
 
     public Camera mainCamera;
+    public NavMeshAgent npcAgent;
     public float attackWillingness = 0.6f;
     // TODO: attach public material variable here.
 
@@ -68,6 +69,8 @@ public class CharacterControl : MonoBehaviour
     {
         _healthBar = GetComponentInChildren<HealthBar>();
 
+        if (_isPlayer) return;
+
         if (_isNeutral) gameObject.layer = _neutralLayer;
         else
         {
@@ -88,8 +91,17 @@ public class CharacterControl : MonoBehaviour
 
     void Update()
     {
-        if (_isPlayer && Input.GetKeyDown(KeyCode.Space) && (_doubleJump > 0)) 
-            _jumpPressed = true;
+        if (_isPlayer)
+        {
+            if (Input.GetKeyDown(KeyCode.Space) && (_doubleJump > 0)) 
+                _jumpPressed = true;
+
+            if (Input.GetKey(KeyCode.Mouse0))
+                gameObject.SendMessage("BarrelShoot", _ammoType);
+            else
+                gameObject.SendMessage("StopShoot");
+        }
+
     }
 
     void FixedUpdate()
@@ -104,12 +116,15 @@ public class CharacterControl : MonoBehaviour
                 _jumpPressed = false;
             }
 
-            _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0);
+            // TODO: clamp velocity with add force?
+            _characterBody.velocity = Vector3.ClampMagnitude(new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0), 1.2f * _speedScaler);
 
             // Rotate the barrel to point at the mouse position
             Vector3 _rotateVector = Input.mousePosition - mainCamera.WorldToScreenPoint(_barrelShaft.position);
             _rotateVector.z = 0;
             _barrelShaft.rotation *= Quaternion.FromToRotation(_barrelShaft.transform.up, _rotateVector);
+
+            return;
         }
 
 
@@ -131,14 +146,11 @@ public class CharacterControl : MonoBehaviour
 
         if (contact.CompareTag(_bulletTag))
         {
-            SwitchTarget(contact.GetComponentsInParent<Rigidbody>()[2]);
+            if (!_isPlayer) SwitchTarget(contact.GetComponentsInParent<Rigidbody>()[2]);
 
         } else if (Array.Exists(_floorTag, tag => tag == contact.tag))
         {
             if (_isPlayer) _doubleJump = 2;
-            // Touch down damage
-            float speedSquare = other.relativeVelocity.sqrMagnitude;
-            if (speedSquare > 100) ReceiveDamage(Mathf.CeilToInt(speedSquare / 10f));
         }
     }
 
@@ -235,9 +247,12 @@ public class CharacterControl : MonoBehaviour
 
         if (!_chaseMode && AimAtTarget())
         {
-            if (!ObstacleBetween(_targetPosition, _avoidLayer)) gameObject.SendMessage("BarrelShoot", _ammoType);
-            else gameObject.SendMessage("StopShoot");
-        } else gameObject.SendMessage("StopShoot");
+            if (!ObstacleBetween(_targetPosition, _avoidLayer))
+                gameObject.SendMessage("BarrelShoot", _ammoType);
+            else
+                gameObject.SendMessage("StopShoot");
+        } else
+            gameObject.SendMessage("StopShoot");
     }
 
     private void ChaseTarget()
