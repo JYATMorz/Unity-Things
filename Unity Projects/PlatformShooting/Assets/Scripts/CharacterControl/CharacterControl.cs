@@ -30,6 +30,7 @@ public class CharacterControl : MonoBehaviour
     private Quaternion _deltaRotation;
     private bool _chaseMode = false;
     private bool _jumpPressed = false;
+    private bool _isDead = false;
     private int _doubleJump = 2;
     private int _currentHealth = _initHealth;
     private int _floorLayer;
@@ -106,6 +107,8 @@ public class CharacterControl : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (_isDead) return;
+    
         if (_isPlayer)
         {
             if (_jumpPressed)
@@ -126,7 +129,6 @@ public class CharacterControl : MonoBehaviour
 
             return;
         }
-
 
         if (_targetCharacter != null && !ObstacleBetween(_targetCharacter.transform.position))
             _targetPosition = _targetCharacter.transform.position;
@@ -156,7 +158,7 @@ public class CharacterControl : MonoBehaviour
 
     private IEnumerator SeekEnemy()
     {
-        while(true)
+        while(true && !_isDead)
         {
             if(!_isNeutral)
             {
@@ -288,6 +290,7 @@ public class CharacterControl : MonoBehaviour
 
     private bool AimAtTarget()
     {
+        // BUG: character can't aim at target because in the floor || linecast works, raycast don't
         return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, _targetCharacter.layer);
     }
 
@@ -313,8 +316,6 @@ public class CharacterControl : MonoBehaviour
             gameObject.tag = "Dead";
             // TODO: Change material here.
 
-            // BUGCheck: enable character to rotate freely, need to check z value after death
-            _characterBody.detectCollisions = false;
             _characterBody.freezeRotation = false;
 
             if (_isPlayer)
@@ -322,6 +323,10 @@ public class CharacterControl : MonoBehaviour
                 _isPlayer = false;
                 Debug.Log("Player is dead.");
             } else Debug.Log("A character is dead.");
+
+            StopAllCoroutines();
+            _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
+            _isDead = true;
 
             return;
         }
@@ -332,17 +337,18 @@ public class CharacterControl : MonoBehaviour
             _currentHealth = _initHealth;
             _healthBar.SetHealthValue(1f);
 
-            if (_targetCharacter.CompareTag(_blueTeamTag))
+            if (_targetCharacter.CompareTag(_redTeamTag))
             {
                 gameObject.tag = _redTeamTag;
                 SwitchLayer(_redTeamTag, _blueTeamTag);
                 // TODO: Change material here.
-            } else if (_targetCharacter.CompareTag(_redTeamTag))
+            } else if (_targetCharacter.CompareTag(_blueTeamTag))
             {
                 gameObject.tag = _blueTeamTag;
                 SwitchLayer(_blueTeamTag, _redTeamTag);
                 // TODO: Change material here.
             }
+            ResetTargetCharacter();
         } else Debug.Log("Target is null when changing team!");
     }
 

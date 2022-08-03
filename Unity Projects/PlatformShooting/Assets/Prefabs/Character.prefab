@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1172832185545319497}
   - component: {fileID: 1172832185545319499}
   - component: {fileID: 1172832185545319496}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Border
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 1172832186015470877}
   - component: {fileID: 1172832186015470874}
   - component: {fileID: 1172832186015470879}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,7 +202,7 @@ GameObject:
   - component: {fileID: 1172832186101091637}
   - component: {fileID: 1172832186101091639}
   - component: {fileID: 1172832186101091636}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -287,9 +287,11 @@ GameObject:
   - component: {fileID: 1172832186453526024}
   - component: {fileID: 1172832186453526025}
   - component: {fileID: 1172832186453526022}
-  m_Layer: 0
+  - component: {fileID: 842996165068396264}
+  - component: {fileID: 5472782923705971827}
+  m_Layer: 11
   m_Name: Character
-  m_TagString: Character
+  m_TagString: Neutral
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -302,7 +304,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1172832186453526023}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -339,7 +341,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f84bdb04cbeab04419c1ad61d6cc13d9, type: 2}
+  - {fileID: 2100000, guid: cabeb2dee1e3c2b46a54a3907459c15e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -391,6 +393,39 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 120
   m_CollisionDetection: 0
+--- !u!114 &842996165068396264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1172832186453526023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05b2743a56f6cf14ba4e454b043841ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isNeutral: 1
+  _isPlayer: 0
+  mainCamera: {fileID: 0}
+  npcAgent: {fileID: 0}
+  attackWillingness: 0.6
+--- !u!114 &5472782923705971827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1172832186453526023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea53326cbf0b0ed40af29c8c933969fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}
+  laserPrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}
+  grenadePrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}
+  explosivePrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}
 --- !u!1 &1172832186466110160
 GameObject:
   m_ObjectHideFlags: 0
@@ -401,7 +436,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1172832186466110163}
   - component: {fileID: 1172832186466110165}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: BarrelRotationCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -450,7 +485,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1172832186574323360}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -491,7 +526,7 @@ GameObject:
   - component: {fileID: 1172832186920365325}
   - component: {fileID: 1172832186920365322}
   - component: {fileID: 1172832186920365327}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -579,7 +614,7 @@ GameObject:
   - component: {fileID: 2867046790337678169}
   - component: {fileID: 541652462757633671}
   - component: {fileID: 7177888113150181020}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: ShootSmoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
