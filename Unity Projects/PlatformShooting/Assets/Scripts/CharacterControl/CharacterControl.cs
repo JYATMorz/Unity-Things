@@ -35,7 +35,7 @@ public class CharacterControl : MonoBehaviour
     private int _currentHealth = _initHealth;
     private int _floorLayer;
     private int _avoidLayer;
-    private int _neutralLayer;
+    // private int _neutralLayer;
     private int _deadLayer;
     private int _enemyLayer = -1;
     private string _ammoType = "CommonBullet";
@@ -49,7 +49,11 @@ public class CharacterControl : MonoBehaviour
     public Camera mainCamera;
     public NavMeshAgent npcAgent;
     public float attackWillingness = 0.6f;
-    // TODO: attach public material variable here.
+    // FIXME: attach public material variable here.
+    public Material m_BlueTeam;
+    public Material m_RedTeam;
+    public Material m_Neutral;
+    public Material m_DeadBody;
 
     void Awake()
     {
@@ -58,7 +62,7 @@ public class CharacterControl : MonoBehaviour
 
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
         _avoidLayer = _floorLayer;
-        _neutralLayer = LayerMask.NameToLayer("Neutral");
+        // _neutralLayer = LayerMask.NameToLayer("Neutral");
         _deadLayer = LayerMask.NameToLayer("Dead");
 
         _ammoType = _ammoTypes[UnityEngine.Random.Range(0, _ammoTypes.Length)];
@@ -71,21 +75,21 @@ public class CharacterControl : MonoBehaviour
         _healthBar = GetComponentInChildren<HealthBar>();
 
         if (_isPlayer) return;
-
+        /*
         if (_isNeutral) gameObject.layer = _neutralLayer;
         else
         {
             if (CompareTag(_redTeamTag))
             {
                 SwitchLayer(_redTeamTag, _blueTeamTag);
-                // TODO: Change material here.
+                // Change material here.
             } else if (CompareTag(_blueTeamTag))
             {
                 SwitchLayer(_blueTeamTag, _redTeamTag);
-                // TODO: Change material here.
+                // Change material here.
             } else Debug.Log("???");
         }
-
+        */
         StartCoroutine(SeekEnemy());
         StartCoroutine(WanderAround());
     }
@@ -119,8 +123,12 @@ public class CharacterControl : MonoBehaviour
                 _jumpPressed = false;
             }
 
-            // TODO: clamp velocity with add force?
-            _characterBody.velocity = Vector3.ClampMagnitude(new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0), 1.2f * _speedScaler);
+            // FIXME: clamp velocity
+            if (_doubleJump < 2)
+                _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0);
+            else 
+                _characterBody.velocity = Vector3.ClampMagnitude(
+                    new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0), 1.2f * _speedScaler);
 
             // Rotate the barrel to point at the mouse position
             Vector3 _rotateVector = Input.mousePosition - mainCamera.WorldToScreenPoint(_barrelShaft.position);
@@ -165,7 +173,8 @@ public class CharacterControl : MonoBehaviour
                 if (_targetCharacter == null) SearchTarget();
                 else
                 {
-                    if (!TargetInRange(_targetPosition, _seekRange)) ResetTargetCharacter();
+                    if (!TargetInRange(_targetCharacter.transform.position, _seekRange))
+                        ResetTargetCharacter();
                     else if (ObstacleBetween(_targetPosition)) _chaseMode = true;
                 }
             }
@@ -290,8 +299,8 @@ public class CharacterControl : MonoBehaviour
 
     private bool AimAtTarget()
     {
-        // BUG: character can't aim at target because in the floor || linecast works, raycast don't
-        return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, _targetCharacter.layer);
+        // FIXME: character can't aim at target because in the floor || linecast works, raycast don't
+        return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, ~_targetCharacter.layer);
     }
 
     private void ReceiveDamage(int damage)
@@ -314,7 +323,8 @@ public class CharacterControl : MonoBehaviour
         {
             gameObject.layer = _deadLayer;
             gameObject.tag = "Dead";
-            // TODO: Change material here.
+            // FIXME: Change material here.
+            // GetComponent<Renderer>().material = m_DeadBody;
 
             _characterBody.freezeRotation = false;
 
@@ -324,6 +334,7 @@ public class CharacterControl : MonoBehaviour
                 Debug.Log("Player is dead.");
             } else Debug.Log("A character is dead.");
 
+            // TODO: Big Dead Smoke Effect
             StopAllCoroutines();
             _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
             _isDead = true;
@@ -336,17 +347,21 @@ public class CharacterControl : MonoBehaviour
             _isNeutral = false;
             _currentHealth = _initHealth;
             _healthBar.SetHealthValue(1f);
+            // FIXME: broadcast message test
+            BroadcastMessage("SetHealthValue", 0.5f);
 
             if (_targetCharacter.CompareTag(_redTeamTag))
             {
                 gameObject.tag = _redTeamTag;
                 SwitchLayer(_redTeamTag, _blueTeamTag);
-                // TODO: Change material here.
+                // FIXME: Change material here.
+                // GetComponent<Renderer>().material = m_RedTeam;
             } else if (_targetCharacter.CompareTag(_blueTeamTag))
             {
                 gameObject.tag = _blueTeamTag;
                 SwitchLayer(_blueTeamTag, _redTeamTag);
-                // TODO: Change material here.
+                // FIXME: Change material here.
+                // GetComponent<Renderer>().material = m_BlueTeam;
             }
             ResetTargetCharacter();
         } else Debug.Log("Target is null when changing team!");
@@ -358,8 +373,8 @@ public class CharacterControl : MonoBehaviour
         {
             if ((_targetCharacter == null) && !_chaseMode)
             {
-                _characterBody.velocity = new Vector3(Mathf.PingPong(Time.time, _speedScaler * 2) - _speedScaler, 0, 0);
-            } else _characterBody.velocity = Vector3.zero;
+                _characterBody.velocity = new Vector3(Mathf.PingPong(Time.time, _speedScaler) - 0.5f * _speedScaler, _characterBody.velocity.y, 0);
+            } else _characterBody.velocity = new Vector3(0, _characterBody.velocity.y, 0);
 
             yield return new WaitForFixedUpdate();
         }

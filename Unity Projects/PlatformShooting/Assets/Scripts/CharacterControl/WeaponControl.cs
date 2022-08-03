@@ -19,6 +19,8 @@ public class WeaponControl : MonoBehaviour {
     public Rigidbody grenadePrefab;
     public Rigidbody explosivePrefab;
 
+    // TODO: shoot effect: gameObject / VFX
+
     void Awake()
     {
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
