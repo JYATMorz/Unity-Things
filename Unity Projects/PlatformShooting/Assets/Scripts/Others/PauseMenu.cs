@@ -5,9 +5,24 @@ using System.Collections;
 public class PauseMenu : MonoBehaviour {
     
     public static bool IsPause = false;
+    public static GameObject PauseMenuUI;
+    public static GameObject EndGameUI;
+    public static GameObject InGameUI;
 
-    public GameObject pauseMenuUI;
-    public GameObject endGameUI;
+    private static int _redTeamNum = 0;
+    private static int _blueTeamNum = 0;
+    private static int _neutralNum = 0;
+
+    private const string _neutralTag = "Neutral";
+    private const string _blueTeamTag = "BlueTeam";
+    private const string _redTeamTag = "RedTeam";
+
+    void Start()
+    {
+        _redTeamNum = GameObject.FindGameObjectsWithTag(_redTeamTag).Length;
+        _blueTeamNum = GameObject.FindGameObjectsWithTag(_blueTeamTag).Length;
+        _neutralNum = GameObject.FindGameObjectsWithTag(_neutralTag).Length;
+    }
 
     void Update()
     {
@@ -20,7 +35,7 @@ public class PauseMenu : MonoBehaviour {
 
     public void ResumeGame()
     {
-        pauseMenuUI.SetActive(false);
+        PauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         IsPause = false;
     }
@@ -28,7 +43,7 @@ public class PauseMenu : MonoBehaviour {
     public void PauseGame()
     {
         // TODO: Animation transition ?
-        pauseMenuUI.SetActive(true);
+        PauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         IsPause = true;
     }
@@ -46,10 +61,14 @@ public class PauseMenu : MonoBehaviour {
         Application.Quit();
     }
 
-    public void GameOver()
+    public static void GameOver()
     {
         Debug.Log("Game Over Menu!");
-        endGameUI.SetActive(true);
+        InGameUI.SetActive(false);
+        PauseMenuUI.SetActive(false);
+        EndGameUI.SetActive(true);
+
+        // TODO: Change text to show who win or a tie.
     }
 
     public void RestartGame()
@@ -58,9 +77,55 @@ public class PauseMenu : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    public static void OneCharacterDie()
+    public static void TeamChanged(string tag)
     {
-        // TODO: count remaining alive members and update UI including game over panel
-        Debug.Log("Menu Copy");
+        switch (tag)
+        {
+            case _redTeamTag:
+                _redTeamNum ++;
+                break;
+            case _blueTeamTag:
+                _redTeamNum ++;
+                break;
+            default:
+                Debug.LogError("Switching Character's Tag isn't Correct !");
+                break;
+        }
+        _neutralNum --;
+
+        Debug.Log($"Blue: {_blueTeamNum}, NPC: {_neutralNum}, Red: {_redTeamNum}");
+    }
+
+    public static void CharacterDie(string tag)
+    {
+        // TODO: update UI including game over panel
+        switch (tag)
+        {
+            case _redTeamTag:
+                _redTeamNum --;
+                break;
+            case _blueTeamTag:
+                _redTeamNum --;
+                break;
+            case _neutralTag:
+                _redTeamNum --;
+                break;
+            default:
+                Debug.LogError("Dead Character's Tag isn't Correct !");
+                break;
+        }
+
+        if (_redTeamNum <= 0 || _blueTeamNum <= 0)
+        {
+            if (GameObject.FindWithTag(_redTeamTag) == null)
+            {
+                Debug.Log("RedTEAM Lose");
+            } else if (GameObject.FindWithTag(_blueTeamTag) == null)
+            {
+                Debug.Log("BlueTEAM Lose");
+            } else Debug.LogWarning("Unexpected Winning Condition");
+
+            GameOver();
+        }
     }
 }

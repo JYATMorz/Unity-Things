@@ -6,7 +6,7 @@ public class MainCamera : MonoBehaviour
     public Transform player;
     public UnityEvent gameOverEvent;
 
-    public static bool GameOver = false;
+    public static bool IsGameOver = false;
 
     private Vector3 _cameraOffset = new(0, 1, -8);
     private Vector3 _endGamePos = Vector3.zero;
@@ -22,7 +22,7 @@ public class MainCamera : MonoBehaviour
 
     void LateUpdate()
     {
-        if (GameOver)
+        if (IsGameOver)
         {
             if (_onPosition) return;
 
@@ -74,7 +74,7 @@ public class MainCamera : MonoBehaviour
             }
             _endGamePos /= aliveEnemies.Length;
 
-            GameOver = true;
+            IsGameOver = true;
             gameOverEvent.Invoke();
 
         } else {

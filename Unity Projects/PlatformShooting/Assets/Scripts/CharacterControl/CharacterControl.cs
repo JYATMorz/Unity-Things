@@ -100,7 +100,7 @@ public class CharacterControl : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (PauseMenu.IsPause) return;
+        // FIXME: if (PauseMenu.IsPause) return;
         if (_isDead) return;
     
         if (_isPlayer)
@@ -332,6 +332,8 @@ public class CharacterControl : MonoBehaviour
     {
         if (!_isNeutral)
         {
+            PauseMenu.CharacterDie(gameObject.tag);
+
             gameObject.layer = _deadLayer;
             gameObject.tag = "Dead";
             GetComponent<Renderer>().material = m_DeadBody;
@@ -348,7 +350,6 @@ public class CharacterControl : MonoBehaviour
             _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
 
             _isDead = true;
-            PauseMenu.OneCharacterDie();
 
             return;
         }
@@ -370,7 +371,10 @@ public class CharacterControl : MonoBehaviour
                 SwitchLayer(_blueTeamTag, _redTeamTag);
                 GetComponent<Renderer>().material = m_BlueTeam;
             }
+
             ResetTargetCharacter();
+            PauseMenu.TeamChanged(gameObject.tag);
+
         } else Debug.Log("Target is null when changing team!");
     }
 
