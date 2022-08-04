@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 using System;
 using System.Collections;
 
@@ -49,6 +50,7 @@ public class CharacterControl : MonoBehaviour
     private bool _isPlayer = false;
 
     public Camera mainCamera;
+    public GameMenu gameMenu;
     public NavMeshAgent npcAgent;
     public float attackWillingness = 0.6f;
     public Material m_BlueTeam;
@@ -69,6 +71,11 @@ public class CharacterControl : MonoBehaviour
         _ammoType = _ammoTypes[UnityEngine.Random.Range(0, _ammoTypes.Length)];
 
         if (_isNeutral && _isPlayer) Debug.LogWarning("Character Setting is Wrong !");
+        if (!_isNeutral)
+        {
+            string enemyTag = CompareTag(_blueTeamTag) ? _redTeamTag : _blueTeamTag;
+            _enemyLayer = LayerMask.GetMask(enemyTag, _neutralTag);
+        }
     }
 
     void Start()
@@ -83,7 +90,7 @@ public class CharacterControl : MonoBehaviour
 
     void Update()
     {
-        if (PauseMenu.IsPause) return;
+        if (GameMenu.IsPause) return;
 
         if (_isPlayer)
         {
@@ -100,7 +107,7 @@ public class CharacterControl : MonoBehaviour
 
     void FixedUpdate()
     {
-        // FIXME: if (PauseMenu.IsPause) return;
+        // if (GameMenu.IsPause) return;
         if (_isDead) return;
     
         if (_isPlayer)
@@ -135,6 +142,7 @@ public class CharacterControl : MonoBehaviour
 
         // Control Barrel Here
         if (_targetCharacter == null) BarrelIdle();
+        else if (_targetCharacter.CompareTag("Dead") || _targetCharacter.CompareTag(gameObject.tag)) BarrelIdle();
         else
         {
             BarrelAim();
@@ -182,6 +190,7 @@ public class CharacterControl : MonoBehaviour
         {
             if(!_isNeutral)
             {
+                // BUG: Can't find target after killing 1 character
                 if (_targetCharacter == null) SearchTarget();
                 else
                 {
@@ -332,7 +341,8 @@ public class CharacterControl : MonoBehaviour
     {
         if (!_isNeutral)
         {
-            PauseMenu.CharacterDie(gameObject.tag);
+            gameMenu.CharacterDie(gameObject.tag);
+            gameObject.SendMessage("StopShoot");
 
             gameObject.layer = _deadLayer;
             gameObject.tag = "Dead";
@@ -348,6 +358,8 @@ public class CharacterControl : MonoBehaviour
             // TODO: Big Dead Smoke Effect
             StopAllCoroutines();
             _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
+            // TODO: fall down body
+            // _characterBody.AddTorque(Vector3.zero, ForceMode.Impulse);
 
             _isDead = true;
 
@@ -373,7 +385,7 @@ public class CharacterControl : MonoBehaviour
             }
 
             ResetTargetCharacter();
-            PauseMenu.TeamChanged(gameObject.tag);
+            gameMenu.TeamChanged(gameObject.tag);
 
         } else Debug.Log("Target is null when changing team!");
     }

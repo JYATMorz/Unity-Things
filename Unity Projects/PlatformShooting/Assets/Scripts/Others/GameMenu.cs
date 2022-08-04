@@ -2,16 +2,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class PauseMenu : MonoBehaviour {
+public class GameMenu : MonoBehaviour {
     
     public static bool IsPause = false;
-    public static GameObject PauseMenuUI;
-    public static GameObject EndGameUI;
-    public static GameObject InGameUI;
+    public GameObject PauseMenuUI;
+    public GameObject EndGameUI;
+    public GameObject InGameUI;
 
-    private static int _redTeamNum = 0;
-    private static int _blueTeamNum = 0;
-    private static int _neutralNum = 0;
+    private int _redTeamNum = 0;
+    private int _blueTeamNum = 0;
+    private int _neutralNum = 0;
 
     private const string _neutralTag = "Neutral";
     private const string _blueTeamTag = "BlueTeam";
@@ -61,7 +61,7 @@ public class PauseMenu : MonoBehaviour {
         Application.Quit();
     }
 
-    public static void GameOver()
+    public void GameOver()
     {
         Debug.Log("Game Over Menu!");
         InGameUI.SetActive(false);
@@ -77,7 +77,7 @@ public class PauseMenu : MonoBehaviour {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    public static void TeamChanged(string tag)
+    public void TeamChanged(string tag)
     {
         switch (tag)
         {
@@ -85,7 +85,7 @@ public class PauseMenu : MonoBehaviour {
                 _redTeamNum ++;
                 break;
             case _blueTeamTag:
-                _redTeamNum ++;
+                _blueTeamNum ++;
                 break;
             default:
                 Debug.LogError("Switching Character's Tag isn't Correct !");
@@ -96,7 +96,7 @@ public class PauseMenu : MonoBehaviour {
         Debug.Log($"Blue: {_blueTeamNum}, NPC: {_neutralNum}, Red: {_redTeamNum}");
     }
 
-    public static void CharacterDie(string tag)
+    public void CharacterDie(string tag)
     {
         // TODO: update UI including game over panel
         switch (tag)
@@ -105,15 +105,17 @@ public class PauseMenu : MonoBehaviour {
                 _redTeamNum --;
                 break;
             case _blueTeamTag:
-                _redTeamNum --;
+                _blueTeamNum --;
                 break;
             case _neutralTag:
-                _redTeamNum --;
+                _neutralNum --;
                 break;
             default:
                 Debug.LogError("Dead Character's Tag isn't Correct !");
                 break;
         }
+
+        // TODO: change UI text to show score
 
         if (_redTeamNum <= 0 || _blueTeamNum <= 0)
         {
@@ -123,7 +125,9 @@ public class PauseMenu : MonoBehaviour {
             } else if (GameObject.FindWithTag(_blueTeamTag) == null)
             {
                 Debug.Log("BlueTEAM Lose");
-            } else Debug.LogWarning("Unexpected Winning Condition");
+            }
+            // It is faster than character dead methods
+            // else Debug.LogWarning("Unexpected Winning Condition");
 
             GameOver();
         }

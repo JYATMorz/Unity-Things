@@ -20,6 +20,14 @@ public class MainCamera : MonoBehaviour
         _enemyTag = (_playerTag == "BlueTeam") ? "RedTeam" : "BlueTeam";
     }
 
+    void Start()
+    {
+        IsGameOver = false;
+        transform.position = player.position + _cameraOffset;
+        transform.LookAt(player);
+        _onPosition = true;
+    }
+
     void LateUpdate()
     {
         if (IsGameOver)
@@ -42,17 +50,19 @@ public class MainCamera : MonoBehaviour
                 return;
             }
 
-            // FIXME: Try implement damping
-            if (!CameraIsClose(transform.position, player.position, 1f))
-                transform.position = player.position + _cameraOffset;
+            // TODO: Try implement damping
+            // if (!CameraIsClose(transform.position, player.position, 1f))
+            transform.position = player.position + _cameraOffset;
         } else
         {
-            transform.position = Vector3.MoveTowards(transform.position, player.position + _cameraOffset, 5 * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, player.position + _cameraOffset, 10 * Time.deltaTime);
 
             if (CameraIsClose(transform.position, player.position))
             {
                 _onPosition = true;
                 player.SendMessage("BecomePlayer");
+
+                // TODO: show UI to notify player
             }
         }
         transform.LookAt(player);
