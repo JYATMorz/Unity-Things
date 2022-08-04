@@ -1,5 +1,3 @@
-// TODO: low gravity, small explosion, no bouncing, hit and explode, low recharge time, low damage
-
 using UnityEngine;
 
 public class ExplosivePayload : MonoBehaviour
@@ -19,7 +17,6 @@ public class ExplosivePayload : MonoBehaviour
     void Start()
     {
         _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
-        Debug.Log(_ownerTag);
 
         _characterLayer = LayerMask.GetMask("Neutral", "BlueTeam", "RedTeam", "Dead");
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");

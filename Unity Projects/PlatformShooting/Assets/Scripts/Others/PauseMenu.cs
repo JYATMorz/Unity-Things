@@ -6,13 +6,13 @@ public class PauseMenu : MonoBehaviour {
     
     public static bool IsPause;
 
-    public gameObject pauseMenuUI;
+    public GameObject pauseMenuUI;
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isPause) ResumeGame();
+            if (IsPause) ResumeGame();
             else PauseGame();
         }
     }
@@ -21,7 +21,7 @@ public class PauseMenu : MonoBehaviour {
     {
         pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
-        isPause = false;
+        IsPause = false;
     }
 
     public void PauseGame()
@@ -29,7 +29,7 @@ public class PauseMenu : MonoBehaviour {
         // TODO: Animation transition ?
         pauseMenuUI.SetActive(true);
         Time.timeScale = 0f; // FIXME: Check if fixedDeltaTime cause issues
-        isPause = true;
+        IsPause = true;
     }
 
     public void LoadMenu()

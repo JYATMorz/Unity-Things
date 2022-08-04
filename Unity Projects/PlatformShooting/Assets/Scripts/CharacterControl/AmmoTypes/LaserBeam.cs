@@ -1,7 +1,3 @@
-// TODO: Ammo with limited size, extreme fast speed, low damage, zero gravity, long lifetime and charge time, medium damage, full bouncing
-
-// TODO: possible use case: NPC can indirectly aim player / Charge Effect?
-
 // TODO: !!! USE CCD SPECULATIVE !!!
 
 using UnityEngine;
@@ -27,7 +23,6 @@ public class LaserBeam : MonoBehaviour
     void Start()
     {
         _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
-        Debug.Log(_ownerTag);
 
         StartCoroutine(LifeTimeOver(_lifeTime));
     }

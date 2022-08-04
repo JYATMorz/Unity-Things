@@ -1,7 +1,3 @@
-// TODO: Ammo with large size, low speed, explosion effect, big weight, medium recharge time, low bouncing, high damage
-
-// Need to find a way to let NPC use parabola
-
 using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
@@ -26,7 +22,6 @@ public class Grenade : MonoBehaviour
     void Start()
     {
         _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
-        Debug.Log(_ownerTag);
 
         _characterLayer = LayerMask.GetMask("Neutral", "BlueTeam", "RedTeam", "Dead");
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");

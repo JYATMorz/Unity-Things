@@ -24,6 +24,7 @@ public class MainCamera : MonoBehaviour
                 return;
             }
 
+            // TODO: Try implement damping
             transform.position = player.position + _cameraOffset;
         } else
         {

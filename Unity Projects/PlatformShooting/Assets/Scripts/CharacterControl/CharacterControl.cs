@@ -11,7 +11,7 @@ public class CharacterControl : MonoBehaviour
     private const float _seekRange = 30f;
     private const float _shootRange = 10f;
     private const float _speedScaler = 5f;
-    private const float _jumpScaler = 25f;
+    private const float _jumpScaler = 20f;
     private const string _bulletTag = "Bullet";
     private const string _neutralTag = "Neutral";
     private const string _blueTeamTag = "BlueTeam";
@@ -30,6 +30,8 @@ public class CharacterControl : MonoBehaviour
     private Quaternion _deltaRotation;
     private bool _chaseMode = false;
     private bool _jumpPressed = false;
+    private bool _onGround = false;
+    private bool _onElevator = false;
     private bool _isDead = false;
     private int _doubleJump = 2;
     private int _currentHealth = _initHealth;
@@ -49,7 +51,6 @@ public class CharacterControl : MonoBehaviour
     public Camera mainCamera;
     public NavMeshAgent npcAgent;
     public float attackWillingness = 0.6f;
-    // FIXME: attach public material variable here.
     public Material m_BlueTeam;
     public Material m_RedTeam;
     public Material m_Neutral;
@@ -75,21 +76,7 @@ public class CharacterControl : MonoBehaviour
         _healthBar = GetComponentInChildren<HealthBar>();
 
         if (_isPlayer) return;
-        /*
-        if (_isNeutral) gameObject.layer = _neutralLayer;
-        else
-        {
-            if (CompareTag(_redTeamTag))
-            {
-                SwitchLayer(_redTeamTag, _blueTeamTag);
-                // Change material here.
-            } else if (CompareTag(_blueTeamTag))
-            {
-                SwitchLayer(_blueTeamTag, _redTeamTag);
-                // Change material here.
-            } else Debug.Log("???");
-        }
-        */
+
         StartCoroutine(SeekEnemy());
         StartCoroutine(WanderAround());
     }
@@ -123,12 +110,14 @@ public class CharacterControl : MonoBehaviour
                 _jumpPressed = false;
             }
 
-            // FIXME: clamp velocity
-            if (_doubleJump < 2)
-                _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0);
-            else 
-                _characterBody.velocity = Vector3.ClampMagnitude(
-                    new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0), 1.2f * _speedScaler);
+            if (!_onElevator)
+            {
+                if (_doubleJump < 2 || !_onGround)
+                    _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0);
+                else 
+                    _characterBody.velocity = Vector3.ClampMagnitude(
+                        new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0), _speedScaler);
+            }
 
             // Rotate the barrel to point at the mouse position
             Vector3 _rotateVector = Input.mousePosition - mainCamera.WorldToScreenPoint(_barrelShaft.position);
@@ -161,6 +150,26 @@ public class CharacterControl : MonoBehaviour
         } else if (Array.Exists(_floorTag, tag => tag == contact.tag))
         {
             if (_isPlayer) _doubleJump = 2;
+            _onGround = true;
+            _onElevator = false;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Elevator")) _onElevator = true;
+    }
+
+    void OnCollisionStay()
+    {
+        if (_isPlayer && _doubleJump == 0) _doubleJump = 2;
+    }
+
+    void OnCollisionExit(Collision other)
+    {
+        if (Array.Exists(_floorTag, tag => tag == other.gameObject.tag))
+        {
+            _onGround = false;
         }
     }
 
@@ -299,7 +308,6 @@ public class CharacterControl : MonoBehaviour
 
     private bool AimAtTarget()
     {
-        // FIXME: character can't aim at target because in the floor || linecast works, raycast don't
         return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, ~_targetCharacter.layer);
     }
 
@@ -323,8 +331,7 @@ public class CharacterControl : MonoBehaviour
         {
             gameObject.layer = _deadLayer;
             gameObject.tag = "Dead";
-            // FIXME: Change material here.
-            // GetComponent<Renderer>().material = m_DeadBody;
+            GetComponent<Renderer>().material = m_DeadBody;
 
             _characterBody.freezeRotation = false;
 
@@ -347,21 +354,17 @@ public class CharacterControl : MonoBehaviour
             _isNeutral = false;
             _currentHealth = _initHealth;
             _healthBar.SetHealthValue(1f);
-            // FIXME: broadcast message test
-            BroadcastMessage("SetHealthValue", 0.5f);
 
             if (_targetCharacter.CompareTag(_redTeamTag))
             {
                 gameObject.tag = _redTeamTag;
                 SwitchLayer(_redTeamTag, _blueTeamTag);
-                // FIXME: Change material here.
-                // GetComponent<Renderer>().material = m_RedTeam;
+                GetComponent<Renderer>().material = m_RedTeam;
             } else if (_targetCharacter.CompareTag(_blueTeamTag))
             {
                 gameObject.tag = _blueTeamTag;
                 SwitchLayer(_blueTeamTag, _redTeamTag);
-                // FIXME: Change material here.
-                // GetComponent<Renderer>().material = m_BlueTeam;
+                GetComponent<Renderer>().material = m_BlueTeam;
             }
             ResetTargetCharacter();
         } else Debug.Log("Target is null when changing team!");

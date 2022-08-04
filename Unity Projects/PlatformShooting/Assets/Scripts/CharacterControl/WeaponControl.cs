@@ -26,6 +26,9 @@ public class WeaponControl : MonoBehaviour {
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
         // TODO: Use different effect for each AmmoType, Use name to distinguish laser from others
         // _shootSmoke = GetComponentInChildren<VisualEffect>();
+        // TODO: Charge effect for laser beam
+
+        // TODO: Need to find a way to let NPC use parabola (Grenades)
 
         // Assign different prefab to each weapon type
         _commonBullet.AmmoPrefab = bulletPrefab;

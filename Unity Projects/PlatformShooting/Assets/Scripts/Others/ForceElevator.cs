@@ -3,9 +3,8 @@ using UnityEngine.VFX;
 
 public class ForceElevator : MonoBehaviour
 {
-    // TODO: Change it to lift character quick
-    private const float _liftForce = 10f;
-    private const float _liftDistance = 15f;
+    public float _liftForce = 30f;
+    public ForceMode forceType = ForceMode.Impulse;
 
     public VisualEffect liftEffect;
 
@@ -19,6 +18,6 @@ public class ForceElevator : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        other.attachedRigidbody.AddExplosionForce(-_liftForce * 0.25f, transform.position, _liftDistance, _liftForce);
+        other.attachedRigidbody.AddForce(transform.up * _liftForce, forceType);
     }
 }
