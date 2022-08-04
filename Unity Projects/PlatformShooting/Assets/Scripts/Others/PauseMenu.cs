@@ -7,6 +7,7 @@ public class PauseMenu : MonoBehaviour {
     public static bool IsPause = false;
 
     public GameObject pauseMenuUI;
+    public GameObject endGameUI;
 
     void Update()
     {
@@ -28,7 +29,7 @@ public class PauseMenu : MonoBehaviour {
     {
         // TODO: Animation transition ?
         pauseMenuUI.SetActive(true);
-        Time.timeScale = 0f; // FIXME: Check if fixedDeltaTime cause issues
+        Time.timeScale = 0f;
         IsPause = true;
     }
 
@@ -43,5 +44,23 @@ public class PauseMenu : MonoBehaviour {
     {
         Debug.Log("Pause Menu");
         Application.Quit();
+    }
+
+    public void GameOver()
+    {
+        Debug.Log("Game Over Menu!");
+        endGameUI.SetActive(true);
+    }
+
+    public void RestartGame()
+    {
+        // TODO: Fade in Fade out effect as game scene load in
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public static void OneCharacterDie()
+    {
+        // TODO: count remaining alive members and update UI including game over panel
+        Debug.Log("Menu Copy");
     }
 }

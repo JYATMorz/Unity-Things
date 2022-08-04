@@ -335,7 +335,6 @@ public class CharacterControl : MonoBehaviour
             gameObject.layer = _deadLayer;
             gameObject.tag = "Dead";
             GetComponent<Renderer>().material = m_DeadBody;
-
             _characterBody.freezeRotation = false;
 
             if (_isPlayer)
@@ -347,7 +346,9 @@ public class CharacterControl : MonoBehaviour
             // TODO: Big Dead Smoke Effect
             StopAllCoroutines();
             _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
+
             _isDead = true;
+            PauseMenu.OneCharacterDie();
 
             return;
         }
