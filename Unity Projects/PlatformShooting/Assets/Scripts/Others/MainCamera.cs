@@ -3,6 +3,7 @@ using UnityEngine;
 public class MainCamera : MonoBehaviour
 {
     public Transform player;
+    public static bool GameOver = false;
 
     private Vector3 _cameraOffset = new(0, 1, -8);
     private string _playerTag;
@@ -15,6 +16,8 @@ public class MainCamera : MonoBehaviour
 
     void LateUpdate()
     {
+        if (GameOver) return;
+
         if (_onPlayer)
         {
             if (player == null || player.CompareTag("Dead"))
@@ -47,6 +50,7 @@ public class MainCamera : MonoBehaviour
         if (nextPlayer == null)
         {
             Debug.Log("Game Over. Did Enemy team win?");
+            GameOver = true;
         } else {
             player = nextPlayer.transform;
         }

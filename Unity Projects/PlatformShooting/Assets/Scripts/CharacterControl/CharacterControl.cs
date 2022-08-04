@@ -83,6 +83,8 @@ public class CharacterControl : MonoBehaviour
 
     void Update()
     {
+        if (PauseMenu.IsPause) return;
+
         if (_isPlayer)
         {
             if (Input.GetKeyDown(KeyCode.Space) && (_doubleJump > 0)) 
@@ -98,6 +100,7 @@ public class CharacterControl : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (PauseMenu.IsPause) return;
         if (_isDead) return;
     
         if (_isPlayer)

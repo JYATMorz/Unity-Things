@@ -391,7 +391,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 120
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &842996165068396264
 MonoBehaviour:
@@ -414,6 +414,7 @@ MonoBehaviour:
   m_RedTeam: {fileID: 2100000, guid: 02803dd49c5e19c45a6662974455f9b7, type: 2}
   m_Neutral: {fileID: 2100000, guid: cabeb2dee1e3c2b46a54a3907459c15e, type: 2}
   m_DeadBody: {fileID: 2100000, guid: b86c493d1b5d86a49809726c977252e6, type: 2}
+  pauseMenu: {fileID: 0}
 --- !u!114 &5472782923705971827
 MonoBehaviour:
   m_ObjectHideFlags: 0

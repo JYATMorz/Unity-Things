@@ -4,7 +4,7 @@ using System.Collections;
 
 public class PauseMenu : MonoBehaviour {
     
-    public static bool IsPause;
+    public static bool IsPause = false;
 
     public GameObject pauseMenuUI;
 
@@ -32,10 +32,11 @@ public class PauseMenu : MonoBehaviour {
         IsPause = true;
     }
 
-    public void LoadMenu()
+    public void LoadMainAsync()
     {
         Time.timeScale = 1f;
         //TODO: The same trick in MainMenu but for main menu
+        ResumeGame();
     }
 
     public void QuitGame()
