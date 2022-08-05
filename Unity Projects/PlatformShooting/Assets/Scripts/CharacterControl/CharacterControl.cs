@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Events;
 using System;
 using System.Collections;
 
@@ -17,6 +16,7 @@ public class CharacterControl : MonoBehaviour
     private const string _neutralTag = "Neutral";
     private const string _blueTeamTag = "BlueTeam";
     private const string _redTeamTag = "RedTeam";
+    private const string _deadTag = "Dead";
 
     private readonly Vector3 _nullTargetPosition = new(0, 100, 0);
     private readonly string[] _floorTag = { "Floor", "Elevator" };
@@ -44,10 +44,8 @@ public class CharacterControl : MonoBehaviour
     private string _ammoType = "CommonBullet";
     private float _rotateSpeed = _barrelRotateSpeed;
 
-    [SerializeField]
-    private bool _isNeutral = true;
-    [SerializeField]
-    private bool _isPlayer = false;
+    [SerializeField] private bool _isNeutral = true;
+    [SerializeField] private bool _isPlayer = false;
 
     public Camera mainCamera;
     public GameMenu gameMenu;
@@ -65,8 +63,7 @@ public class CharacterControl : MonoBehaviour
 
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
         _avoidLayer = _floorLayer;
-        // _neutralLayer = LayerMask.NameToLayer("Neutral");
-        _deadLayer = LayerMask.NameToLayer("Dead");
+        _deadLayer = LayerMask.NameToLayer(_deadTag);
 
         _ammoType = _ammoTypes[UnityEngine.Random.Range(0, _ammoTypes.Length)];
 
@@ -142,7 +139,7 @@ public class CharacterControl : MonoBehaviour
 
         // Control Barrel Here
         if (_targetCharacter == null) BarrelIdle();
-        else if (_targetCharacter.CompareTag("Dead") || _targetCharacter.CompareTag(gameObject.tag)) BarrelIdle();
+        else if (_targetCharacter.CompareTag(_deadTag) || _targetCharacter.CompareTag(gameObject.tag)) BarrelIdle();
         else
         {
             BarrelAim();
@@ -190,8 +187,8 @@ public class CharacterControl : MonoBehaviour
         {
             if(!_isNeutral)
             {
-                // BUG: Can't find target after killing 1 character
-                if (_targetCharacter == null) SearchTarget();
+                // FIXME: Can't find target after killing 1 character
+                if (_targetCharacter.CompareTag(_deadTag) || _targetCharacter.CompareTag(gameObject.tag)) SearchTarget();
                 else
                 {
                     if (!TargetInRange(_targetCharacter.transform.position, _seekRange))
@@ -345,21 +342,23 @@ public class CharacterControl : MonoBehaviour
             gameObject.SendMessage("StopShoot");
 
             gameObject.layer = _deadLayer;
-            gameObject.tag = "Dead";
+            gameObject.tag = _deadTag;
             GetComponent<Renderer>().material = m_DeadBody;
             _characterBody.freezeRotation = false;
 
             if (_isPlayer)
             {
                 _isPlayer = false;
-                Debug.Log("Player is dead.");
-            } else Debug.Log("A character is dead.");
+                gameMenu.ShowNotification("PlayerDie");
+            }
 
             // TODO: Big Dead Smoke Effect
             StopAllCoroutines();
             _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
-            // TODO: fall down body
-            // _characterBody.AddTorque(Vector3.zero, ForceMode.Impulse);
+            // FIXME: Whether the force is too big
+            _characterBody.AddTorque(
+                UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 
+                ForceMode.Impulse);
 
             _isDead = true;
 
@@ -413,7 +412,7 @@ public class CharacterControl : MonoBehaviour
     {
         gameObject.layer = LayerMask.NameToLayer(teamTag);
         _avoidLayer = LayerMask.GetMask(teamTag, "Floor", "Elevator");
-        _enemyLayer = LayerMask.GetMask(enemyTag, "Neutral");
+        _enemyLayer = LayerMask.GetMask(enemyTag, _neutralTag);
     }
 
     private void BecomePlayer()
@@ -425,8 +424,8 @@ public class CharacterControl : MonoBehaviour
         _currentHealth = _initHealth;
         _healthBar.SetMaxHealth();
 
-         StopAllCoroutines();
-        // TODO: Use UI to notify the player transformation is complete 
+        StopAllCoroutines();
+        gameMenu.ShowNotification("PlayerBorn");
     }
 }
 

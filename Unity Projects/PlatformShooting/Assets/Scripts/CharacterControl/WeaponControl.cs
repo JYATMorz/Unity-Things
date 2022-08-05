@@ -14,6 +14,7 @@ public class WeaponControl : MonoBehaviour {
     private bool _fireConfirm = false;
     private bool _isFiring = false;
 
+    public GameMenu gameMenu;
     public Rigidbody bulletPrefab;
     public Rigidbody laserPrefab;
     public Rigidbody grenadePrefab;
@@ -73,8 +74,7 @@ public class WeaponControl : MonoBehaviour {
             newAmmo.AddForce(angleRandomness * _barrelTransform.up * ammoType.AmmoSpeed, ForceMode.VelocityChange);
         } else
         {
-            // TODO: Add notification/sound effect when in wrong angle
-            Debug.Log($"Shooting {ammoType} in Dead Zone!");
+            gameMenu.ShowNotification("DeadZone");
         }
     }
 

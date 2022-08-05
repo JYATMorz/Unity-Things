@@ -10,6 +10,7 @@ public class MainCamera : MonoBehaviour
 
     private Vector3 _cameraOffset = new(0, 1, -8);
     private Vector3 _endGamePos = Vector3.zero;
+    private Vector3 _clampVelocity = Vector3.zero;
     private string _playerTag;
     private string _enemyTag;
     private bool _onPosition = true;
@@ -50,9 +51,10 @@ public class MainCamera : MonoBehaviour
                 return;
             }
 
-            // TODO: Try implement damping
+            // FIXME: Try implement damping
             // if (!CameraIsClose(transform.position, player.position, 1f))
-            transform.position = player.position + _cameraOffset;
+            // transform.position = player.position + _cameraOffset;
+            transform.position = Vector3.SmoothDamp(transform.position, player.position + _cameraOffset, ref _clampVelocity, 0.5f);
         } else
         {
             transform.position = Vector3.MoveTowards(transform.position, player.position + _cameraOffset, 10 * Time.deltaTime);
@@ -61,8 +63,6 @@ public class MainCamera : MonoBehaviour
             {
                 _onPosition = true;
                 player.SendMessage("BecomePlayer");
-
-                // TODO: show UI to notify player
             }
         }
         transform.LookAt(player);
