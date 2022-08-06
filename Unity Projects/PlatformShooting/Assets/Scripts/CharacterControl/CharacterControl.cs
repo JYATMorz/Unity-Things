@@ -47,14 +47,13 @@ public class CharacterControl : MonoBehaviour
     [SerializeField] private bool _isNeutral = true;
     [SerializeField] private bool _isPlayer = false;
 
+    public bool IsTeleported { get; set; } = false;
     public Camera mainCamera;
     public GameMenu gameMenu;
     public NavMeshAgent npcAgent;
     public float attackWillingness = 0.6f;
     public Material m_BlueTeam;
     public Material m_RedTeam;
-    public Material m_Neutral;
-    public Material m_DeadBody;
 
     void Awake()
     {
@@ -87,7 +86,7 @@ public class CharacterControl : MonoBehaviour
 
     void Update()
     {
-        if (GameMenu.IsPause) return;
+        if (GameMenu.IsPause || MainCamera.IsGameOver) return;
 
         if (_isPlayer)
         {
@@ -104,7 +103,9 @@ public class CharacterControl : MonoBehaviour
 
     void FixedUpdate()
     {
-        // if (GameMenu.IsPause) return;
+        // if (GameMenu.IsPause || MainCamera.IsGameOver) return;
+        if (IsTeleported) return;
+
         if (_isDead) return;
     
         if (_isPlayer)
@@ -139,7 +140,11 @@ public class CharacterControl : MonoBehaviour
 
         // Control Barrel Here
         if (_targetCharacter == null) BarrelIdle();
-        else if (_targetCharacter.CompareTag(_deadTag) || _targetCharacter.CompareTag(gameObject.tag)) BarrelIdle();
+        else if (_targetCharacter.CompareTag(_deadTag) || CompareTag(_targetCharacter.tag))
+        {
+            ResetTargetCharacter();
+            BarrelIdle();
+        }
         else
         {
             BarrelAim();
@@ -187,8 +192,8 @@ public class CharacterControl : MonoBehaviour
         {
             if(!_isNeutral)
             {
-                // FIXME: Can't find target after killing 1 character
-                if (_targetCharacter.CompareTag(_deadTag) || _targetCharacter.CompareTag(gameObject.tag)) SearchTarget();
+                if (_targetCharacter == null) SearchTarget();
+                else if (_targetCharacter.CompareTag(_deadTag) || _targetCharacter.CompareTag(gameObject.tag)) SearchTarget();
                 else
                 {
                     if (!TargetInRange(_targetCharacter.transform.position, _seekRange))
@@ -244,6 +249,8 @@ public class CharacterControl : MonoBehaviour
             }
         } else
         {
+            if (CompareTag(suspect.tag)) return;
+
             if (_targetCharacter == null) _targetCharacter = CompareTag(suspect.tag) ? null : suspect.gameObject;
             else
             {
@@ -317,6 +324,7 @@ public class CharacterControl : MonoBehaviour
 
     private bool AimAtTarget()
     {
+        // FIXME: working weirdly
         return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, ~_targetCharacter.layer);
     }
 
@@ -334,6 +342,12 @@ public class CharacterControl : MonoBehaviour
         }
     }
 
+    private void FullHealth()
+    {
+        _currentHealth = _initHealth;
+        _healthBar.SetMaxHealth();
+    }
+
    private void ZeroHealth()
     {
         if (!_isNeutral)
@@ -341,9 +355,7 @@ public class CharacterControl : MonoBehaviour
             gameMenu.CharacterDie(gameObject.tag);
             gameObject.SendMessage("StopShoot");
 
-            gameObject.layer = _deadLayer;
-            gameObject.tag = _deadTag;
-            GetComponent<Renderer>().material = m_DeadBody;
+            DeadTagAndLayer();
             _characterBody.freezeRotation = false;
 
             if (_isPlayer)
@@ -355,9 +367,8 @@ public class CharacterControl : MonoBehaviour
             // TODO: Big Dead Smoke Effect
             StopAllCoroutines();
             _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
-            // FIXME: Whether the force is too big
             _characterBody.AddTorque(
-                UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, 
+                new Vector3(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value) * 0.1f, 
                 ForceMode.Impulse);
 
             _isDead = true;
@@ -368,8 +379,8 @@ public class CharacterControl : MonoBehaviour
         if (_targetCharacter!=null)
         {
             _isNeutral = false;
-            _currentHealth = _initHealth;
-            _healthBar.SetHealthValue(1f);
+            FullHealth();
+            _targetCharacter.SendMessage("FullHealth");
 
             if (_targetCharacter.CompareTag(_redTeamTag))
             {
@@ -415,14 +426,22 @@ public class CharacterControl : MonoBehaviour
         _enemyLayer = LayerMask.GetMask(enemyTag, _neutralTag);
     }
 
+    private void DeadTagAndLayer()
+    {
+        gameObject.tag = _deadTag;
+        foreach(Collider child in GetComponentsInChildren<Collider>())
+        {
+            child.gameObject.layer = _deadLayer;
+        }
+    }
+
     private void BecomePlayer()
     {
         _isPlayer = true;
         if (_isNeutral && _isPlayer) Debug.LogWarning("Neutral Character becomes Player !");
         else Debug.Log("New Player Born!");
 
-        _currentHealth = _initHealth;
-        _healthBar.SetMaxHealth();
+        FullHealth();
 
         StopAllCoroutines();
         gameMenu.ShowNotification("PlayerBorn");

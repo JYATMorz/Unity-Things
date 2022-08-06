@@ -427,6 +427,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea53326cbf0b0ed40af29c8c933969fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameMenu: {fileID: 0}
   bulletPrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}
   laserPrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}
   grenadePrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}

@@ -28,13 +28,18 @@ public class ExplosivePayload : MonoBehaviour
         Destroy(gameObject);
     }
 
+    void OnDestroy()
+    {
+        // TODO: Add explosion (particle) dead effect when destroy
+    }
+
     private void SmallExplosion()
     {
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
         {
             if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
             {
-                if (_ownerTag != _neutralTag || !character.CompareTag(_neutralTag) || !character.CompareTag(_deadTag))
+                if (!character.CompareTag(_deadTag) && !(_ownerTag == _neutralTag && character.CompareTag(_neutralTag)))
                 {
                     character.SendMessage("ReceiveDamage", Mathf.FloorToInt(_ammoDamage
                         * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius))));
@@ -44,6 +49,5 @@ public class ExplosivePayload : MonoBehaviour
             
         }
 
-        // TODO: Add explosion (particle) dead effect when destroy
     }
 }

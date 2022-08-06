@@ -1,4 +1,4 @@
-// TODO: !!! USE CCD SPECULATIVE !!!
+// FIXME: !!! USE CCD SPECULATIVE !!!
 
 using UnityEngine;
 using UnityEngine.VFX;
@@ -40,10 +40,15 @@ public class LaserBeam : MonoBehaviour
         // TODO: Add sci-fi effect when collides
     }
 
+    void OnDestroy()
+    {
+        // TODO: Add sci-fi dead effect when destroy
+    }
+
     IEnumerator LifeTimeOver(float lifeTime)
     {
         yield return new WaitForSeconds(lifeTime);
-        // TODO: Add sci-fi dead effect when destroy
+        
         Destroy(gameObject);
     }
 }

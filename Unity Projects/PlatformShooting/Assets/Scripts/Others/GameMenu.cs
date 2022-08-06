@@ -31,6 +31,8 @@ public class GameMenu : MonoBehaviour {
         _redTeamNum = GameObject.FindGameObjectsWithTag(_redTeamTag).Length;
         _blueTeamNum = GameObject.FindGameObjectsWithTag(_blueTeamTag).Length;
         _neutralNum = GameObject.FindGameObjectsWithTag(_neutralTag).Length;
+
+        UpdateGameUI();
     }
 
     void Update()
@@ -40,6 +42,8 @@ public class GameMenu : MonoBehaviour {
             if (IsPause) ResumeGame();
             else PauseGame();
         }
+
+        // TODO: Player choose Weapon
     }
 
     public void ResumeGame()
@@ -120,17 +124,17 @@ public class GameMenu : MonoBehaviour {
     private void UpdateGameUI()
     {
         string gameScore = 
-            "Red: " + _redTeamNum.ToString().PadLeft(2) + "\n" +
-            "Blue: " + _redTeamNum.ToString().PadLeft(2) + "";
+            "<#D0BDC7>Red: " + _redTeamNum.ToString().PadLeft(2, '0') + "\n" +
+            "<#B4BED1>Blue: " + _blueTeamNum.ToString().PadLeft(2, '0');
         _scoreText.text = gameScore;
     }
 
     private void GameOver()
     {
-        if ((_redTeamNum <= 0) && (_blueTeamNum <= 0)) _gameOverText.text = "A Rare Tie !";
-        else if (_redTeamNum <= 0) _gameOverText.text = "Blue Wins";
-        else if (_blueTeamNum <= 0) _gameOverText.text = "Red Wins";
-        else _gameOverText.text = "Hmm...Something wrong with the result.";
+        if ((_redTeamNum <= 0) && (_blueTeamNum <= 0)) _gameOverText.text = "<#C6A2D1>A Rare Tie !";
+        else if (_redTeamNum <= 0) _gameOverText.text = "<#B4BED1>Blue Wins";
+        else if (_blueTeamNum <= 0) _gameOverText.text = "<#D0BDC7>Red Wins";
+        else _gameOverText.text = "<#FFFFFF>Hmm...Something wrong with the result.";
 
         InGameUI.SetActive(false);
         PauseMenuUI.SetActive(false);
@@ -144,7 +148,7 @@ public class GameMenu : MonoBehaviour {
             (_blueTeamTag + "Die") => "One Blue Team Member Die.",
             (_redTeamTag + "Die") => "One Red Team Member Die.",
             (_blueTeamTag + "Born") => "New Blue Team Member.",
-            (_redTeamTag + "Born") => "New Blue Team Member.",
+            (_redTeamTag + "Born") => "New Red Team Member.",
             "PlayerDie" => "You Are Dead. Wait For Reborn.",
             "PlayerBorn" => "You Are Alive, Again.",
             _ => null,
@@ -164,7 +168,7 @@ public class GameMenu : MonoBehaviour {
 
     IEnumerator NotificationAlpha()
     {
-        for (float alpha = 0f; alpha <= 1f; alpha += 0.1f)
+        for (float alpha = 0f; alpha <= 1f; alpha += Time.deltaTime * 1.2f)
         {
             _notifyText.alpha = alpha;
             yield return null;
@@ -172,7 +176,7 @@ public class GameMenu : MonoBehaviour {
 
         yield return new WaitForSeconds(3f);
 
-        for (float alpha = 1f; alpha >= 0f; alpha -= 0.1f)
+        for (float alpha = 1f; alpha >= 0f; alpha -= Time.deltaTime)
         {
             _notifyText.alpha = alpha;
             yield return null;

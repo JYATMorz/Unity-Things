@@ -74,7 +74,7 @@ public class WeaponControl : MonoBehaviour {
             newAmmo.AddForce(angleRandomness * _barrelTransform.up * ammoType.AmmoSpeed, ForceMode.VelocityChange);
         } else
         {
-            gameMenu.ShowNotification("DeadZone");
+            if (!MainCamera.IsGameOver) gameMenu.ShowNotification("DeadZone");
         }
     }
 

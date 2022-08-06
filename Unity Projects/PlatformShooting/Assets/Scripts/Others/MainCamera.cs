@@ -8,9 +8,10 @@ public class MainCamera : MonoBehaviour
 
     public static bool IsGameOver = false;
 
+    private const float _limitPositionX = 45f;
+
     private Vector3 _cameraOffset = new(0, 1, -8);
     private Vector3 _endGamePos = Vector3.zero;
-    private Vector3 _clampVelocity = Vector3.zero;
     private string _playerTag;
     private string _enemyTag;
     private bool _onPosition = true;
@@ -51,10 +52,14 @@ public class MainCamera : MonoBehaviour
                 return;
             }
 
-            // FIXME: Try implement damping
-            // if (!CameraIsClose(transform.position, player.position, 1f))
-            // transform.position = player.position + _cameraOffset;
-            transform.position = Vector3.SmoothDamp(transform.position, player.position + _cameraOffset, ref _clampVelocity, 0.5f);
+            if (Mathf.Abs(player.position.x) < _limitPositionX)
+            {
+                transform.position = player.position + _cameraOffset;
+                transform.LookAt(player);
+            } else
+            {
+                transform.position = new Vector3(Mathf.Sign(player.position.x) * _limitPositionX, player.position.y, 0) + _cameraOffset;
+            }
         } else
         {
             transform.position = Vector3.MoveTowards(transform.position, player.position + _cameraOffset, 10 * Time.deltaTime);
@@ -64,8 +69,10 @@ public class MainCamera : MonoBehaviour
                 _onPosition = true;
                 player.SendMessage("BecomePlayer");
             }
+
+            transform.LookAt(player);
+
         }
-        transform.LookAt(player);
     }
 
     private void ChangePlayer()
@@ -96,5 +103,10 @@ public class MainCamera : MonoBehaviour
     {
         if ((current - target - _cameraOffset).sqrMagnitude < limit) return true;
         else return false;
+    }
+
+    public void ForceUpdateCamera()
+    {
+        transform.position = new Vector3(Mathf.Sign(player.position.x) * _limitPositionX, player.position.y, player.position.z) + _cameraOffset;
     }
 }

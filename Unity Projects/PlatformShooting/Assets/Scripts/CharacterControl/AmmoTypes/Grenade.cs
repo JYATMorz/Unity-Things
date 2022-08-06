@@ -33,6 +33,11 @@ public class Grenade : MonoBehaviour
         // TODO: Add hit (particle) effect when collides
     }
 
+    void OnDestroy()
+    {
+        // TODO: Add explosion (particle) dead effect when destroy
+    }
+
     IEnumerator LifeTimeOver(float lifeTime)
     {
         yield return new WaitForSeconds(lifeTime);
@@ -46,7 +51,7 @@ public class Grenade : MonoBehaviour
         {
             if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
             {
-                if (_ownerTag != _neutralTag || !character.CompareTag(_neutralTag) || !character.CompareTag(_deadTag))
+                if (!character.CompareTag(_deadTag) && !(_ownerTag == _neutralTag && character.CompareTag(_neutralTag)))
                 {
                     character.SendMessage("ReceiveDamage", Mathf.FloorToInt(_ammoDamage
                         * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius))));
@@ -56,6 +61,5 @@ public class Grenade : MonoBehaviour
             
         }
 
-        // TODO: Add explosion (particle) dead effect when destroy
     }
 }
