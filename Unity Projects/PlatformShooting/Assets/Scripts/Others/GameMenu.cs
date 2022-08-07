@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using TMPro;
@@ -6,16 +7,19 @@ using TMPro;
 public class GameMenu : MonoBehaviour {
     
     public static bool IsPause = false;
+
+    public GameObject NotifyPrefab;
+    public GameObject NotificationPanel;
     public GameObject PauseMenuUI;
     public GameObject EndGameUI;
     public GameObject InGameUI;
+    public TextMeshProUGUI ScoreText;
 
     private int _redTeamNum = 0;
     private int _blueTeamNum = 0;
     private int _neutralNum = 0;
-    private TextMeshProUGUI _scoreText;
-    private TextMeshProUGUI _notifyText;
     private TextMeshProUGUI _gameOverText;
+    private Button[] _weaponButtons;
 
     private const string _neutralTag = "Neutral";
     private const string _blueTeamTag = "BlueTeam";
@@ -23,8 +27,6 @@ public class GameMenu : MonoBehaviour {
 
     void Start()
     {
-        _scoreText = InGameUI.GetComponentsInChildren<TextMeshProUGUI>(true)[0];
-        _notifyText = InGameUI.GetComponentsInChildren<TextMeshProUGUI>(true)[1];
         _gameOverText = EndGameUI.GetComponentInChildren<TextMeshProUGUI>(true);
 
 
@@ -126,7 +128,7 @@ public class GameMenu : MonoBehaviour {
         string gameScore = 
             "<#D0BDC7>Red: " + _redTeamNum.ToString().PadLeft(2, '0') + "\n" +
             "<#B4BED1>Blue: " + _blueTeamNum.ToString().PadLeft(2, '0');
-        _scoreText.text = gameScore;
+        ScoreText.text = gameScore;
     }
 
     private void GameOver()
@@ -143,7 +145,7 @@ public class GameMenu : MonoBehaviour {
 
     public void ShowNotification(string noteType)
     {
-        string notification = noteType switch {
+        string notifyText = noteType switch {
             "DeadZone" => "Shooting Dead Zone !\n",
             (_blueTeamTag + "Die") => "One Blue Team Member Die.",
             (_redTeamTag + "Die") => "One Red Team Member Die.",
@@ -154,34 +156,14 @@ public class GameMenu : MonoBehaviour {
             _ => null,
         };
 
-        if (notification == null)
+        if (notifyText == null)
         {
             Debug.LogWarning("Wrong Notification Input");
             return;
         }
 
-        _notifyText.text = notification;
-        
-        StopAllCoroutines();
-        StartCoroutine(NotificationAlpha());
+        GameObject newNotify = Instantiate(NotifyPrefab, NotificationPanel.transform);
+        newNotify.GetComponent<NotificationBlock>().StartNotification(notifyText);
     }
 
-    IEnumerator NotificationAlpha()
-    {
-        for (float alpha = 0f; alpha <= 1f; alpha += Time.deltaTime * 1.2f)
-        {
-            _notifyText.alpha = alpha;
-            yield return null;
-        }
-
-        yield return new WaitForSeconds(3f);
-
-        for (float alpha = 1f; alpha >= 0f; alpha -= Time.deltaTime)
-        {
-            _notifyText.alpha = alpha;
-            yield return null;
-        }
-
-        _notifyText.alpha = 0f;
-    }
 }
