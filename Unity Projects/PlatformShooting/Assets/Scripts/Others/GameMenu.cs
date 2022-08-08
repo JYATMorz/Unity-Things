@@ -8,12 +8,16 @@ public class GameMenu : MonoBehaviour {
     
     public static bool IsPause = false;
 
+    [Header("In Game UI Elements")]
+    public GameObject InGameUI;
     public GameObject NotifyPrefab;
     public GameObject NotificationPanel;
-    public GameObject PauseMenuUI;
-    public GameObject EndGameUI;
-    public GameObject InGameUI;
     public TextMeshProUGUI ScoreText;
+    public GameObject WeaponPanel;
+    [Header("Pause Menu UI Elements")]
+    public GameObject PauseMenuUI;
+    [Header("Game Over UI Elements")]
+    public GameObject EndGameUI;
 
     private int _redTeamNum = 0;
     private int _blueTeamNum = 0;
@@ -29,6 +33,7 @@ public class GameMenu : MonoBehaviour {
     {
         _gameOverText = EndGameUI.GetComponentInChildren<TextMeshProUGUI>(true);
 
+        _weaponButtons = WeaponPanel.GetComponentsInChildren<Button>();
 
         _redTeamNum = GameObject.FindGameObjectsWithTag(_redTeamTag).Length;
         _blueTeamNum = GameObject.FindGameObjectsWithTag(_blueTeamTag).Length;
@@ -44,8 +49,6 @@ public class GameMenu : MonoBehaviour {
             if (IsPause) ResumeGame();
             else PauseGame();
         }
-
-        // TODO: Player choose Weapon
     }
 
     public void ResumeGame()
@@ -168,7 +171,10 @@ public class GameMenu : MonoBehaviour {
 
     public void SwitchWeaponIcon(int num)
     {
-        // TODO: switch weapon icon (Optional: Change scale according to choice)
-        Debug.Log(num);
+        for (int i = 0; i < _weaponButtons.Length; i++)
+        {
+            if (i == num) _weaponButtons[i].GetComponent<ButtonResize>.SizeToMax();
+            else _weaponButtons[i].GetComponent<ButtonResize>.SizeToMin();
+        }
     }
 }

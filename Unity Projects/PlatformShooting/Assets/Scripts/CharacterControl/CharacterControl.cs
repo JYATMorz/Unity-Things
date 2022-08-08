@@ -12,6 +12,7 @@ public class CharacterControl : MonoBehaviour
     private const float _shootRange = 10f;
     private const float _speedScaler = 5f;
     private const float _jumpScaler = 20f;
+    private const float _attackWillingness = 0.6f;
     private const string _bulletTag = "Bullet";
     private const string _neutralTag = "Neutral";
     private const string _blueTeamTag = "BlueTeam";
@@ -44,16 +45,18 @@ public class CharacterControl : MonoBehaviour
     private int _ammoTypeNum = 0;
     private float _rotateSpeed = _barrelRotateSpeed;
 
+    public bool IsTeleported { get; set; } = false;
+
+    [Header("Character Status")]
     [SerializeField] private bool _isNeutral = true;
     [SerializeField] private bool _isPlayer = false;
+    public Material m_BlueTeam;
+    public Material m_RedTeam;
 
-    public bool IsTeleported { get; set; } = false;
+    [Header("Scene Elements")]
     public Camera mainCamera;
     public GameMenu gameMenu;
     public NavMeshAgent npcAgent;
-    public float attackWillingness = 0.6f;
-    public Material m_BlueTeam;
-    public Material m_RedTeam;
 
     void Awake()
     {
@@ -78,7 +81,11 @@ public class CharacterControl : MonoBehaviour
     {
         _healthBar = GetComponentInChildren<HealthBar>();
 
-        if (_isPlayer) return;
+        if (_isPlayer)
+        {
+            gameMenu.SwitchWeaponIcon(_ammoTypeNum);
+            return;
+        }
 
         StartCoroutine(SeekEnemy());
         StartCoroutine(WanderAround());
@@ -215,7 +222,7 @@ public class CharacterControl : MonoBehaviour
     {
         foreach (Collider target in Physics.OverlapSphere(transform.position, _seekRange, _enemyLayer))
         {
-            if ((UnityEngine.Random.value < attackWillingness) && !ObstacleBetween(target.transform.position))
+            if ((UnityEngine.Random.value < _attackWillingness) && !ObstacleBetween(target.transform.position))
             {
                 _targetCharacter = target.gameObject;
                 break;

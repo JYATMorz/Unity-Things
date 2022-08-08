@@ -14,13 +14,16 @@ public class WeaponControl : MonoBehaviour {
     private bool _fireConfirm = false;
     private bool _isFiring = false;
 
+    [Header("In Game UI")]
     public GameMenu gameMenu;
+    [Header("Ammo Prefabs")]
     public Rigidbody bulletPrefab;
     public Rigidbody laserPrefab;
     public Rigidbody grenadePrefab;
     public Rigidbody explosivePrefab;
 
     // TODO: shoot effect: gameObject / VFX
+    // [Header("Visual Effect Prefabs")]
 
     void Awake()
     {
