@@ -38,6 +38,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Others\MainCamera.cs" />
      <Compile Include="Assets\Scripts\Others\ForceElevator.cs" />
+     <Compile Include="Assets\Scripts\Others\NotificationBlock.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\Grenade.cs" />
      <Compile Include="Assets\Scripts\Others\GameMenu.cs" />
      <Compile Include="Assets\Scripts\Others\TeleportWall.cs" />
@@ -51,7 +52,7 @@
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\TemplateBullet.cs" />
      <Compile Include="Assets\Scripts\Others\BillboardCanvas.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\LaserBeam.cs" />
-     <Compile Include="Assets\NotificationBlock.cs" />
+     <Compile Include="Assets\Scripts\Others\ButtonResize.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\Scripts\Note.txt" />

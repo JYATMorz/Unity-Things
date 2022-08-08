@@ -166,4 +166,9 @@ public class GameMenu : MonoBehaviour {
         newNotify.GetComponent<NotificationBlock>().StartNotification(notifyText);
     }
 
+    public void SwitchWeaponIcon(int num)
+    {
+        // TODO: switch weapon icon (Optional: Change scale according to choice)
+        Debug.Log(num);
+    }
 }

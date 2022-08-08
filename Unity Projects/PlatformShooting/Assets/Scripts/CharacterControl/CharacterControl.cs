@@ -41,7 +41,7 @@ public class CharacterControl : MonoBehaviour
     // private int _neutralLayer;
     private int _deadLayer;
     private int _enemyLayer = -1;
-    private string _ammoType = "CommonBullet";
+    private int _ammoTypeNum = 0;
     private float _rotateSpeed = _barrelRotateSpeed;
 
     [SerializeField] private bool _isNeutral = true;
@@ -64,7 +64,7 @@ public class CharacterControl : MonoBehaviour
         _avoidLayer = _floorLayer;
         _deadLayer = LayerMask.NameToLayer(_deadTag);
 
-        _ammoType = _ammoTypes[UnityEngine.Random.Range(0, _ammoTypes.Length)];
+        _ammoTypeNum = UnityEngine.Random.Range(0, _ammoTypes.Length);
 
         if (_isNeutral && _isPlayer) Debug.LogWarning("Character Setting is Wrong !");
         if (!_isNeutral)
@@ -94,9 +94,15 @@ public class CharacterControl : MonoBehaviour
                 _jumpPressed = true;
 
             if (Input.GetKey(KeyCode.Mouse0))
-                gameObject.SendMessage("BarrelShoot", _ammoType);
+                gameObject.SendMessage("BarrelShoot", _ammoTypes[_ammoTypeNum]);
             else
                 gameObject.SendMessage("StopShoot");
+
+            if (Input.GetKeyDown(KeyCode.Alpha1)) ChangeWeapon(0);
+            else if (Input.GetKeyDown(KeyCode.Alpha2)) ChangeWeapon(1);
+            else if (Input.GetKeyDown(KeyCode.Alpha3)) ChangeWeapon(2);
+            else if (Input.GetKeyDown(KeyCode.Alpha4)) ChangeWeapon(3);
+            else if (Input.mouseScrollDelta.y != 0) ChangeWeapon((_ammoTypeNum + (int)Input.mouseScrollDelta.y) % 4);
         }
 
     }
@@ -284,7 +290,7 @@ public class CharacterControl : MonoBehaviour
         if (!_chaseMode && AimAtTarget())
         {
             if (!ObstacleBetween(_targetPosition, _avoidLayer))
-                gameObject.SendMessage("BarrelShoot", _ammoType);
+                gameObject.SendMessage("BarrelShoot", _ammoTypes[_ammoTypeNum]);
             else
                 gameObject.SendMessage("StopShoot");
         } else
@@ -445,6 +451,14 @@ public class CharacterControl : MonoBehaviour
 
         StopAllCoroutines();
         gameMenu.ShowNotification("PlayerBorn");
+    }
+
+    private void ChangeWeapon(int num)
+    {
+        _ammoTypeNum = (num < 0) ? (num + _ammoTypes.Length) : num;
+
+        gameMenu.SwitchWeaponIcon(_ammoTypeNum);
+        // TODO: switch different vfx
     }
 }
 
