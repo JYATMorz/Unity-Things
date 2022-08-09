@@ -6,7 +6,7 @@ public class ButtonResize : MonoBehaviour
 {
     private const float _maxSize = 80f;
     private const float _minSize = 60f;
-    public int scalar = 2;
+    private const int _resizeScalar = 100;
 
     private RectTransform _rectTransform;
     private Button _thisButton;
@@ -14,21 +14,19 @@ public class ButtonResize : MonoBehaviour
     void Start()
     {
         _rectTransform = GetComponent<RectTransform>();
-        _thisButton = GetComponent<ButtonResize>();
+        _thisButton = GetComponent<Button>();
     }
 
     public void SizeToMax()
     {
-        // FIXME: set the rect size to max
         StopAllCoroutines();
-        StartCoroutine(ChangeSize(scalar));
+        StartCoroutine(ChangeSize(_resizeScalar));
     }
 
     public void SizeToMin()
     {
-        // FIXME: set the rect size
         StopAllCoroutines();
-        StartCoroutine(ChangeSize(-scalar));
+        StartCoroutine(ChangeSize(-_resizeScalar));
     }
 
     IEnumerator ChangeSize(int scalar)
@@ -37,7 +35,7 @@ public class ButtonResize : MonoBehaviour
 
         if (scalar < 0)
         {
-            _thisButton.Interactable = true;
+            _thisButton.interactable = true;
             for (float size = _rectTransform.sizeDelta.x; size > _minSize; size += scalar * Time.deltaTime)
             {
                 SetRectTransformSize(size);
@@ -46,7 +44,7 @@ public class ButtonResize : MonoBehaviour
             SetRectTransformSize(_minSize);
         } else if (scalar > 0)
         {
-            _thisButton.Interactable = false;
+            _thisButton.interactable = false;
             for (float size = _rectTransform.sizeDelta.x; size < _maxSize; size += scalar * Time.deltaTime)
             {
                 SetRectTransformSize(size);

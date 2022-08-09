@@ -11,7 +11,7 @@ public class Grenade : MonoBehaviour
 
     private const int _ammoDamage = 20;
     private const float _explosionRadius = 5f;
-    private const float _lifeTime = 4f;
+    private const float _lifeTime = 3f;
     private const string _deadTag = "Dead";
     private const string _neutralTag = "Neutral";
 
@@ -26,6 +26,8 @@ public class Grenade : MonoBehaviour
         _characterLayer = LayerMask.GetMask("Neutral", "BlueTeam", "RedTeam", "Dead");
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
         StartCoroutine(LifeTimeOver(_lifeTime));
+
+        GetComponent<Rigidbody>().AddTorque(Random.value, Random.value, Random.value, ForceMode.Impulse);
     }
 
     void OnCollisionEnter()
@@ -49,14 +51,17 @@ public class Grenade : MonoBehaviour
     {
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
         {
-            if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
+            // BUG: Nobody get hurt (LineCast)
+            // if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
+            if (true)
             {
                 if (!character.CompareTag(_deadTag) && !(_ownerTag == _neutralTag && character.CompareTag(_neutralTag)))
                 {
+                    // BUG: who is killer?
                     character.SendMessage("ReceiveDamage", Mathf.FloorToInt(_ammoDamage
                         * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius))));
                 }
-                character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0, ForceMode.Impulse);
+                character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, _ammoDamage, ForceMode.Impulse);
             }
             
         }

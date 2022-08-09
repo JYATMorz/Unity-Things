@@ -29,11 +29,16 @@ public class GameMenu : MonoBehaviour {
     private const string _blueTeamTag = "BlueTeam";
     private const string _redTeamTag = "RedTeam";
 
+    void Awake()
+    {
+        _weaponButtons = WeaponPanel.GetComponentsInChildren<Button>();
+    }
+
     void Start()
     {
         _gameOverText = EndGameUI.GetComponentInChildren<TextMeshProUGUI>(true);
 
-        _weaponButtons = WeaponPanel.GetComponentsInChildren<Button>();
+        // _weaponButtons = WeaponPanel.GetComponentsInChildren<Button>();
 
         _redTeamNum = GameObject.FindGameObjectsWithTag(_redTeamTag).Length;
         _blueTeamNum = GameObject.FindGameObjectsWithTag(_blueTeamTag).Length;
@@ -173,8 +178,8 @@ public class GameMenu : MonoBehaviour {
     {
         for (int i = 0; i < _weaponButtons.Length; i++)
         {
-            if (i == num) _weaponButtons[i].GetComponent<ButtonResize>.SizeToMax();
-            else _weaponButtons[i].GetComponent<ButtonResize>.SizeToMin();
+            if (i == num) _weaponButtons[i].GetComponent<ButtonResize>().SizeToMax();
+            else _weaponButtons[i].GetComponent<ButtonResize>().SizeToMin();
         }
     }
 }

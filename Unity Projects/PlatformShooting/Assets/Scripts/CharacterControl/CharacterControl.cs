@@ -148,6 +148,7 @@ public class CharacterControl : MonoBehaviour
             return;
         }
 
+        // FIXME: Target position
         if (_targetCharacter != null && !ObstacleBetween(_targetCharacter.transform.position))
             _targetPosition = _targetCharacter.transform.position;
 

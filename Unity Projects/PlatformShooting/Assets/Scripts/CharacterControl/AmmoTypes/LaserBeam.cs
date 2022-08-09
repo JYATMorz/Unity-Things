@@ -1,5 +1,3 @@
-// FIXME: !!! USE CCD SPECULATIVE !!!
-
 using UnityEngine;
 using UnityEngine.VFX;
 using System;
@@ -12,19 +10,21 @@ public class LaserBeam : MonoBehaviour
     public VisualEffect laserDestroy;
 
     private const int _ammoDamage = 10;
-    private const float _lifeTime = 10f;
+    private const float _lifeTime = 5f;
     private const string _neutralTag = "Neutral";
 
     private readonly string[] _characterTag = { "Neutral", "RedTeam", "BlueTeam" };
     
-
+    private Rigidbody _laserBody;
     private string _ownerTag;
 
     void Start()
     {
         _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
+        _laserBody = GetComponent<Rigidbody>();
 
         StartCoroutine(LifeTimeOver(_lifeTime));
+        StartCoroutine(TooSlowToLive());
     }
 
     void OnCollisionEnter(Collision other)
@@ -36,6 +36,7 @@ public class LaserBeam : MonoBehaviour
             {
                 contact.SendMessage("ReceiveDamage", _ammoDamage);
             }
+            Destroy(gameObject);
         }
         // TODO: Add sci-fi effect when collides
     }
@@ -50,5 +51,16 @@ public class LaserBeam : MonoBehaviour
         yield return new WaitForSeconds(lifeTime);
         
         Destroy(gameObject);
+    }
+
+    IEnumerator TooSlowToLive()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        while (true)
+        {
+            if (_laserBody.velocity.sqrMagnitude < 50) Destroy(gameObject);
+            yield return new WaitForFixedUpdate();
+        }
     }
 }

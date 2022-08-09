@@ -5,10 +5,10 @@ using AmmoType;
 
 public class WeaponControl : MonoBehaviour {
     
-    private AmmoData _commonBullet = new(20, 0.5f, 0.5f);
+    private AmmoData _commonBullet = new(20, 0.6f, 0.5f);
     private AmmoData _laserBeam = new(100, 1f, 0f);
-    private AmmoData _grenadeLauncher = new(10, 0.8f, 2f);
-    private AmmoData _explosivePayload = new(25, 0.5f, 1f);
+    private AmmoData _grenadeLauncher = new(10, 1.2f, 2f);
+    private AmmoData _explosivePayload = new(25, 0.8f, 1f);
     private Rigidbody _barrelShaft;
     // private VisualEffect _shootSmoke;
     private bool _fireConfirm = false;
