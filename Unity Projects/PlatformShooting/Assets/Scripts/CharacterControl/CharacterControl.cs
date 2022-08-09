@@ -148,7 +148,6 @@ public class CharacterControl : MonoBehaviour
             return;
         }
 
-        // FIXME: Target position
         if (_targetCharacter != null && !ObstacleBetween(_targetCharacter.transform.position))
             _targetPosition = _targetCharacter.transform.position;
 
@@ -339,11 +338,17 @@ public class CharacterControl : MonoBehaviour
     private bool AimAtTarget()
     {
         // FIXME: working weirdly
+        Debug.Log(_barrelShaft.transform.up);
+        // TODO: parabola
+        // https://physics.stackexchange.com/questions/56265/how-to-get-the-angle-needed-for-a-projectile-to-pass-through-a-given-point-for-t/70480#70480
         return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, ~_targetCharacter.layer);
     }
 
-    private void ReceiveDamage(int damage)
+    // FIXME: private => public
+    public void ReceiveDamage(int damage, Rigidbody attacker = null)
     {
+        if (attacker != null) SwitchTarget(attacker);
+
         _currentHealth -= damage;
 
         if (_currentHealth <= 0)
