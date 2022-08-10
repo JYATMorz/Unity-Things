@@ -2,12 +2,11 @@ using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
 using System.Collections.Generic;
-using AmmoType;
 
 public class WeaponControl : MonoBehaviour {
     private const int _barrelRotateSpeed = 45;
 
-    private readonly Dictionary<string, AmmoData> _ammoInfos;
+    private readonly Dictionary<string, AmmoData> _ammoInfos = new();
     private readonly string[] _ammoTypes =
         { "CommonBullet", "LaserBeam", "GrenadeLauncher", "ExplosivePayload" };
 
@@ -31,14 +30,15 @@ public class WeaponControl : MonoBehaviour {
 
     [Header("In Game UI")]
     public GameMenu gameMenu;
-    [Header("Ammo Prefabs")]
+    [Header("Ammo Prefabs & VFX")]
     public Rigidbody bulletPrefab;
-    public Rigidbody laserPrefab;
-    public Rigidbody grenadePrefab;
-    public Rigidbody explosivePrefab;
-
     // TODO: shoot effect: gameObject / VFX
-    // [Header("Visual Effect Prefabs")]
+    [Space]
+    public Rigidbody laserPrefab;
+    [Space]
+    public Rigidbody grenadePrefab;
+    [Space]
+    public Rigidbody explosivePrefab;
 
     void Awake()
     {
@@ -101,7 +101,8 @@ public class WeaponControl : MonoBehaviour {
             newAmmo.AddForce(_barrelTransform.up * ammoType.AmmoSpeed, ForceMode.VelocityChange);
         } else
         {
-            if (!MainCamera.IsGameOver) gameMenu.ShowNotification("DeadZone");
+            // FIXME:if (!MainCamera.IsGameOver) gameMenu.ShowNotification("DeadZone");
+            // only player's notification
         }
     }
 
@@ -109,9 +110,9 @@ public class WeaponControl : MonoBehaviour {
     {
         while(_fireConfirm)
         {
-            yield return new WaitForSeconds(ammoType.FireInterval);
             _isFiring = true;
             ShootOnce(ammoType);
+            yield return new WaitForSeconds(ammoType.FireInterval);
         }
         _isFiring = false;
     }
@@ -140,7 +141,8 @@ public class WeaponControl : MonoBehaviour {
     private void BarrelAim()
     {
         Quaternion targetRotation =
-            CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
+            // FIXME: CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
+            CurrentAmmo.IsParabola ? DirectAim(TargetPosition) : DirectAim(TargetPosition);
         _barrelShaft.rotation =
             Quaternion.RotateTowards(_barrelShaft.rotation, targetRotation, 3 * _barrelRotateSpeed * Time.fixedDeltaTime);
 
@@ -155,7 +157,7 @@ public class WeaponControl : MonoBehaviour {
         return Quaternion.FromToRotation(Vector3.up, (targetPos - _barrelShaft.position).normalized);
     }
 
-    // FIXME: parabola
+    // BUG: parabola
     // https://physics.stackexchange.com/questions/56265/how-to-get-the-angle-needed-for-a-projectile-to-pass-through-a-given-point-for-t/70480#70480
     private Quaternion ParabolaAim(Vector3 targetPos, int speed)
     {
@@ -168,7 +170,7 @@ public class WeaponControl : MonoBehaviour {
 
         float tanAngle = sign * speed * speed / gravity / deltaX
             - Mathf.Sqrt((Mathf.Pow(speed, 4) - 2 * speed * speed * gravity * deltaY) / (gravity * gravity * deltaX * deltaX) - 1);
-        Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan(tanAngle) * Mathf.Rad2Deg - 90);
+        Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan(tanAngle) * Mathf.Rad2Deg);
 
         return rotation.normalized;
     }
@@ -177,7 +179,7 @@ public class WeaponControl : MonoBehaviour {
     {
         if (isScroll)
         {
-            int temp = (_ammoTypeNum + num) % 4;
+            int temp = (_ammoTypeNum - num) % 4;
             _ammoTypeNum = (temp < 0) ? temp + _ammoTypes.Length : temp;
         } else _ammoTypeNum = num;
 

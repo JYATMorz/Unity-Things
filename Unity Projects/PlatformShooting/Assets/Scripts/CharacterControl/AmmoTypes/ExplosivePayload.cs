@@ -26,7 +26,7 @@ public class ExplosivePayload : MonoBehaviour
 
     void OnCollisionEnter()
     {
-        SmallExplosion();
+        Explosion();
         Destroy(gameObject);
     }
 
@@ -35,7 +35,7 @@ public class ExplosivePayload : MonoBehaviour
         // TODO: Add explosion (particle) dead effect when destroy
     }
 
-    private void SmallExplosion()
+    private void Explosion()
     {
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
         {

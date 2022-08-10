@@ -6,7 +6,8 @@ using TMPro;
 
 public class GameMenu : MonoBehaviour {
     
-    public static bool IsPause = false;
+    public static bool IsPause { get; set; } = false;
+    public WeaponControl CurrentPlayerControl { get; set; } = null;
 
     [Header("In Game UI Elements")]
     public GameObject InGameUI;
@@ -32,6 +33,12 @@ public class GameMenu : MonoBehaviour {
     void Awake()
     {
         _weaponButtons = WeaponPanel.GetComponentsInChildren<Button>();
+
+        for (int i = 0; i < _weaponButtons.Length; i++)
+        {
+            int buttonIndex = i;
+            _weaponButtons[i].onClick.AddListener(() => CurrentPlayerControl.ChangeWeapon(buttonIndex));
+        }
     }
 
     void Start()
@@ -49,6 +56,8 @@ public class GameMenu : MonoBehaviour {
 
     void Update()
     {
+        if (MainCamera.IsGameOver) return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (IsPause) ResumeGame();
@@ -141,6 +150,8 @@ public class GameMenu : MonoBehaviour {
 
     private void GameOver()
     {
+        MainCamera.GameIsOver();
+
         if ((_redTeamNum <= 0) && (_blueTeamNum <= 0)) _gameOverText.text = "<#C6A2D1>A Rare Tie !";
         else if (_redTeamNum <= 0) _gameOverText.text = "<#B4BED1>Blue Wins";
         else if (_blueTeamNum <= 0) _gameOverText.text = "<#D0BDC7>Red Wins";

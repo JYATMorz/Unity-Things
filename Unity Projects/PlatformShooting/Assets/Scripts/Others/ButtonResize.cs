@@ -19,12 +19,16 @@ public class ButtonResize : MonoBehaviour
 
     public void SizeToMax()
     {
+        if (!gameObject.activeInHierarchy) return;
+
         StopAllCoroutines();
         StartCoroutine(ChangeSize(_resizeScalar));
     }
 
     public void SizeToMin()
     {
+        if (!gameObject.activeInHierarchy) return;
+
         StopAllCoroutines();
         StartCoroutine(ChangeSize(-_resizeScalar));
     }

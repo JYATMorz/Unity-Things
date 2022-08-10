@@ -1,12 +1,10 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class MainCamera : MonoBehaviour
 {
     public Transform player;
-    public UnityEvent gameOverEvent;
 
-    public static bool IsGameOver = false;
+    public static bool IsGameOver { get; private set;} = false;
 
     private const float _limitPositionX = 45f;
 
@@ -34,6 +32,8 @@ public class MainCamera : MonoBehaviour
     {
         if (IsGameOver)
         {
+            if (player != null && !player.CompareTag("Dead")) FocusOnPlayer();
+
             if (_onPosition) return;
 
             if (!CameraIsClose(transform.position, _endGamePos))
@@ -52,14 +52,8 @@ public class MainCamera : MonoBehaviour
                 return;
             }
 
-            if (Mathf.Abs(player.position.x) < _limitPositionX)
-            {
-                transform.position = player.position + _cameraOffset;
-                transform.LookAt(player);
-            } else
-            {
-                transform.position = new Vector3(Mathf.Sign(player.position.x) * _limitPositionX, player.position.y, 0) + _cameraOffset;
-            }
+            FocusOnPlayer();
+
         } else
         {
             transform.position = Vector3.MoveTowards(transform.position, player.position + _cameraOffset, 10 * Time.deltaTime);
@@ -89,11 +83,20 @@ public class MainCamera : MonoBehaviour
             }
             _endGamePos /= aliveEnemies.Length;
 
-            IsGameOver = true;
-            gameOverEvent.Invoke();
-
         } else {
             player = nextPlayer.transform;
+        }
+    }
+
+    private void FocusOnPlayer()
+    {
+        if (Mathf.Abs(player.position.x) < _limitPositionX)
+        {
+            transform.position = player.position + _cameraOffset;
+            transform.LookAt(player);
+        } else
+        {
+            transform.position = new Vector3(Mathf.Sign(player.position.x) * _limitPositionX, player.position.y, 0) + _cameraOffset;
         }
     }
 
@@ -106,5 +109,10 @@ public class MainCamera : MonoBehaviour
     public void ForceUpdateCamera()
     {
         transform.position = new Vector3(Mathf.Sign(player.position.x) * _limitPositionX, player.position.y, player.position.z) + _cameraOffset;
+    }
+
+    public static void GameIsOver()
+    {
+        IsGameOver = true;
     }
 }

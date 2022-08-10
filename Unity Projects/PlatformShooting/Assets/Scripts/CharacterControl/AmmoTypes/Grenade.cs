@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
 
-// FIXME: Use interface and share with explosive
 public class Grenade : MonoBehaviour
 {
     // TODO: Leave explosion particle on the floor
@@ -46,11 +45,11 @@ public class Grenade : MonoBehaviour
     IEnumerator LifeTimeOver(float lifeTime)
     {
         yield return new WaitForSeconds(lifeTime);
-        HugeExplosion();
+        Explosion();
         Destroy(gameObject);
     }
 
-    private void HugeExplosion()
+    private void Explosion()
     {
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
         {

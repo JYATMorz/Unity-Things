@@ -11,9 +11,8 @@ public class ResetCharacter : MonoBehaviour
     {
         GameObject contact = other.gameObject;
 
-        if (contact.CompareTag(_bulletTag)) Destroy(contact);
-
         if (Array.Exists(_characterTags, tag => tag == contact.tag))
             contact.transform.position = new Vector3(contact.transform.position.x, _freeHeight, 0);
+        else Destroy(contact);
     }
 }

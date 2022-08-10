@@ -70,10 +70,16 @@ public class CharacterControl : MonoBehaviour
 
     void Start()
     {
+        StartCoroutine(OutOfMapCheck());
+
         _healthBar = GetComponentInChildren<HealthBar>();
 
         _weaponControl.IsBarrelIdle = !_isPlayer;
-        if (_isPlayer) return;
+        if (_isPlayer)
+        {
+            gameMenu.CurrentPlayerControl = GetComponent<WeaponControl>();
+            return;
+        }
 
         StartCoroutine(SeekEnemy());
         StartCoroutine(WanderAround());
@@ -82,7 +88,7 @@ public class CharacterControl : MonoBehaviour
 
     void Update()
     {
-        if (GameMenu.IsPause || MainCamera.IsGameOver) return;
+        if (GameMenu.IsPause) return;
 
         if (_isPlayer)
         {
@@ -93,6 +99,8 @@ public class CharacterControl : MonoBehaviour
                 _weaponControl.BarrelShoot();
             else
                 _weaponControl.StopShoot();
+
+            if (MainCamera.IsGameOver) return;
 
             if (Input.GetKeyDown(KeyCode.Alpha1)) _weaponControl.ChangeWeapon(0);
             else if (Input.GetKeyDown(KeyCode.Alpha2)) _weaponControl.ChangeWeapon(1);
@@ -330,6 +338,7 @@ public class CharacterControl : MonoBehaviour
         {
             gameMenu.CharacterDie(gameObject.tag);
             _weaponControl.StopShoot();
+            _weaponControl.StopAllCoroutines();
 
             DeadTagAndLayer();
             _characterBody.freezeRotation = false;
@@ -348,6 +357,7 @@ public class CharacterControl : MonoBehaviour
                 ForceMode.Impulse);
 
             _isDead = true;
+            StartCoroutine(OutOfMapCheck());
 
             return;
         }
@@ -416,11 +426,21 @@ public class CharacterControl : MonoBehaviour
         else Debug.Log("New Player Born!");
 
         FullHealth();
+        gameMenu.CurrentPlayerControl = GetComponent<WeaponControl>();
 
         StopAllCoroutines();
         _weaponControl.StopAllCoroutines();
         gameMenu.ShowNotification("PlayerBorn");
     }
 
+    IEnumerator OutOfMapCheck()
+    {
+        yield return new WaitForSecondsRealtime(5f);
+
+        if (transform.position.y < -15) Destroy(gameObject);
+
+        if (!_isDead && !Mathf.Approximately(transform.position.z, 0))
+            transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+    }
 }
 
