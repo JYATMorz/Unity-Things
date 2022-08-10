@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1172832185545319497}
   - component: {fileID: 1172832185545319499}
   - component: {fileID: 1172832185545319496}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Border
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 1172832186015470877}
   - component: {fileID: 1172832186015470874}
   - component: {fileID: 1172832186015470879}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,7 +202,7 @@ GameObject:
   - component: {fileID: 1172832186101091637}
   - component: {fileID: 1172832186101091639}
   - component: {fileID: 1172832186101091636}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -407,14 +407,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isNeutral: 1
   _isPlayer: 0
+  m_BlueTeam: {fileID: 2100000, guid: f24c7b58ba7d2c8489b54277d1eade0e, type: 2}
+  m_RedTeam: {fileID: 2100000, guid: 02803dd49c5e19c45a6662974455f9b7, type: 2}
   mainCamera: {fileID: 0}
   gameMenu: {fileID: 0}
   npcAgent: {fileID: 0}
-  attackWillingness: 0.6
-  m_BlueTeam: {fileID: 2100000, guid: f24c7b58ba7d2c8489b54277d1eade0e, type: 2}
-  m_RedTeam: {fileID: 2100000, guid: 02803dd49c5e19c45a6662974455f9b7, type: 2}
-  m_Neutral: {fileID: 2100000, guid: cabeb2dee1e3c2b46a54a3907459c15e, type: 2}
-  m_DeadBody: {fileID: 2100000, guid: b86c493d1b5d86a49809726c977252e6, type: 2}
 --- !u!114 &5472782923705971827
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -442,7 +439,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1172832186466110163}
   - component: {fileID: 1172832186466110165}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: BarrelRotationCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -491,7 +488,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1172832186574323360}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -532,7 +529,7 @@ GameObject:
   - component: {fileID: 1172832186920365325}
   - component: {fileID: 1172832186920365322}
   - component: {fileID: 1172832186920365327}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -620,7 +617,7 @@ GameObject:
   - component: {fileID: 2867046790337678169}
   - component: {fileID: 541652462757633671}
   - component: {fileID: 7177888113150181020}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: ShootSmoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}

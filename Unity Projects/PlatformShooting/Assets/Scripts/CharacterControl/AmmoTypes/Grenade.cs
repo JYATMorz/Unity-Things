@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
 
+// FIXME: Use interface and share with explosive
 public class Grenade : MonoBehaviour
 {
     // TODO: Leave explosion particle on the floor
@@ -53,15 +54,11 @@ public class Grenade : MonoBehaviour
     {
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
         {
-            // FIXME: Nobody get hurt (LineCast)
             if (Physics.Linecast(transform.position, character.transform.position, ~_floorLayer))
-            // if (true)
             {
                 if (!character.CompareTag(_deadTag) && !(_ownerTag == _neutralTag && character.CompareTag(_neutralTag)))
                 {
-                    // FIXME: who is killer?
                     int damage = Mathf.FloorToInt(_ammoDamage * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius)));
-                    // character.SendMessage("ReceiveDamage", damage);
                     character.GetComponent<CharacterControl>().ReceiveDamage(damage, _ownerBody);
                 }
                 character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, _ammoDamage, ForceMode.Impulse);

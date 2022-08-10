@@ -67,7 +67,7 @@ public class MainCamera : MonoBehaviour
             if (CameraIsClose(transform.position, player.position))
             {
                 _onPosition = true;
-                player.SendMessage("BecomePlayer");
+                player.GetComponent<CharacterControl>().BecomePlayer();
             }
 
             transform.LookAt(player);
@@ -81,8 +81,6 @@ public class MainCamera : MonoBehaviour
 
         if (nextPlayer == null)
         {
-            Debug.Log("Game Over. Did Enemy team win?");
-
             // transform camera to alive team members
             GameObject[] aliveEnemies = GameObject.FindGameObjectsWithTag(_enemyTag);
             foreach (GameObject aliveEnemy in aliveEnemies)

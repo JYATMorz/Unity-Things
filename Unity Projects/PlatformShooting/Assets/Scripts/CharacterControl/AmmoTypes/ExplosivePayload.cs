@@ -13,10 +13,12 @@ public class ExplosivePayload : MonoBehaviour
     private int _characterLayer;
     private int _floorLayer;
     private string _ownerTag;
+    private Rigidbody _ownerBody;
 
     void Start()
     {
-        _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
+        _ownerBody = GetComponentsInParent<Rigidbody>()[2];
+        _ownerTag = _ownerBody.tag;
 
         _characterLayer = LayerMask.GetMask("Neutral", "BlueTeam", "RedTeam", "Dead");
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
@@ -41,8 +43,8 @@ public class ExplosivePayload : MonoBehaviour
             {
                 if (!character.CompareTag(_deadTag) && !(_ownerTag == _neutralTag && character.CompareTag(_neutralTag)))
                 {
-                    character.SendMessage("ReceiveDamage", Mathf.FloorToInt(_ammoDamage
-                        * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius))));
+                    int damage = Mathf.FloorToInt(_ammoDamage * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius)));
+                    character.GetComponent<CharacterControl>().ReceiveDamage(damage, _ownerBody);
                 }
                 character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0, ForceMode.Impulse);
             }

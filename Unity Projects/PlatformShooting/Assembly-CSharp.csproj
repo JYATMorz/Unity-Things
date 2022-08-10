@@ -50,10 +50,10 @@
      <Compile Include="Assets\Scripts\Others\HealthBar.cs" />
      <Compile Include="Assets\Scripts\Others\BrickElevator.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\TemplateBullet.cs" />
+     <Compile Include="Assets\Scripts\Others\ResetCharacter.cs" />
      <Compile Include="Assets\Scripts\Others\ButtonResize.cs" />
      <Compile Include="Assets\Scripts\Others\BillboardCanvas.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\LaserBeam.cs" />
-     <Compile Include="Assets\Scripts\Others\ResetCharacter.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\Scripts\Note.txt" />

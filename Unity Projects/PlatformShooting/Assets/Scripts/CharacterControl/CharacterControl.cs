@@ -30,6 +30,7 @@ public class CharacterControl : MonoBehaviour
     private Rigidbody _characterBody;
     private Rigidbody _barrelShaft;
     private Quaternion _deltaRotation;
+    private WeaponControl _weaponControl;
     private bool _chaseMode = false;
     private bool _jumpPressed = false;
     private bool _onGround = false;
@@ -62,6 +63,7 @@ public class CharacterControl : MonoBehaviour
     {
         _characterBody = GetComponent<Rigidbody>();
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
+        _weaponControl = GetComponent<WeaponControl>();
 
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
         _avoidLayer = _floorLayer;
@@ -101,9 +103,9 @@ public class CharacterControl : MonoBehaviour
                 _jumpPressed = true;
 
             if (Input.GetKey(KeyCode.Mouse0))
-                gameObject.SendMessage("BarrelShoot", _ammoTypes[_ammoTypeNum]);
+                _weaponControl.BarrelShoot(_ammoTypes[_ammoTypeNum]);
             else
-                gameObject.SendMessage("StopShoot");
+                _weaponControl.StopShoot();
 
             if (Input.GetKeyDown(KeyCode.Alpha1)) ChangeWeapon(0);
             else if (Input.GetKeyDown(KeyCode.Alpha2)) ChangeWeapon(1);
@@ -281,7 +283,7 @@ public class CharacterControl : MonoBehaviour
 
     private void BarrelIdle()
     {
-        gameObject.SendMessage("StopShoot");
+        _weaponControl.StopShoot();
 
         if (Quaternion.Angle(Quaternion.identity, _barrelShaft.rotation) > 120) _rotateSpeed *= -1;
 
@@ -297,11 +299,11 @@ public class CharacterControl : MonoBehaviour
         if (!_chaseMode && AimAtTarget())
         {
             if (!ObstacleBetween(_targetPosition, _avoidLayer))
-                gameObject.SendMessage("BarrelShoot", _ammoTypes[_ammoTypeNum]);
+                _weaponControl.BarrelShoot(_ammoTypes[_ammoTypeNum]);
             else
-                gameObject.SendMessage("StopShoot");
+                _weaponControl.StopShoot();
         } else
-            gameObject.SendMessage("StopShoot");
+            _weaponControl.StopShoot();
     }
 
     private void ChaseTarget()
@@ -338,13 +340,9 @@ public class CharacterControl : MonoBehaviour
     private bool AimAtTarget()
     {
         // FIXME: working weirdly
-        Debug.Log(_barrelShaft.transform.up);
-        // TODO: parabola
-        // https://physics.stackexchange.com/questions/56265/how-to-get-the-angle-needed-for-a-projectile-to-pass-through-a-given-point-for-t/70480#70480
         return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, ~_targetCharacter.layer);
     }
 
-    // FIXME: private => public
     public void ReceiveDamage(int damage, Rigidbody attacker = null)
     {
         if (attacker != null) SwitchTarget(attacker);
@@ -372,7 +370,7 @@ public class CharacterControl : MonoBehaviour
         if (!_isNeutral)
         {
             gameMenu.CharacterDie(gameObject.tag);
-            gameObject.SendMessage("StopShoot");
+            _weaponControl.StopShoot();
 
             DeadTagAndLayer();
             _characterBody.freezeRotation = false;
@@ -395,11 +393,11 @@ public class CharacterControl : MonoBehaviour
             return;
         }
 
-        if (_targetCharacter!=null)
+        if (_targetCharacter != null)
         {
             _isNeutral = false;
             FullHealth();
-            _targetCharacter.SendMessage("FullHealth");
+            _targetCharacter.GetComponent<CharacterControl>().FullHealth();
 
             if (_targetCharacter.CompareTag(_redTeamTag))
             {
@@ -448,13 +446,10 @@ public class CharacterControl : MonoBehaviour
     private void DeadTagAndLayer()
     {
         gameObject.tag = _deadTag;
-        foreach(Collider child in GetComponentsInChildren<Collider>())
-        {
-            child.gameObject.layer = _deadLayer;
-        }
+        gameObject.layer = _deadLayer;
     }
 
-    private void BecomePlayer()
+    public void BecomePlayer()
     {
         _isPlayer = true;
         if (_isNeutral && _isPlayer) Debug.LogWarning("Neutral Character becomes Player !");
