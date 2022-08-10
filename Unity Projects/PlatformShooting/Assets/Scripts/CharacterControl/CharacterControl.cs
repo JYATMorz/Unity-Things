@@ -6,7 +6,6 @@ using System.Collections;
 public class CharacterControl : MonoBehaviour
 {
     private const int _initHealth = 100;
-    private const int _barrelRotateSpeed = 45;
     private const float _seekInterval = 1f;
     private const float _seekRange = 30f;
     private const float _shootRange = 10f;
@@ -21,15 +20,12 @@ public class CharacterControl : MonoBehaviour
 
     private readonly Vector3 _nullTargetPosition = new(0, 100, 0);
     private readonly string[] _floorTag = { "Floor", "Elevator" };
-    private readonly string[] _ammoTypes = 
-        { "CommonBullet", "LaserBeam", "GrenadeLauncher", "ExplosivePayload" };
 
     private GameObject _targetCharacter = null;
     private Vector3 _targetPosition;
     private HealthBar _healthBar;
     private Rigidbody _characterBody;
     private Rigidbody _barrelShaft;
-    private Quaternion _deltaRotation;
     private WeaponControl _weaponControl;
     private bool _chaseMode = false;
     private bool _jumpPressed = false;
@@ -39,12 +35,8 @@ public class CharacterControl : MonoBehaviour
     private int _doubleJump = 2;
     private int _currentHealth = _initHealth;
     private int _floorLayer;
-    private int _avoidLayer;
-    // private int _neutralLayer;
     private int _deadLayer;
     private int _enemyLayer = -1;
-    private int _ammoTypeNum = 0;
-    private float _rotateSpeed = _barrelRotateSpeed;
 
     public bool IsTeleported { get; set; } = false;
 
@@ -66,10 +58,7 @@ public class CharacterControl : MonoBehaviour
         _weaponControl = GetComponent<WeaponControl>();
 
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
-        _avoidLayer = _floorLayer;
         _deadLayer = LayerMask.NameToLayer(_deadTag);
-
-        _ammoTypeNum = UnityEngine.Random.Range(0, _ammoTypes.Length);
 
         if (_isNeutral && _isPlayer) Debug.LogWarning("Character Setting is Wrong !");
         if (!_isNeutral)
@@ -83,14 +72,12 @@ public class CharacterControl : MonoBehaviour
     {
         _healthBar = GetComponentInChildren<HealthBar>();
 
-        if (_isPlayer)
-        {
-            gameMenu.SwitchWeaponIcon(_ammoTypeNum);
-            return;
-        }
+        _weaponControl.IsBarrelIdle = !_isPlayer;
+        if (_isPlayer) return;
 
         StartCoroutine(SeekEnemy());
         StartCoroutine(WanderAround());
+        _weaponControl.StartNPC();
     }
 
     void Update()
@@ -103,15 +90,16 @@ public class CharacterControl : MonoBehaviour
                 _jumpPressed = true;
 
             if (Input.GetKey(KeyCode.Mouse0))
-                _weaponControl.BarrelShoot(_ammoTypes[_ammoTypeNum]);
+                _weaponControl.BarrelShoot();
             else
                 _weaponControl.StopShoot();
 
-            if (Input.GetKeyDown(KeyCode.Alpha1)) ChangeWeapon(0);
-            else if (Input.GetKeyDown(KeyCode.Alpha2)) ChangeWeapon(1);
-            else if (Input.GetKeyDown(KeyCode.Alpha3)) ChangeWeapon(2);
-            else if (Input.GetKeyDown(KeyCode.Alpha4)) ChangeWeapon(3);
-            else if (Input.mouseScrollDelta.y != 0) ChangeWeapon((_ammoTypeNum + (int)Input.mouseScrollDelta.y) % 4);
+            if (Input.GetKeyDown(KeyCode.Alpha1)) _weaponControl.ChangeWeapon(0);
+            else if (Input.GetKeyDown(KeyCode.Alpha2)) _weaponControl.ChangeWeapon(1);
+            else if (Input.GetKeyDown(KeyCode.Alpha3)) _weaponControl.ChangeWeapon(2);
+            else if (Input.GetKeyDown(KeyCode.Alpha4)) _weaponControl.ChangeWeapon(3);
+            else if (Input.mouseScrollDelta.y != 0) 
+                _weaponControl.ChangeWeapon((int)Input.mouseScrollDelta.y, true);
         }
 
     }
@@ -150,19 +138,21 @@ public class CharacterControl : MonoBehaviour
             return;
         }
 
+        // Update target position, prepare for NavMesh AI
         if (_targetCharacter != null && !ObstacleBetween(_targetCharacter.transform.position))
             _targetPosition = _targetCharacter.transform.position;
 
         // Control Barrel Here
-        if (_targetCharacter == null) BarrelIdle();
+        if (_targetCharacter == null) _weaponControl.IsBarrelIdle = true;
         else if (_targetCharacter.CompareTag(_deadTag) || CompareTag(_targetCharacter.tag))
         {
             ResetTargetCharacter();
-            BarrelIdle();
         }
         else
         {
-            BarrelAim();
+            _weaponControl.IsBarrelIdle = false;
+            _weaponControl.TargetPosition = _targetPosition;
+
             if (_chaseMode) ChaseTarget();
         }
     }
@@ -281,31 +271,6 @@ public class CharacterControl : MonoBehaviour
         }
     }
 
-    private void BarrelIdle()
-    {
-        _weaponControl.StopShoot();
-
-        if (Quaternion.Angle(Quaternion.identity, _barrelShaft.rotation) > 120) _rotateSpeed *= -1;
-
-        _deltaRotation = Quaternion.Euler(0, 0, _rotateSpeed * Time.fixedDeltaTime);
-        _barrelShaft.MoveRotation(_barrelShaft.rotation * _deltaRotation);
-    }
-
-    private void BarrelAim()
-    {
-        Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, (_targetPosition - _barrelShaft.position).normalized);
-        _barrelShaft.rotation = Quaternion.RotateTowards(_barrelShaft.rotation, targetRotation, 3 * _barrelRotateSpeed * Time.fixedDeltaTime);
-
-        if (!_chaseMode && AimAtTarget())
-        {
-            if (!ObstacleBetween(_targetPosition, _avoidLayer))
-                _weaponControl.BarrelShoot(_ammoTypes[_ammoTypeNum]);
-            else
-                _weaponControl.StopShoot();
-        } else
-            _weaponControl.StopShoot();
-    }
-
     private void ChaseTarget()
     {
         if (_targetPosition == null || _targetPosition == _nullTargetPosition) Debug.Log("Why there is no target position?");
@@ -334,13 +299,7 @@ public class CharacterControl : MonoBehaviour
     private bool ObstacleBetween(Vector3 targetPosition, int layer = -1)
     {
         if (layer == -1) layer = _floorLayer;
-        return Physics.Linecast(_barrelShaft.position, targetPosition, layer);
-    }
-
-    private bool AimAtTarget()
-    {
-        // FIXME: working weirdly
-        return Physics.Raycast(_barrelShaft.position, _barrelShaft.transform.up, _shootRange, ~_targetCharacter.layer);
+        return Physics.Linecast(transform.position, targetPosition, layer);
     }
 
     public void ReceiveDamage(int damage, Rigidbody attacker = null)
@@ -402,12 +361,12 @@ public class CharacterControl : MonoBehaviour
             if (_targetCharacter.CompareTag(_redTeamTag))
             {
                 gameObject.tag = _redTeamTag;
-                SwitchLayer(_redTeamTag, _blueTeamTag);
+                SwitchToTeamLayer(_redTeamTag, _blueTeamTag);
                 GetComponent<Renderer>().material = m_RedTeam;
             } else if (_targetCharacter.CompareTag(_blueTeamTag))
             {
                 gameObject.tag = _blueTeamTag;
-                SwitchLayer(_blueTeamTag, _redTeamTag);
+                SwitchToTeamLayer(_blueTeamTag, _redTeamTag);
                 GetComponent<Renderer>().material = m_BlueTeam;
             }
 
@@ -421,7 +380,7 @@ public class CharacterControl : MonoBehaviour
     {
         while (true)
         {
-            if ((_targetCharacter == null) && !_chaseMode)
+            if (_targetCharacter == null)
             {
                 _characterBody.velocity = new Vector3(Mathf.PingPong(Time.time, _speedScaler) - 0.5f * _speedScaler, _characterBody.velocity.y, 0);
             } else _characterBody.velocity = new Vector3(0, _characterBody.velocity.y, 0);
@@ -436,11 +395,12 @@ public class CharacterControl : MonoBehaviour
         _targetPosition = _nullTargetPosition;
     }
 
-    private void SwitchLayer(string teamTag, string enemyTag)
+    private void SwitchToTeamLayer(string teamTag, string enemyTag)
     {
         gameObject.layer = LayerMask.NameToLayer(teamTag);
-        _avoidLayer = LayerMask.GetMask(teamTag, "Floor", "Elevator");
         _enemyLayer = LayerMask.GetMask(enemyTag, _neutralTag);
+
+        _weaponControl.AvoidLayer = LayerMask.GetMask(teamTag, "Floor", "Elevator");
     }
 
     private void DeadTagAndLayer()
@@ -458,15 +418,9 @@ public class CharacterControl : MonoBehaviour
         FullHealth();
 
         StopAllCoroutines();
+        _weaponControl.StopAllCoroutines();
         gameMenu.ShowNotification("PlayerBorn");
     }
 
-    private void ChangeWeapon(int num)
-    {
-        _ammoTypeNum = (num < 0) ? (num + _ammoTypes.Length) : num;
-
-        gameMenu.SwitchWeaponIcon(_ammoTypeNum);
-        // TODO: switch different vfx
-    }
 }
 

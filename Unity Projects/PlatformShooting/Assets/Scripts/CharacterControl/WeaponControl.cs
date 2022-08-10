@@ -1,24 +1,37 @@
 using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
+using System.Collections.Generic;
 using AmmoType;
 
 public class WeaponControl : MonoBehaviour {
-    
-    private AmmoData _commonBullet = new(20, 0.6f, 0.5f);
-    private AmmoData _laserBeam = new(100, 1f, 0f);
-    private AmmoData _grenadeLauncher = new(10, 1.2f, 2f);
-    private AmmoData _explosivePayload = new(25, 0.8f, 1f);
+    private const int _barrelRotateSpeed = 45;
+
+    private readonly Dictionary<string, AmmoData> _ammoInfos;
+    private readonly string[] _ammoTypes =
+        { "CommonBullet", "LaserBeam", "GrenadeLauncher", "ExplosivePayload" };
+
+    private AmmoData _commonBullet = new("CommonBullet", 20, 0.6f, true);
+    private AmmoData _laserBeam = new("LaserBeam", 100, 1f);
+    private AmmoData _grenadeLauncher = new("GrenadeLauncher", 10, 1.2f, true);
+    private AmmoData _explosivePayload = new("ExplosivePayload", 25, 0.8f);
     private Rigidbody _barrelShaft;
     private Transform _barrelTransform;
+    private Quaternion _deltaRotation;
     // private VisualEffect _shootSmoke;
     private bool _fireConfirm = false;
     private bool _isFiring = false;
+    private float _rotateSpeed = _barrelRotateSpeed;
+    private int _ammoTypeNum = 0;
+
+    public bool IsBarrelIdle { get; set; } = false;
+    public int AvoidLayer { get; set; } = -1;
+    public AmmoData CurrentAmmo { get; private set; }
+    public Vector3 TargetPosition { get; set; }
 
     [Header("In Game UI")]
     public GameMenu gameMenu;
     [Header("Ammo Prefabs")]
-    // FIXME: use dictionary?
     public Rigidbody bulletPrefab;
     public Rigidbody laserPrefab;
     public Rigidbody grenadePrefab;
@@ -31,32 +44,47 @@ public class WeaponControl : MonoBehaviour {
     {
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
         _barrelTransform = _barrelShaft.transform;
-        // TODO: Use different effect for each AmmoType, Use name to distinguish laser from others
-        // _shootSmoke = GetComponentInChildren<VisualEffect>();
-        // TODO: Charge effect for laser beam
+        
+        AvoidLayer = LayerMask.GetMask("Floor", "Elevator");
 
         // Assign different prefab to each weapon type
         _commonBullet.AmmoPrefab = bulletPrefab;
+        // TODO: _commonBullet.ShootEffect = ;
         _laserBeam.AmmoPrefab = laserPrefab;
         _grenadeLauncher.AmmoPrefab = grenadePrefab;
         _explosivePayload.AmmoPrefab = explosivePrefab;
+        
+        _ammoInfos.Add(_commonBullet.Tag, _commonBullet);
+        _ammoInfos.Add(_laserBeam.Tag, _laserBeam);
+        _ammoInfos.Add(_grenadeLauncher.Tag, _grenadeLauncher);
+        _ammoInfos.Add(_explosivePayload.Tag, _explosivePayload);
     }
 
-    public void BarrelShoot(string ammoType)
+    void Start()
+    {
+        SwitchCurrentAmmo(Random.Range(0, _ammoTypes.Length));
+    }
+
+    public void StartNPC()
+    {
+        StartCoroutine(AutoBarrel());
+    }
+
+    public void BarrelShoot()
     {
         if (!_fireConfirm && !_isFiring)
         {
             _fireConfirm = true;
-            StartCoroutine(RepeatShooting(SwitchAmmo(ammoType)));
+            StartCoroutine(RepeatShooting(CurrentAmmo));
         }
     }
+
     public void StopShoot()
     {
         if (_isFiring)
         {
             _fireConfirm = false;
         }
-        
     }
 
     private void ShootOnce(AmmoData ammoType)
@@ -64,16 +92,13 @@ public class WeaponControl : MonoBehaviour {
         if (Vector3.Angle(Vector3.up, _barrelTransform.up) <= 135)
         {
             // TODO: Create fog at barrel to hide distance between ammo
-            // _shootSmoke.Play();
+            // CurrentAmmo.ShootEffect.Play();
 
             // Prepare a Selected Ammo to shoot.
             Rigidbody newAmmo = Instantiate(ammoType.AmmoPrefab, 
                 _barrelShaft.position + _barrelTransform.up * 0.55f, _barrelShaft.rotation, _barrelTransform);
 
-            // Add randomness when setting the launch angle
-            Quaternion angleRandomness = Quaternion.Euler(0, 0, Random.Range(-ammoType.AmmoSpread, ammoType.AmmoSpread));
-
-            newAmmo.AddForce(angleRandomness * _barrelTransform.up * ammoType.AmmoSpeed, ForceMode.VelocityChange);
+            newAmmo.AddForce(_barrelTransform.up * ammoType.AmmoSpeed, ForceMode.VelocityChange);
         } else
         {
             if (!MainCamera.IsGameOver) gameMenu.ShowNotification("DeadZone");
@@ -84,26 +109,57 @@ public class WeaponControl : MonoBehaviour {
     {
         while(_fireConfirm)
         {
+            yield return new WaitForSeconds(ammoType.FireInterval);
             _isFiring = true;
             ShootOnce(ammoType);
-            yield return new WaitForSeconds(ammoType.FireInterval);
         }
         _isFiring = false;
     }
 
-    private AmmoData SwitchAmmo(string typeName) => typeName switch
+    IEnumerator AutoBarrel()
     {
-        "LaserBeam" => _laserBeam,
-        "GrenadeLauncher" => _grenadeLauncher,
-        "ExplosivePayload" => _explosivePayload,
-        _ => _commonBullet,
-    };
+        while (true)
+        {
+            yield return new WaitForFixedUpdate();
+
+            if (IsBarrelIdle) BarrelIdle();
+            else BarrelAim();
+        }
+    }
+
+    private void BarrelIdle()
+    {
+        StopShoot();
+
+        if (Quaternion.Angle(Quaternion.identity, _barrelShaft.rotation) > 120) _rotateSpeed *= -1;
+
+        _deltaRotation = Quaternion.Euler(0, 0, _rotateSpeed * Time.fixedDeltaTime);
+        _barrelShaft.MoveRotation(_barrelShaft.rotation * _deltaRotation);
+    }
+
+    private void BarrelAim()
+    {
+        Quaternion targetRotation =
+            CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
+        _barrelShaft.rotation =
+            Quaternion.RotateTowards(_barrelShaft.rotation, targetRotation, 3 * _barrelRotateSpeed * Time.fixedDeltaTime);
+
+        if (!Physics.Linecast(_barrelShaft.position, TargetPosition, AvoidLayer))
+            BarrelShoot();
+        else
+            StopShoot();
+    }
+
+    private Quaternion DirectAim(Vector3 targetPos)
+    {
+        return Quaternion.FromToRotation(Vector3.up, (targetPos - _barrelShaft.position).normalized);
+    }
 
     // FIXME: parabola
     // https://physics.stackexchange.com/questions/56265/how-to-get-the-angle-needed-for-a-projectile-to-pass-through-a-given-point-for-t/70480#70480
-    private Quaternion CalculateElevationAngle(Vector3 targetPosition, int speed)
+    private Quaternion ParabolaAim(Vector3 targetPos, int speed)
     {
-        Vector3 deltaPos = targetPosition - _barrelShaft.position;
+        Vector3 deltaPos = targetPos - _barrelShaft.position;
 
         float deltaX = deltaPos.x;
         float deltaY = deltaPos.y;
@@ -114,6 +170,23 @@ public class WeaponControl : MonoBehaviour {
             - Mathf.Sqrt((Mathf.Pow(speed, 4) - 2 * speed * speed * gravity * deltaY) / (gravity * gravity * deltaX * deltaX) - 1);
         Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan(tanAngle) * Mathf.Rad2Deg - 90);
 
-        return rotation;
+        return rotation.normalized;
+    }
+
+    public void ChangeWeapon(int num, bool isScroll = false)
+    {
+        if (isScroll)
+        {
+            int temp = (_ammoTypeNum + num) % 4;
+            _ammoTypeNum = (temp < 0) ? temp + _ammoTypes.Length : temp;
+        } else _ammoTypeNum = num;
+
+        SwitchCurrentAmmo(_ammoTypeNum);
+    }
+
+    private void SwitchCurrentAmmo(int ammoNum)
+    {
+        gameMenu.SwitchWeaponIcon(ammoNum);
+        CurrentAmmo = _ammoInfos[_ammoTypes[ammoNum]];
     }
 }

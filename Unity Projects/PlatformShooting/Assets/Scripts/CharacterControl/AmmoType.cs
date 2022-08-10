@@ -8,22 +8,24 @@ namespace AmmoType
         public Rigidbody AmmoPrefab { get; set; }
         public VisualEffect ShootEffect { get; set; }
 
+        public string Tag { get; private set; }
         public int AmmoSpeed { get; private set; }
         public float FireInterval { get; private set; }
-        public float AmmoSpread { get; private set; }
+        public bool IsParabola { get; private set; }
 
-        public AmmoData(int speed, float interval, float spread)
+        public AmmoData(string tag, int speed, float interval, bool parabola = false)
         {
+            Tag = tag;
             AmmoSpeed = speed;
             FireInterval = interval;
-            AmmoSpread = spread;
+            IsParabola = parabola;
             AmmoPrefab = null;
             ShootEffect = null;
         }
 
         public override string ToString()
         {
-            return $"Ammo Info:\nAmmo Speed: {AmmoSpeed}; Fire Interval: {FireInterval}; Ammo Spread: {AmmoSpread}.";
+            return $"Ammo Name: {Tag}.";
         }
     }
 }
