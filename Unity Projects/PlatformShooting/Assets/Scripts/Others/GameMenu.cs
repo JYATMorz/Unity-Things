@@ -131,7 +131,7 @@ public class GameMenu : MonoBehaviour {
                 _blueTeamNum --;
                 break;
             default:
-                Debug.LogError("Dead Character's Tag isn't Correct !");
+                Debug.Log("Character didn't die Correctly !");
                 break;
         }
         ShowNotification(tag + "Die");

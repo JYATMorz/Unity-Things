@@ -6,7 +6,6 @@ public class Grenade : MonoBehaviour
 {
     // TODO: Leave explosion particle on the floor
     public GameObject explosionEffect;
-    // TODO: Smoke impact effect
     public VisualEffect hitEffect;
 
     private const int _ammoDamage = 20;
@@ -34,7 +33,9 @@ public class Grenade : MonoBehaviour
 
     void OnCollisionEnter()
     {
-        // TODO: Add hit (particle) effect when collides
+        // TODO: Edit hit (particle) effect when collides
+        // Don't let destroy kill effect (instantiate / very short animation)
+        hitEffect.Play();
     }
 
     void OnDestroy()
@@ -60,7 +61,7 @@ public class Grenade : MonoBehaviour
                     int damage = Mathf.FloorToInt(_ammoDamage * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius)));
                     character.GetComponent<CharacterControl>().ReceiveDamage(damage, _ownerBody);
                 }
-                character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, _ammoDamage, ForceMode.Impulse);
+                character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0.1f * _ammoDamage, ForceMode.Impulse);
             }
             
         }

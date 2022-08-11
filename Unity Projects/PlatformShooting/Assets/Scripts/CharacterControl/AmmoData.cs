@@ -10,13 +10,15 @@ public struct AmmoData
     public int AmmoSpeed { get; private set; }
     public float FireInterval { get; private set; }
     public bool IsParabola { get; private set; }
+    public bool RequireCharge { get; private set; }
 
-    public AmmoData(string tag, int speed, float interval, bool parabola = false)
+    public AmmoData(string tag, int speed, float interval, bool parabola = false, bool charge = false)
     {
         Tag = tag;
         AmmoSpeed = speed;
         FireInterval = interval;
         IsParabola = parabola;
+        RequireCharge = charge;
         AmmoPrefab = null;
         ShootEffect = null;
     }

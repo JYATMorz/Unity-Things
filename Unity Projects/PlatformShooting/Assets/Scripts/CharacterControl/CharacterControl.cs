@@ -129,13 +129,17 @@ public class CharacterControl : MonoBehaviour
                 _jumpPressed = false;
             }
 
+            // FIXME: character movement without clamping other forces
             if (!_onElevator)
             {
                 if (_doubleJump < 2 || !_onGround)
                     _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0);
-                else 
+                else
+                {
                     _characterBody.velocity = Vector3.ClampMagnitude(
                         new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0), _speedScaler);
+                }
+
             }
 
             // Rotate the barrel to point at the mouse position
@@ -277,8 +281,12 @@ public class CharacterControl : MonoBehaviour
                 }
             }
         }
+
+        if (_targetCharacter != null) _characterBody.velocity = new Vector3(0, _characterBody.velocity.y, 0);
     }
 
+
+    // FIXME: Doesn't work, wait for nav mesh
     private void ChaseTarget()
     {
         if (_targetPosition == null || _targetPosition == _nullTargetPosition) Debug.Log("Why there is no target position?");
@@ -342,6 +350,7 @@ public class CharacterControl : MonoBehaviour
 
             DeadTagAndLayer();
             _characterBody.freezeRotation = false;
+            _characterBody.constraints = RigidbodyConstraints.None;
 
             if (_isPlayer)
             {
@@ -349,7 +358,6 @@ public class CharacterControl : MonoBehaviour
                 gameMenu.ShowNotification("PlayerDie");
             }
 
-            // TODO: Big Dead Smoke Effect
             StopAllCoroutines();
             _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
             _characterBody.AddTorque(
@@ -393,7 +401,7 @@ public class CharacterControl : MonoBehaviour
             if (_targetCharacter == null)
             {
                 _characterBody.velocity = new Vector3(Mathf.PingPong(Time.time, _speedScaler) - 0.5f * _speedScaler, _characterBody.velocity.y, 0);
-            } else _characterBody.velocity = new Vector3(0, _characterBody.velocity.y, 0);
+            } // else _characterBody.velocity = new Vector3(0, _characterBody.velocity.y, 0);
 
             yield return new WaitForFixedUpdate();
         }
@@ -435,12 +443,15 @@ public class CharacterControl : MonoBehaviour
 
     IEnumerator OutOfMapCheck()
     {
-        yield return new WaitForSecondsRealtime(5f);
+        while (true)
+        {
+            yield return new WaitForSecondsRealtime(5f);
 
-        if (transform.position.y < -15) Destroy(gameObject);
+            if (transform.position.y < -15) Destroy(gameObject);
 
-        if (!_isDead && !Mathf.Approximately(transform.position.z, 0))
-            transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+            if (!_isDead && !Mathf.Approximately(transform.position.z, 0))
+                transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+        }
     }
 }
 

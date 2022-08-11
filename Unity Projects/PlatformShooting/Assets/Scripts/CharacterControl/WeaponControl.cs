@@ -10,14 +10,13 @@ public class WeaponControl : MonoBehaviour {
     private readonly string[] _ammoTypes =
         { "CommonBullet", "LaserBeam", "GrenadeLauncher", "ExplosivePayload" };
 
-    private AmmoData _commonBullet = new("CommonBullet", 20, 0.6f, true);
-    private AmmoData _laserBeam = new("LaserBeam", 100, 1f);
+    private AmmoData _commonBullet = new("CommonBullet", 20, 0.6f, true, true);
+    private AmmoData _laserBeam = new("LaserBeam", 100, 1f, false, true);
     private AmmoData _grenadeLauncher = new("GrenadeLauncher", 10, 1.2f, true);
     private AmmoData _explosivePayload = new("ExplosivePayload", 25, 0.8f);
     private Rigidbody _barrelShaft;
     private Transform _barrelTransform;
     private Quaternion _deltaRotation;
-    // private VisualEffect _shootSmoke;
     private bool _fireConfirm = false;
     private bool _isFiring = false;
     private float _rotateSpeed = _barrelRotateSpeed;
@@ -32,13 +31,16 @@ public class WeaponControl : MonoBehaviour {
     public GameMenu gameMenu;
     [Header("Ammo Prefabs & VFX")]
     public Rigidbody bulletPrefab;
-    // TODO: shoot effect: gameObject / VFX
+    public VisualEffect bulletSmoke;
     [Space]
     public Rigidbody laserPrefab;
+    public VisualEffect laserCharge;
     [Space]
     public Rigidbody grenadePrefab;
+    public VisualEffect grenadeSmoke;
     [Space]
     public Rigidbody explosivePrefab;
+    public VisualEffect explosiveSmoke;
 
     void Awake()
     {
@@ -49,10 +51,13 @@ public class WeaponControl : MonoBehaviour {
 
         // Assign different prefab to each weapon type
         _commonBullet.AmmoPrefab = bulletPrefab;
-        // TODO: _commonBullet.ShootEffect = ;
+        _commonBullet.ShootEffect = bulletSmoke;
         _laserBeam.AmmoPrefab = laserPrefab;
+        _laserBeam.ShootEffect = laserCharge;
         _grenadeLauncher.AmmoPrefab = grenadePrefab;
+        _grenadeLauncher.ShootEffect = grenadeSmoke;
         _explosivePayload.AmmoPrefab = explosivePrefab;
+        _explosivePayload.ShootEffect = explosiveSmoke;
         
         _ammoInfos.Add(_commonBullet.Tag, _commonBullet);
         _ammoInfos.Add(_laserBeam.Tag, _laserBeam);
@@ -62,7 +67,8 @@ public class WeaponControl : MonoBehaviour {
 
     void Start()
     {
-        SwitchCurrentAmmo(Random.Range(0, _ammoTypes.Length));
+        // FIXME: Testing parabola SwitchCurrentAmmo(Random.Range(0, _ammoTypes.Length));
+        SwitchCurrentAmmo(2);
     }
 
     public void StartNPC()
@@ -91,9 +97,6 @@ public class WeaponControl : MonoBehaviour {
     {
         if (Vector3.Angle(Vector3.up, _barrelTransform.up) <= 135)
         {
-            // TODO: Create fog at barrel to hide distance between ammo
-            // CurrentAmmo.ShootEffect.Play();
-
             // Prepare a Selected Ammo to shoot.
             Rigidbody newAmmo = Instantiate(ammoType.AmmoPrefab, 
                 _barrelShaft.position + _barrelTransform.up * 0.55f, _barrelShaft.rotation, _barrelTransform);
@@ -111,8 +114,19 @@ public class WeaponControl : MonoBehaviour {
         while(_fireConfirm)
         {
             _isFiring = true;
-            ShootOnce(ammoType);
-            yield return new WaitForSeconds(ammoType.FireInterval);
+            ammoType.ShootEffect.Play();
+
+            if (ammoType.RequireCharge)
+            {
+                yield return new WaitForSeconds(ammoType.FireInterval * 0.25f);
+                ShootOnce(ammoType);
+                yield return new WaitForSeconds(ammoType.FireInterval * 0.75f);
+            } else
+            {
+                yield return new WaitForSeconds(ammoType.FireInterval * 0.1f);
+                ShootOnce(ammoType);
+                yield return new WaitForSeconds(ammoType.FireInterval * 0.9f);
+            }
         }
         _isFiring = false;
     }
@@ -140,6 +154,12 @@ public class WeaponControl : MonoBehaviour {
 
     private void BarrelAim()
     {
+        /*
+        if ((TargetPosition - transform.position).sqrMagnitude > 100)
+        {
+            StopShoot();
+            return;
+        }*/
         Quaternion targetRotation =
             // FIXME: CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
             CurrentAmmo.IsParabola ? DirectAim(TargetPosition) : DirectAim(TargetPosition);
@@ -165,12 +185,17 @@ public class WeaponControl : MonoBehaviour {
 
         float deltaX = deltaPos.x;
         float deltaY = deltaPos.y;
-        float sign = Mathf.Sign(deltaPos.x * deltaPos.y);
         float gravity = Physics.gravity.y;
 
-        float tanAngle = sign * speed * speed / gravity / deltaX
-            - Mathf.Sqrt((Mathf.Pow(speed, 4) - 2 * speed * speed * gravity * deltaY) / (gravity * gravity * deltaX * deltaX) - 1);
-        Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan(tanAngle) * Mathf.Rad2Deg);
+        /*
+        float tanAngleLeft = sign * speed * speed / gravity / deltaX;
+        float tanAngleRightSqr = (Mathf.Pow(speed, 4) - 2 * speed * speed * gravity * deltaY) / (gravity * gravity * deltaX * deltaX) - 1;
+        float tanAngle = tanAngleLeft - ((tanAngleRightSqr < 0) ? 0 : Mathf.Sqrt(tanAngleRightSqr));
+        */
+
+        float actualAngle = 0; // Mathf.Atan(tanAngle) * Mathf.Rad2Deg
+        Quaternion rotation = Quaternion.Euler(0, 0, actualAngle);
+        Debug.Log(actualAngle);
 
         return rotation.normalized;
     }

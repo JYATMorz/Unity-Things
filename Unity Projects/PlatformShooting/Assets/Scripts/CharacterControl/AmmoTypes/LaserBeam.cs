@@ -5,7 +5,6 @@ using System.Collections;
 
 public class LaserBeam : MonoBehaviour
 {
-    // TODO: VFX Effect for Laser
     public VisualEffect laserImpact;
     public VisualEffect laserDestroy;
 
@@ -43,7 +42,7 @@ public class LaserBeam : MonoBehaviour
 
     void OnDestroy()
     {
-        // TODO: Add sci-fi dead effect when destroy
+        // TODO: Add sci-fi dead effect when destroy / Or do I ?
     }
 
     IEnumerator LifeTimeOver(float lifeTime)

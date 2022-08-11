@@ -32,7 +32,6 @@ public class TemplateBullet : MonoBehaviour
 
     void OnDestroy()
     {
-        // TODO: Add more detailed smoke (particle) effect when collides
         Instantiate(bulletImpact, transform.position, transform.rotation * Quaternion.FromToRotation(Vector3.forward, Vector3.down));
     }
 }
