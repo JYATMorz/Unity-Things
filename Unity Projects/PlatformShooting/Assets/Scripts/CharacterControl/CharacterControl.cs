@@ -8,7 +8,6 @@ public class CharacterControl : MonoBehaviour
     private const int _initHealth = 100;
     private const float _seekInterval = 1f;
     private const float _seekRange = 30f;
-    private const float _shootRange = 10f;
     private const float _speedScaler = 5f;
     private const float _jumpScaler = 20f;
     private const float _attackWillingness = 0.6f;
@@ -75,6 +74,8 @@ public class CharacterControl : MonoBehaviour
         _healthBar = GetComponentInChildren<HealthBar>();
 
         _weaponControl.IsBarrelIdle = !_isPlayer;
+        _weaponControl.IsPlayer = _isPlayer;
+
         if (_isPlayer)
         {
             gameMenu.CurrentPlayerControl = GetComponent<WeaponControl>();
@@ -83,7 +84,6 @@ public class CharacterControl : MonoBehaviour
 
         StartCoroutine(SeekEnemy());
         StartCoroutine(WanderAround());
-        _weaponControl.StartNPC();
     }
 
     void Update()
@@ -257,7 +257,7 @@ public class CharacterControl : MonoBehaviour
                     if (!TargetInRange(_targetPosition, _seekRange))
                     {
                         _targetCharacter = suspect.gameObject;
-                    } else if (!TargetInRange(_targetPosition, _shootRange))
+                    } else if (!TargetInRange(_targetPosition, WeaponControl.ShootRange))
                     {
                         if (ObstacleBetween(_targetPosition)) _targetCharacter = suspect.gameObject;
                         else _targetCharacter = (UnityEngine.Random.value < 0.3f) ? suspect.gameObject : _targetCharacter;
@@ -268,13 +268,13 @@ public class CharacterControl : MonoBehaviour
         {
             if (CompareTag(suspect.tag)) return;
 
-            if (_targetCharacter == null) _targetCharacter = CompareTag(suspect.tag) ? null : suspect.gameObject;
+            if (_targetCharacter == null) _targetCharacter = suspect.gameObject;
             else
             {
                 if (!suspect.CompareTag(_neutralTag))
                 {
                     if (_targetCharacter.CompareTag(_neutralTag)) _targetCharacter = suspect.gameObject;
-                    else 
+                    else // if suspect is 2 times closer than current target
                         _targetCharacter = 
                             ((suspectPosition - transform.position).sqrMagnitude < 4 * (_targetPosition - transform.position).sqrMagnitude)
                             ? suspect.gameObject : _targetCharacter;
@@ -307,10 +307,7 @@ public class CharacterControl : MonoBehaviour
     }
 
     private bool TargetInRange(Vector3 targetPosition, float range)
-    {
-        if ((targetPosition - transform.position).sqrMagnitude < range * range) return true;
-        else return false;
-    }
+        => (targetPosition - transform.position).sqrMagnitude < range * range;
 
     private bool ObstacleBetween(Vector3 targetPosition, int layer = -1)
     {
@@ -355,6 +352,7 @@ public class CharacterControl : MonoBehaviour
             if (_isPlayer)
             {
                 _isPlayer = false;
+                _weaponControl.IsPlayer = _isPlayer;
                 gameMenu.ShowNotification("PlayerDie");
             }
 
@@ -430,6 +428,8 @@ public class CharacterControl : MonoBehaviour
     public void BecomePlayer()
     {
         _isPlayer = true;
+        _weaponControl.IsPlayer = _isPlayer;
+
         if (_isNeutral && _isPlayer) Debug.LogWarning("Neutral Character becomes Player !");
         else Debug.Log("New Player Born!");
 
@@ -438,6 +438,7 @@ public class CharacterControl : MonoBehaviour
 
         StopAllCoroutines();
         _weaponControl.StopAllCoroutines();
+
         gameMenu.ShowNotification("PlayerBorn");
     }
 

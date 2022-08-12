@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class WeaponControl : MonoBehaviour {
     private const int _barrelRotateSpeed = 45;
+    [HideInInspector] public static readonly float ShootRange = 10f;
 
     private readonly Dictionary<string, AmmoData> _ammoInfos = new();
     private readonly string[] _ammoTypes =
@@ -23,6 +24,7 @@ public class WeaponControl : MonoBehaviour {
     private int _ammoTypeNum = 0;
 
     public bool IsBarrelIdle { get; set; } = false;
+    public bool IsPlayer { get; set; } = false;
     public int AvoidLayer { get; set; } = -1;
     public AmmoData CurrentAmmo { get; private set; }
     public Vector3 TargetPosition { get; set; }
@@ -69,10 +71,7 @@ public class WeaponControl : MonoBehaviour {
     {
         // FIXME: Testing parabola SwitchCurrentAmmo(Random.Range(0, _ammoTypes.Length));
         SwitchCurrentAmmo(2);
-    }
 
-    public void StartNPC()
-    {
         StartCoroutine(AutoBarrel());
     }
 
@@ -104,8 +103,7 @@ public class WeaponControl : MonoBehaviour {
             newAmmo.AddForce(_barrelTransform.up * ammoType.AmmoSpeed, ForceMode.VelocityChange);
         } else
         {
-            // FIXME:if (!MainCamera.IsGameOver) gameMenu.ShowNotification("DeadZone");
-            // only player's notification
+            if (IsPlayer && !MainCamera.IsGameOver) gameMenu.ShowNotification("DeadZone");
         }
     }
 
@@ -133,7 +131,7 @@ public class WeaponControl : MonoBehaviour {
 
     IEnumerator AutoBarrel()
     {
-        while (true)
+        while (!IsPlayer)
         {
             yield return new WaitForFixedUpdate();
 
@@ -161,12 +159,13 @@ public class WeaponControl : MonoBehaviour {
             return;
         }*/
         Quaternion targetRotation =
-            // FIXME: CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
-            CurrentAmmo.IsParabola ? DirectAim(TargetPosition) : DirectAim(TargetPosition);
+            CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
+            // FIXME: CurrentAmmo.IsParabola ? DirectAim(TargetPosition) : DirectAim(TargetPosition);
         _barrelShaft.rotation =
             Quaternion.RotateTowards(_barrelShaft.rotation, targetRotation, 3 * _barrelRotateSpeed * Time.fixedDeltaTime);
 
-        if (!Physics.Linecast(_barrelShaft.position, TargetPosition, AvoidLayer))
+        if (!Physics.Linecast(_barrelShaft.position, TargetPosition, AvoidLayer)
+            && (TargetPosition - transform.position).sqrMagnitude < ShootRange * ShootRange)
             BarrelShoot();
         else
             StopShoot();
@@ -177,7 +176,7 @@ public class WeaponControl : MonoBehaviour {
         return Quaternion.FromToRotation(Vector3.up, (targetPos - _barrelShaft.position).normalized);
     }
 
-    // BUG: parabola
+    // FIXME: parabola
     // https://physics.stackexchange.com/questions/56265/how-to-get-the-angle-needed-for-a-projectile-to-pass-through-a-given-point-for-t/70480#70480
     private Quaternion ParabolaAim(Vector3 targetPos, int speed)
     {
@@ -187,13 +186,11 @@ public class WeaponControl : MonoBehaviour {
         float deltaY = deltaPos.y;
         float gravity = Physics.gravity.y;
 
-        /*
-        float tanAngleLeft = sign * speed * speed / gravity / deltaX;
+        float tanAngleLeft = speed * speed / gravity / Mathf.Abs(deltaX);
         float tanAngleRightSqr = (Mathf.Pow(speed, 4) - 2 * speed * speed * gravity * deltaY) / (gravity * gravity * deltaX * deltaX) - 1;
-        float tanAngle = tanAngleLeft - ((tanAngleRightSqr < 0) ? 0 : Mathf.Sqrt(tanAngleRightSqr));
-        */
+        float tanAngle = (tanAngleRightSqr < 0) ? Mathf.Sign(tanAngleLeft) : (tanAngleLeft - Mathf.Sqrt(tanAngleRightSqr));
 
-        float actualAngle = 0; // Mathf.Atan(tanAngle) * Mathf.Rad2Deg
+        float actualAngle = Mathf.Sign(deltaX) * (90f - Mathf.Atan(tanAngle) * Mathf.Rad2Deg);
         Quaternion rotation = Quaternion.Euler(0, 0, actualAngle);
         Debug.Log(actualAngle);
 
