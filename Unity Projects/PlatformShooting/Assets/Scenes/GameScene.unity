@@ -2384,7 +2384,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 28
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3498,22 +3498,10 @@ PrefabInstance:
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 963194227}
-    - target: {fileID: 1172832185545319494, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
-      propertyPath: m_Layer
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1172832186015470872, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
-      propertyPath: m_Layer
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 1172832186015470879, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 963194228}
-    - target: {fileID: 1172832186101091634, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526023, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_Name
       value: RedLeader
@@ -3572,18 +3560,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1172832186574323294, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
-      propertyPath: m_Layer
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1172832186920365323, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
-      propertyPath: m_Layer
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2112690541823495055, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
-      propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5472782923705971827, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}

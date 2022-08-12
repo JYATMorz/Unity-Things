@@ -69,8 +69,7 @@ public class WeaponControl : MonoBehaviour {
 
     void Start()
     {
-        // FIXME: Testing parabola SwitchCurrentAmmo(Random.Range(0, _ammoTypes.Length));
-        SwitchCurrentAmmo(2);
+        SwitchCurrentAmmo(Random.Range(0, _ammoTypes.Length));
 
         StartCoroutine(AutoBarrel());
     }
@@ -160,7 +159,6 @@ public class WeaponControl : MonoBehaviour {
         }*/
         Quaternion targetRotation =
             CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
-            // FIXME: CurrentAmmo.IsParabola ? DirectAim(TargetPosition) : DirectAim(TargetPosition);
         _barrelShaft.rotation =
             Quaternion.RotateTowards(_barrelShaft.rotation, targetRotation, 3 * _barrelRotateSpeed * Time.fixedDeltaTime);
 
@@ -176,7 +174,6 @@ public class WeaponControl : MonoBehaviour {
         return Quaternion.FromToRotation(Vector3.up, (targetPos - _barrelShaft.position).normalized);
     }
 
-    // FIXME: parabola
     // https://physics.stackexchange.com/questions/56265/how-to-get-the-angle-needed-for-a-projectile-to-pass-through-a-given-point-for-t/70480#70480
     private Quaternion ParabolaAim(Vector3 targetPos, int speed)
     {
@@ -185,14 +182,14 @@ public class WeaponControl : MonoBehaviour {
         float deltaX = deltaPos.x;
         float deltaY = deltaPos.y;
         float gravity = Physics.gravity.y;
+        float angleScalar = deltaY switch { < -0.5f => 1.4f, > 0.5f => 0.9f, _ => 1.1f };
 
         float tanAngleLeft = speed * speed / gravity / Mathf.Abs(deltaX);
         float tanAngleRightSqr = (Mathf.Pow(speed, 4) - 2 * speed * speed * gravity * deltaY) / (gravity * gravity * deltaX * deltaX) - 1;
         float tanAngle = (tanAngleRightSqr < 0) ? Mathf.Sign(tanAngleLeft) : (tanAngleLeft - Mathf.Sqrt(tanAngleRightSqr));
 
-        float actualAngle = Mathf.Sign(deltaX) * (90f - Mathf.Atan(tanAngle) * Mathf.Rad2Deg);
+        float actualAngle = Mathf.Sign(deltaX) * Mathf.Atan(tanAngle) * Mathf.Rad2Deg * angleScalar;
         Quaternion rotation = Quaternion.Euler(0, 0, actualAngle);
-        Debug.Log(actualAngle);
 
         return rotation.normalized;
     }
