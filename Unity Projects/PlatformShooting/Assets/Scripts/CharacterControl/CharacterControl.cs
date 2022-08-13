@@ -319,7 +319,7 @@ public class CharacterControl : MonoBehaviour
     {
         if (attacker != null) SwitchTarget(attacker);
 
-        _currentHealth -= damage;
+        _currentHealth -= Mathf.Clamp(damage, 0, 25);
 
         if (_currentHealth <= 0)
         {
