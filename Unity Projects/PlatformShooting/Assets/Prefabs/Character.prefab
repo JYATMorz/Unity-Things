@@ -431,7 +431,7 @@ MonoBehaviour:
   laserCharge: {fileID: 4549511472629290545}
   grenadePrefab: {fileID: -7210357293131411562, guid: ffa0b2cf30ea883439c4359ee1bab3d7, type: 3}
   grenadeSmoke: {fileID: 6013160954196469022}
-  explosivePrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}
+  explosivePrefab: {fileID: 3799888855401227237, guid: 4180fbc38182b5847ad6ffc0913bb08a, type: 3}
   explosiveSmoke: {fileID: 5529207258796212492}
 --- !u!1 &1172832186466110160
 GameObject:

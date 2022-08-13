@@ -5,7 +5,7 @@ public class ExplosivePayload : MonoBehaviour
     // TODO: Leave small explosion particle on the floor
     public GameObject explosionEffect;
 
-    private const int _ammoDamage = 10;
+    private const int _ammoDamage = 15;
     private const float _explosionRadius = 2f;
     private const string _deadTag = "Dead";
     private const string _neutralTag = "Neutral";
@@ -39,7 +39,7 @@ public class ExplosivePayload : MonoBehaviour
     {
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
         {
-            if (Physics.Linecast(transform.position, character.transform.position, _floorLayer))
+            if (Physics.Linecast(transform.position, character.transform.position, ~_floorLayer))
             {
                 if (!character.CompareTag(_deadTag) && !(_ownerTag == _neutralTag && character.CompareTag(_neutralTag)))
                 {

@@ -14,7 +14,7 @@ public class WeaponControl : MonoBehaviour {
     private AmmoData _commonBullet = new("CommonBullet", 20, 0.6f, true, true);
     private AmmoData _laserBeam = new("LaserBeam", 100, 1f, false, true);
     private AmmoData _grenadeLauncher = new("GrenadeLauncher", 10, 1.2f, true);
-    private AmmoData _explosivePayload = new("ExplosivePayload", 25, 0.8f);
+    private AmmoData _explosivePayload = new("ExplosivePayload", 15, 0.8f);
     private Rigidbody _barrelShaft;
     private Transform _barrelTransform;
     private Quaternion _deltaRotation;
@@ -151,12 +151,6 @@ public class WeaponControl : MonoBehaviour {
 
     private void BarrelAim()
     {
-        /*
-        if ((TargetPosition - transform.position).sqrMagnitude > 100)
-        {
-            StopShoot();
-            return;
-        }*/
         Quaternion targetRotation =
             CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
         _barrelShaft.rotation =
@@ -182,7 +176,7 @@ public class WeaponControl : MonoBehaviour {
         float deltaX = deltaPos.x;
         float deltaY = deltaPos.y;
         float gravity = Physics.gravity.y;
-        float angleScalar = deltaY switch { < -0.5f => 1.4f, > 0.5f => 0.9f, _ => 1.1f };
+        float angleScalar = deltaY switch { < -0.5f => 1.4f, > 0.5f => 0.85f, _ => 1.1f };
 
         float tanAngleLeft = speed * speed / gravity / Mathf.Abs(deltaX);
         float tanAngleRightSqr = (Mathf.Pow(speed, 4) - 2 * speed * speed * gravity * deltaY) / (gravity * gravity * deltaX * deltaX) - 1;

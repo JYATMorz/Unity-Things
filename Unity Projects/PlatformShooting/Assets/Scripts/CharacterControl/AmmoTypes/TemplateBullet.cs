@@ -5,7 +5,7 @@ public class TemplateBullet : MonoBehaviour
 {
     public GameObject bulletImpact;
 
-    private const int _ammoDamage = 15;
+    private const int _ammoDamage = 10;
     private const string _neutralTag = "Neutral";
 
     private readonly string[] _characterTag = { "Neutral", "RedTeam", "BlueTeam" };

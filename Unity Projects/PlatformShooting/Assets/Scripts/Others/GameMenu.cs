@@ -10,15 +10,16 @@ public class GameMenu : MonoBehaviour {
     public WeaponControl CurrentPlayerControl { get; set; } = null;
 
     [Header("In Game UI Elements")]
-    public GameObject InGameUI;
-    public GameObject NotifyPrefab;
-    public GameObject NotificationPanel;
-    public TextMeshProUGUI ScoreText;
-    public GameObject WeaponPanel;
+    public GameObject inGameUI;
+    public GameObject notifyPrefab;
+    public GameObject notificationPanel;
+    public TextMeshProUGUI scoreText;
+    public GameObject weaponPanel;
     [Header("Pause Menu UI Elements")]
-    public GameObject PauseMenuUI;
+    public GameObject pauseMenuUI;
+    public Animator pauseToResume;
     [Header("Game Over UI Elements")]
-    public GameObject EndGameUI;
+    public GameObject endGameUI;
 
     private int _redTeamNum = 0;
     private int _blueTeamNum = 0;
@@ -32,7 +33,7 @@ public class GameMenu : MonoBehaviour {
 
     void Awake()
     {
-        _weaponButtons = WeaponPanel.GetComponentsInChildren<Button>();
+        _weaponButtons = weaponPanel.GetComponentsInChildren<Button>();
 
         for (int i = 0; i < _weaponButtons.Length; i++)
         {
@@ -43,10 +44,7 @@ public class GameMenu : MonoBehaviour {
 
     void Start()
     {
-        _gameOverText = EndGameUI.GetComponentInChildren<TextMeshProUGUI>(true);
-
-        // _weaponButtons = WeaponPanel.GetComponentsInChildren<Button>();
-
+        _gameOverText = endGameUI.GetComponentInChildren<TextMeshProUGUI>(true);
         _redTeamNum = GameObject.FindGameObjectsWithTag(_redTeamTag).Length;
         _blueTeamNum = GameObject.FindGameObjectsWithTag(_blueTeamTag).Length;
         _neutralNum = GameObject.FindGameObjectsWithTag(_neutralTag).Length;
@@ -67,15 +65,23 @@ public class GameMenu : MonoBehaviour {
 
     public void ResumeGame()
     {
-        PauseMenuUI.SetActive(false);
+        StartCoroutine(ResumeTransition(0.15f));
+    }
+
+    IEnumerator ResumeTransition(float animeTime)
+    {
+        pauseToResume.SetTrigger("Resume");
+
+        yield return new WaitForSecondsRealtime(animeTime);
+
+        pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         IsPause = false;
     }
 
     public void PauseGame()
     {
-        // TODO: Animation transition ?
-        PauseMenuUI.SetActive(true);
+        pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         IsPause = true;
     }
@@ -145,7 +151,7 @@ public class GameMenu : MonoBehaviour {
         string gameScore = 
             "<#D0BDC7>Red: " + _redTeamNum.ToString().PadLeft(2, '0') + "\n" +
             "<#B4BED1>Blue: " + _blueTeamNum.ToString().PadLeft(2, '0');
-        ScoreText.text = gameScore;
+        scoreText.text = gameScore;
     }
 
     private void GameOver()
@@ -157,9 +163,9 @@ public class GameMenu : MonoBehaviour {
         else if (_blueTeamNum <= 0) _gameOverText.text = "<#D0BDC7>Red Wins";
         else _gameOverText.text = "<#FFFFFF>Hmm...Something wrong with the result.";
 
-        InGameUI.SetActive(false);
-        PauseMenuUI.SetActive(false);
-        EndGameUI.SetActive(true);
+        inGameUI.SetActive(false);
+        pauseMenuUI.SetActive(false);
+        endGameUI.SetActive(true);
     }
 
     public void ShowNotification(string noteType)
@@ -181,7 +187,7 @@ public class GameMenu : MonoBehaviour {
             return;
         }
 
-        GameObject newNotify = Instantiate(NotifyPrefab, NotificationPanel.transform);
+        GameObject newNotify = Instantiate(notifyPrefab, notificationPanel.transform);
         newNotify.GetComponent<NotificationBlock>().StartNotification(notifyText);
     }
 

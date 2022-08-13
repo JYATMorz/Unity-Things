@@ -1384,7 +1384,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 26
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2285,6 +2285,8 @@ GameObject:
   - component: {fileID: 784400174}
   - component: {fileID: 784400176}
   - component: {fileID: 784400175}
+  - component: {fileID: 784400178}
+  - component: {fileID: 784400177}
   m_Layer: 5
   m_Name: GameOverPanel
   m_TagString: Untagged
@@ -2355,6 +2357,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 784400173}
   m_CullTransparentMesh: 1
+--- !u!225 &784400177
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 784400173}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!95 &784400178
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 784400173}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 78f3c45ca2fc5e94983f471d9b9ba71f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &805038928
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3719,6 +3753,8 @@ GameObject:
   - component: {fileID: 1346832567}
   - component: {fileID: 1346832569}
   - component: {fileID: 1346832568}
+  - component: {fileID: 1346832570}
+  - component: {fileID: 1346832571}
   m_Layer: 5
   m_Name: PausePanel
   m_TagString: Untagged
@@ -3787,6 +3823,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1346832566}
   m_CullTransparentMesh: 1
+--- !u!95 &1346832570
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346832566}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 195cea3271f6a4f479d4ba68ab2e511c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 2
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!225 &1346832571
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346832566}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1397070799
 GameObject:
   m_ObjectHideFlags: 0
@@ -5323,13 +5391,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f88a88fb2bed9144d8df2876ce5d7fdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InGameUI: {fileID: 263633765}
-  NotifyPrefab: {fileID: 3241083125505083349, guid: d34c44b2ebf75974782b4f67b90c0258, type: 3}
-  NotificationPanel: {fileID: 943564295}
-  ScoreText: {fileID: 1416467705}
-  WeaponPanel: {fileID: 276490914}
-  PauseMenuUI: {fileID: 1346832566}
-  EndGameUI: {fileID: 784400173}
+  inGameUI: {fileID: 263633765}
+  notifyPrefab: {fileID: 3241083125505083349, guid: d34c44b2ebf75974782b4f67b90c0258, type: 3}
+  notificationPanel: {fileID: 943564295}
+  scoreText: {fileID: 1416467705}
+  weaponPanel: {fileID: 276490914}
+  pauseMenuUI: {fileID: 1346832566}
+  pauseToResume: {fileID: 1346832570}
+  endGameUI: {fileID: 784400173}
 --- !u!1 &1782106036
 GameObject:
   m_ObjectHideFlags: 0
