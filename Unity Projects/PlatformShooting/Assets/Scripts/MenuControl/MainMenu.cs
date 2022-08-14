@@ -1,44 +1,39 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
 
-public class MainMenu : MonoBehaviour {
-    // TODO: Move all fade related objects to a new canvas with dont destroy on load
-    public Animator fadeTransition;
-    public GameObject loadingPanel;
+public class MainMenu : MonoBehaviour, IMenuUI {
+
+    public static bool IsPause { get; set; } = false;
+    public WeaponControl CurrentWeaponControl { get; set; } = null;
 
     public void StartGame()
     {
-        StartCoroutine(FadeOutTransition());
+        GeneralLoadMenu.Instance.StartLoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
     public void QuitGame()
     {
-        Debug.Log("Main Menu");
         Application.Quit();
     }
 
-    IEnumerator FadeOutTransition()
+    // Basically do nothing, maybe change text rotation
+    public void CharacterDie(string tag)
     {
-        fadeTransition.SetTrigger("FadeOut");
-
-        yield return new WaitForSeconds(1f);
-
-        loadingPanel.SetActive(true);
-        StartCoroutine(LoadGameAsync());
+        Debug.Log(tag);
     }
 
-    IEnumerator LoadGameAsync()
+    public void TeamChanged(string tag)
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("GameScene");
+        Debug.Log(tag);
+    }
 
-        // TODO: Play some fade / in fade out effect here
-        // https://www.youtube.com/watch?v=YMj2qPq9CP8
-        while (!asyncLoad.isDone)
-        {
-            Debug.Log(asyncLoad.progress);
-            // Debug.Log(Mathf.Clamp01(asyncLoad.progress / 0.9f));
-            yield return null;
-        }
+    public void ShowNotification(string noteType)
+    {
+        Debug.Log(noteType);
+    }
+
+    public void SwitchWeaponIcon(int num)
+    {
+        Debug.Log(num);
     }
 }

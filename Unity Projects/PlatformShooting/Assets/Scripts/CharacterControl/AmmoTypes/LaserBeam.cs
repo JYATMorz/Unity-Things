@@ -6,7 +6,6 @@ using System.Collections;
 public class LaserBeam : MonoBehaviour
 {
     public VisualEffect laserImpact;
-    public VisualEffect laserDestroy;
 
     private const int _ammoDamage = 10;
     private const float _lifeTime = 5f;
@@ -37,12 +36,8 @@ public class LaserBeam : MonoBehaviour
             }
             Destroy(gameObject);
         }
-        // TODO: Add sci-fi effect when collides
-    }
-
-    void OnDestroy()
-    {
-        // TODO: Add sci-fi dead effect when destroy / Or do I ?
+        
+        laserImpact.Play();
     }
 
     IEnumerator LifeTimeOver(float lifeTime)

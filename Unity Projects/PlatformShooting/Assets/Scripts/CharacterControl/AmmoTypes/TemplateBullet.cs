@@ -1,10 +1,12 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 public class TemplateBullet : MonoBehaviour
 {
     public GameObject bulletImpact;
 
+    private const int _selfDestructionTime = 10;
     private const int _ammoDamage = 10;
     private const string _neutralTag = "Neutral";
 
@@ -15,6 +17,8 @@ public class TemplateBullet : MonoBehaviour
     void Start()
     {
         _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
+
+        StartCoroutine(SelfDestruction());
     }
 
     void OnCollisionEnter(Collision other)
@@ -27,11 +31,14 @@ public class TemplateBullet : MonoBehaviour
                 contact.GetComponent<CharacterControl>().ReceiveDamage(_ammoDamage);
             }
         }
+        Instantiate(bulletImpact, transform.position, transform.rotation * Quaternion.FromToRotation(Vector3.forward, Vector3.down));
+
         Destroy(gameObject);
     }
 
-    void OnDestroy()
+    IEnumerator SelfDestruction()
     {
-        Instantiate(bulletImpact, transform.position, transform.rotation * Quaternion.FromToRotation(Vector3.forward, Vector3.down));
+        yield return new WaitForSeconds(_selfDestructionTime);
+        Destroy(gameObject);
     }
 }

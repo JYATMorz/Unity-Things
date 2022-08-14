@@ -8,14 +8,9 @@ public class TeleportWall : MonoBehaviour {
     
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Bullet"))
-        {
-            Destroy(other.gameObject);
-            // TODO: play some disrobe effect
-        } else if (Array.Exists(_characterTags, tag => tag == other.tag))
-        {
+        if (other.CompareTag("Bullet")) Destroy(other.gameObject);
+        else if (Array.Exists(_characterTags, tag => tag == other.tag))
             StartCoroutine(TeleportCharacter(other.gameObject));
-        }
     }
 
     IEnumerator TeleportCharacter(GameObject character)

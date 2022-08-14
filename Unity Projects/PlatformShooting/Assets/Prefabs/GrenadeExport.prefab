@@ -130,7 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56ee749165f1f644789c1f07be2d77f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionEffect: {fileID: 0}
+  explosionEffect: {fileID: 5135573788045207449, guid: 8b47c89ace533144a894ca85066d1117, type: 3}
   hitEffect: {fileID: 5782488124873656392}
 --- !u!1 &9017667659107489983
 GameObject:
@@ -143,7 +143,7 @@ GameObject:
   - component: {fileID: 8863095379689323684}
   - component: {fileID: 5782488124873656392}
   - component: {fileID: 8262769928144088853}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: HitSmoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -173,7 +173,7 @@ VisualEffect:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9017667659107489983}
   m_Enabled: 1
-  m_Asset: {fileID: 8926484042661614526, guid: 7b2e64eedb9cbdd4d99b970b700dffd7, type: 3}
+  m_Asset: {fileID: 8926484042661614526, guid: 63f57639d3b791445b503c437d6a660d, type: 3}
   m_InitialEventName: OnPlay
   m_InitialEventNameOverriden: 0
   m_StartSeed: 0

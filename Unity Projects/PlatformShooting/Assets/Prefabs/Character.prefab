@@ -410,7 +410,7 @@ MonoBehaviour:
   m_BlueTeam: {fileID: 2100000, guid: f24c7b58ba7d2c8489b54277d1eade0e, type: 2}
   m_RedTeam: {fileID: 2100000, guid: 02803dd49c5e19c45a6662974455f9b7, type: 2}
   mainCamera: {fileID: 0}
-  gameMenu: {fileID: 0}
+  sceneMenu: {fileID: 0}
   npcAgent: {fileID: 0}
 --- !u!114 &5472782923705971827
 MonoBehaviour:
@@ -424,7 +424,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea53326cbf0b0ed40af29c8c933969fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameMenu: {fileID: 0}
+  sceneMenu: {fileID: 0}
   bulletPrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}
   bulletSmoke: {fileID: 541652462757633671}
   laserPrefab: {fileID: 5793500155800120651, guid: 6365b293003a3b8408490bba9ccc0833, type: 3}
@@ -886,7 +886,7 @@ VisualEffect:
       - m_Value: 6.28
         m_Name: SpwanArc_arc
         m_Overridden: 1
-      - m_Value: 0.2
+      - m_Value: 0.25
         m_Name: SpwanArc_circle_radius
         m_Overridden: 1
     m_Vector2f:

@@ -26,6 +26,7 @@ public class CharacterControl : MonoBehaviour
     private Rigidbody _characterBody;
     private Rigidbody _barrelShaft;
     private WeaponControl _weaponControl;
+    private IMenuUI _gameMenu;
     private bool _chaseMode = false;
     private bool _jumpPressed = false;
     private bool _onGround = false;
@@ -45,9 +46,9 @@ public class CharacterControl : MonoBehaviour
     public Material m_BlueTeam;
     public Material m_RedTeam;
 
-    [Header("Scene Elements")]
+    [Header("Game Scene Elements")]
     public Camera mainCamera;
-    public GameMenu gameMenu;
+    public GameObject sceneMenu;
     public NavMeshAgent npcAgent;
 
     void Awake()
@@ -55,9 +56,13 @@ public class CharacterControl : MonoBehaviour
         _characterBody = GetComponent<Rigidbody>();
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
         _weaponControl = GetComponent<WeaponControl>();
+        _gameMenu = sceneMenu.GetComponent<IMenuUI>();
 
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
         _deadLayer = LayerMask.NameToLayer(_deadTag);
+
+        _weaponControl.IsBarrelIdle = !_isPlayer;
+        _weaponControl.IsPlayer = _isPlayer;
 
         if (_isNeutral && _isPlayer) Debug.LogWarning("Character Setting is Wrong !");
         if (!_isNeutral)
@@ -73,12 +78,9 @@ public class CharacterControl : MonoBehaviour
 
         _healthBar = GetComponentInChildren<HealthBar>();
 
-        _weaponControl.IsBarrelIdle = !_isPlayer;
-        _weaponControl.IsPlayer = _isPlayer;
-
         if (_isPlayer)
         {
-            gameMenu.CurrentPlayerControl = GetComponent<WeaponControl>();
+            _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();
             return;
         }
 
@@ -114,10 +116,7 @@ public class CharacterControl : MonoBehaviour
 
     void FixedUpdate()
     {
-        // if (GameMenu.IsPause || MainCamera.IsGameOver) return;
-        if (IsTeleported) return;
-
-        if (_isDead) return;
+        if (IsTeleported || _isDead) return;
     
         if (_isPlayer)
         {
@@ -341,7 +340,7 @@ public class CharacterControl : MonoBehaviour
     {
         if (!_isNeutral)
         {
-            gameMenu.CharacterDie(gameObject.tag);
+            _gameMenu.CharacterDie(gameObject.tag);
             _weaponControl.StopShoot();
             _weaponControl.StopAllCoroutines();
 
@@ -353,7 +352,7 @@ public class CharacterControl : MonoBehaviour
             {
                 _isPlayer = false;
                 _weaponControl.IsPlayer = _isPlayer;
-                gameMenu.ShowNotification("PlayerDie");
+                _gameMenu.ShowNotification("PlayerDie");
             }
 
             StopAllCoroutines();
@@ -387,7 +386,7 @@ public class CharacterControl : MonoBehaviour
             }
 
             ResetTargetCharacter();
-            gameMenu.TeamChanged(gameObject.tag);
+            _gameMenu.TeamChanged(gameObject.tag);
 
         } else Debug.Log("Target is null when changing team!");
     }
@@ -431,15 +430,13 @@ public class CharacterControl : MonoBehaviour
         _weaponControl.IsPlayer = _isPlayer;
 
         if (_isNeutral && _isPlayer) Debug.LogWarning("Neutral Character becomes Player !");
-        else Debug.Log("New Player Born!");
 
-        FullHealth();
-        gameMenu.CurrentPlayerControl = GetComponent<WeaponControl>();
+        _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();
+        _gameMenu.ShowNotification("PlayerBorn");
 
         StopAllCoroutines();
         _weaponControl.StopAllCoroutines();
 
-        gameMenu.ShowNotification("PlayerBorn");
     }
 
     IEnumerator OutOfMapCheck()

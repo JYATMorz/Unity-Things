@@ -1,10 +1,11 @@
 using UnityEngine;
+using System.Collections;
 
 public class ExplosivePayload : MonoBehaviour
 {
-    // TODO: Leave small explosion particle on the floor
     public GameObject explosionEffect;
 
+    private const int _selfDestructionTime = 10;
     private const int _ammoDamage = 15;
     private const float _explosionRadius = 2f;
     private const string _deadTag = "Dead";
@@ -22,6 +23,8 @@ public class ExplosivePayload : MonoBehaviour
 
         _characterLayer = LayerMask.GetMask("Neutral", "BlueTeam", "RedTeam", "Dead");
         _floorLayer = LayerMask.GetMask("Floor", "Elevator");
+
+        StartCoroutine(SelfDestruction());
     }
 
     void OnCollisionEnter()
@@ -32,7 +35,7 @@ public class ExplosivePayload : MonoBehaviour
 
     void OnDestroy()
     {
-        // TODO: Add explosion (particle) dead effect when destroy
+        Instantiate(explosionEffect, transform.position, transform.rotation);
     }
 
     private void Explosion()
@@ -50,6 +53,12 @@ public class ExplosivePayload : MonoBehaviour
             }
             
         }
+    }
 
+
+    IEnumerator SelfDestruction()
+    {
+        yield return new WaitForSeconds(_selfDestructionTime);
+        Destroy(gameObject);
     }
 }

@@ -4,7 +4,6 @@ using System.Collections;
 
 public class Grenade : MonoBehaviour
 {
-    // TODO: Leave explosion particle on the floor
     public GameObject explosionEffect;
     public VisualEffect hitEffect;
 
@@ -33,14 +32,12 @@ public class Grenade : MonoBehaviour
 
     void OnCollisionEnter()
     {
-        // TODO: Edit hit (particle) effect when collides
-        // Don't let destroy kill effect (instantiate / very short animation)
         hitEffect.Play();
     }
 
     void OnDestroy()
     {
-        // TODO: Add explosion (particle) dead effect when destroy
+        Instantiate(explosionEffect, transform.position, transform.rotation);
     }
 
     IEnumerator LifeTimeOver(float lifeTime)

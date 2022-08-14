@@ -4,10 +4,10 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using TMPro;
 
-public class GameMenu : MonoBehaviour {
+public class GameMenu : MonoBehaviour, IMenuUI {
     
     public static bool IsPause { get; set; } = false;
-    public WeaponControl CurrentPlayerControl { get; set; } = null;
+    public WeaponControl CurrentWeaponControl { get; set; } = null;
 
     [Header("In Game UI Elements")]
     public GameObject inGameUI;
@@ -38,7 +38,7 @@ public class GameMenu : MonoBehaviour {
         for (int i = 0; i < _weaponButtons.Length; i++)
         {
             int buttonIndex = i;
-            _weaponButtons[i].onClick.AddListener(() => CurrentPlayerControl.ChangeWeapon(buttonIndex));
+            _weaponButtons[i].onClick.AddListener(() => CurrentWeaponControl.ChangeWeapon(buttonIndex));
         }
     }
 
@@ -89,20 +89,17 @@ public class GameMenu : MonoBehaviour {
     public void LoadMainAsync()
     {
         Time.timeScale = 1f;
-        //TODO: The same trick in MainMenu but for main menu
-        ResumeGame();
+        GeneralLoadMenu.Instance.StartLoadScene(0);
     }
 
     public void QuitGame()
     {
-        Debug.Log("Pause Menu");
         Application.Quit();
     }
 
     public void RestartGame()
     {
-        // TODO: Fade in Fade out effect as game scene load in
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        GeneralLoadMenu.Instance.StartLoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void TeamChanged(string tag)
@@ -186,6 +183,8 @@ public class GameMenu : MonoBehaviour {
             Debug.LogWarning("Wrong Notification Input");
             return;
         }
+
+        if (noteType == "PlayerBorn") SwitchWeaponIcon(CurrentWeaponControl.CurrentAmmoNo());
 
         GameObject newNotify = Instantiate(notifyPrefab, notificationPanel.transform);
         newNotify.GetComponent<NotificationBlock>().StartNotification(notifyText);

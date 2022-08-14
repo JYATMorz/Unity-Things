@@ -37,7 +37,9 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Other\MainCamera.cs" />
+     <Compile Include="Assets\Scripts\MenuControl\IMenuUI.cs" />
      <Compile Include="Assets\Scripts\Environment\ForceElevator.cs" />
+     <Compile Include="Assets\Scripts\MenuControl\GeneralLoadMenu.cs" />
      <Compile Include="Assets\Scripts\MenuControl\NotificationBlock.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\Grenade.cs" />
      <Compile Include="Assets\Scripts\MenuControl\GameMenu.cs" />
@@ -56,7 +58,6 @@
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\LaserBeam.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
-     <None Include="Assets\Scripts\Note.txt" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
