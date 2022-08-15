@@ -56,6 +56,7 @@
      <Compile Include="Assets\Scripts\MenuControl\ButtonResize.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\BillboardCanvas.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\LaserBeam.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\CharacterControl_TempBugFix.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
@@ -761,8 +762,14 @@
     <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.AI.Navigation">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.AI.Navigation.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Mathematics.Editor">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.AI.Navigation.Editor">
+        <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.AI.Navigation.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.ProGrids">
         <HintPath>C:\Users\JYATM\Documents\GitHub\Unity-Things\Unity Projects\PlatformShooting\Library\ScriptAssemblies\Unity.ProGrids.dll</HintPath>

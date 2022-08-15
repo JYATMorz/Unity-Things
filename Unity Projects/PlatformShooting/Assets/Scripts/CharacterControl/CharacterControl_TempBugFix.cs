@@ -3,7 +3,7 @@ using UnityEngine.AI;
 using System;
 using System.Collections;
 
-public class CharacterControl : MonoBehaviour
+public class CharacterControl_TempBugFix : MonoBehaviour
 {
     private const int _initHealth = 100;
     private const float _seekInterval = 1f;
@@ -331,7 +331,7 @@ public class CharacterControl : MonoBehaviour
     {
         if (!_isPlayer && attacker != null) SwitchTarget(attacker);
 
-        // FIXME: _currentHealth -= Mathf.Clamp(damage, 0, 25);
+        _currentHealth -= Mathf.Clamp(damage, 0, 25);
 
         if (_currentHealth <= 0)
         {
@@ -386,7 +386,7 @@ public class CharacterControl : MonoBehaviour
         {
             _isNeutral = false;
             FullHealth();
-            _targetCharacter.GetComponent<CharacterControl>().FullHealth();
+            _targetCharacter.GetComponent<CharacterControl_TempBugFix>().FullHealth();
 
             if (_targetCharacter.CompareTag(_redTeamTag))
             {
