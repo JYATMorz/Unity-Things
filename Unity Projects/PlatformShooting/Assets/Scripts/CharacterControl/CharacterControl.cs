@@ -10,18 +10,15 @@ public class CharacterControl : MonoBehaviour
     private const float _seekRange = 30f;
     private const float _speedScaler = 5f;
     private const float _jumpScaler = 20f;
-    private const float _attackWillingness = 0.6f;
     private const string _bulletTag = "Bullet";
     private const string _neutralTag = "Neutral";
     private const string _blueTeamTag = "BlueTeam";
     private const string _redTeamTag = "RedTeam";
     private const string _deadTag = "Dead";
 
-    private readonly Vector3 _nullTargetPosition = new(0, 100, 0);
     private readonly string[] _floorTag = { "Floor", "Elevator" };
 
     private GameObject _targetCharacter = null;
-    private Vector3 _targetPosition;
     private HealthBar _healthBar;
     private Rigidbody _characterBody;
     private NavMeshAgent _npcAgent;
@@ -83,12 +80,14 @@ public class CharacterControl : MonoBehaviour
         if (_isPlayer)
         {
             _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();
-            _npcAgent.enabled = false;
+            _npcAgent.updatePosition = false;
+            _characterBody.isKinematic = true;
+            // FIXME: https://docs.unity.cn/2021.3/Documentation/Manual/nav-MixingComponents.html
             return;
         }
 
-        // StartCoroutine(SeekEnemy());
-        // StartCoroutine(WanderAround());
+        StartCoroutine(SeekEnemy());
+        StartCoroutine(WanderAround());
     }
 
     void Update()
@@ -135,10 +134,10 @@ public class CharacterControl : MonoBehaviour
             if (!_onElevator)
             {
                 if (_doubleJump < 2 || !_onGround)
-                    _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0);
+                    _npcAgent.velocity = new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0);
                 else
                 {
-                    _characterBody.velocity = Vector3.ClampMagnitude(
+                    _npcAgent.velocity = Vector3.ClampMagnitude(
                         new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0), _speedScaler);
                 }
 
@@ -152,22 +151,15 @@ public class CharacterControl : MonoBehaviour
             return;
         }
 
-        // Update target position, prepare for NavMesh AI
-        if (_targetCharacter != null && !ObstacleBetween(_targetCharacter.transform.position))
-            _targetPosition = _targetCharacter.transform.position;
+        if (_chaseMode) ChaseTarget();
 
-        // Control Barrel Here
         if (_targetCharacter == null) _weaponControl.IsBarrelIdle = true;
         else if (_targetCharacter.CompareTag(_deadTag) || CompareTag(_targetCharacter.tag))
-        {
             ResetTargetCharacter();
-        }
-        else
+        else if (!ObstacleBetween(_targetCharacter.transform.position))
         {
             _weaponControl.IsBarrelIdle = false;
-            _weaponControl.TargetPosition = _targetPosition;
-
-            if (_chaseMode) ChaseTarget();
+            _weaponControl.TargetPosition = _targetCharacter.transform.position;
         }
     }
 
@@ -212,12 +204,13 @@ public class CharacterControl : MonoBehaviour
             if(!_isNeutral)
             {
                 if (_targetCharacter == null) SearchTarget();
-                else if (_targetCharacter.CompareTag(_deadTag) || _targetCharacter.CompareTag(gameObject.tag)) SearchTarget();
                 else
                 {
-                    if (!TargetInRange(_targetCharacter.transform.position, _seekRange))
+                    Vector3 targetPos = _targetCharacter.transform.position;
+                    if (!TargetInRange(targetPos, _seekRange))
                         ResetTargetCharacter();
-                    else if (ObstacleBetween(_targetPosition)) _chaseMode = true;
+                    else if (!_npcAgent.hasPath && !_npcAgent.pathPending)
+                        _chaseMode = true;
                 }
             }
             yield return new WaitForSeconds(_seekInterval);
@@ -228,7 +221,7 @@ public class CharacterControl : MonoBehaviour
     {
         foreach (Collider target in Physics.OverlapSphere(transform.position, _seekRange, _enemyLayer))
         {
-            if ((UnityEngine.Random.value < _attackWillingness) && !ObstacleBetween(target.transform.position))
+            if (!ObstacleBetween(target.transform.position))
             {
                 _targetCharacter = target.gameObject;
                 break;
@@ -239,83 +232,89 @@ public class CharacterControl : MonoBehaviour
     private void SwitchTarget(Rigidbody suspect)
     {
         Vector3 suspectPosition = suspect.position;
+        Vector3 targetPosition = _targetCharacter.transform.position;
 
-        if (_isNeutral)
+        if (_isNeutral) // I'm a neutral character
         {
-            if (_targetCharacter == null)
-            {
+            if (_targetCharacter == null) // Currently has no target
                 _targetCharacter = suspect.gameObject;
-            }
-            else if (_targetCharacter.CompareTag(_neutralTag))
+            else if (_targetCharacter.CompareTag(_neutralTag)) // Currently has neutral target
             {
                 if (suspect.CompareTag(_neutralTag))
-                    _targetCharacter = (UnityEngine.Random.value < 0.2f) ? suspect.gameObject : _targetCharacter;
-                else 
+                    // 50% chance to switch from one neutral target to another
+                    _targetCharacter = (UnityEngine.Random.value < 0.5f) ? suspect.gameObject : _targetCharacter;
+                else
+                    // 100% chance to switch from one neutral target to team target
                     _targetCharacter = suspect.gameObject;
-            } /*else
+            } else if (!suspect.CompareTag(_neutralTag)) // Currently has team target & suspect is not neutral
             {
-                if (!suspect.CompareTag(_neutralTag))
+                if (!TargetInRange(targetPosition, _seekRange)) // Current target is out of seek range
                 {
-                    if (!TargetInRange(_targetPosition, _seekRange))
-                    {
-                        _targetCharacter = suspect.gameObject;
-                    } else if (!TargetInRange(_targetPosition, WeaponControl.ShootRange))
-                    {
-                        if (ObstacleBetween(_targetPosition)) _targetCharacter = suspect.gameObject;
-                        else _targetCharacter = (UnityEngine.Random.value < 0.3f) ? suspect.gameObject : _targetCharacter;
-                    }
-                }
-            }*/
-        } else
-        {
-            if (CompareTag(suspect.tag)) return;
-
-            if (_targetCharacter == null) _targetCharacter = suspect.gameObject;
-            else
-            {
-                if (!suspect.CompareTag(_neutralTag))
+                    _targetCharacter = suspect.gameObject;
+                } else if (!TargetInRange(targetPosition, WeaponControl.ShootRange)) // Current target is out of shoot range
                 {
-                    if (_targetCharacter.CompareTag(_neutralTag)) _targetCharacter = suspect.gameObject;
-                    else // if suspect is 2 times closer than current target
-                        _targetCharacter = 
-                            ((suspectPosition - transform.position).sqrMagnitude < 4 * (_targetPosition - transform.position).sqrMagnitude)
-                            ? suspect.gameObject : _targetCharacter;
+                    _targetCharacter = ObstacleBetween(suspectPosition) ? _targetCharacter : suspect.gameObject;
                 }
             }
-        }
-
-        // FIXME: nav mesh agent only trigger this once when hit
-        if (_targetCharacter != null)
+        } else // I'm a team character
         {
-            _npcAgent.SetDestination(_targetCharacter.transform.position);
-            Debug.Log(_targetCharacter.transform.position.x);
+            if (CompareTag(suspect.tag)) return; // Attack by teammate
+
+            if (_targetCharacter == null) _targetCharacter = suspect.gameObject;
+            else if (!suspect.CompareTag(_neutralTag))
+            {
+                if (_targetCharacter.CompareTag(_neutralTag)) _targetCharacter = suspect.gameObject;
+                else _targetCharacter =
+                        (ObstacleBetween(targetPosition) && !ObstacleBetween(suspectPosition))
+                        ? suspect.gameObject : _targetCharacter;
+            }
         }
     }
 
-
-    // FIXME: Doesn't work, wait for nav mesh
     private void ChaseTarget()
     {
-        if (_targetPosition == null || _targetPosition == _nullTargetPosition)
-            Debug.Log("Why there is no target position?");
-        else
+        _chaseMode = false;
+
+        if (_targetCharacter == null) return;
+
+        Vector3 targetPosition = _targetCharacter.transform.position;
+        if (TargetInRange(targetPosition, WeaponControl.ShootRange) && !ObstacleBetween(targetPosition))
         {
-            _npcAgent.SetDestination(_targetCharacter.transform.position);
-            Debug.Log(_targetCharacter.transform.position.x);
-            if (_npcAgent.isStopped) _chaseMode = false;
-            /*
-            // float xDirection = Mathf.Sign((_targetPosition - _characterBody.position).x);
-            if (Mathf.Abs((_targetPosition - _characterBody.position).x) > 1)
-            {
-                // TODO: Apply NavMesh AI
-                _npcAgent.SetDestination(_targetCharacter.transform.position);
-                // _characterBody.MovePosition(_characterBody.position + new Vector3(xDirection * _speedScaler, 0, 0));
-            } else
-            {
-                _chaseMode = false;
-                if (ObstacleBetween(_targetCharacter.transform.position))
-                    ResetTargetCharacter();
-            }*/
+            _npcAgent.SetDestination(targetPosition);
+            Debug.Log(targetPosition.x);
+        }
+    }
+
+    // TODO: https://docs.unity3d.com/ScriptReference/AI.NavMeshAgent.CompleteOffMeshLink.html
+    private void JumpAcrossGap()
+    {
+        // FIXME: _npcAgent.autoTraverseOffMeshLink = false;
+
+        // in start(): StartCoroutine(StartNavMeshJump());
+    }
+
+    IEnumerator StartNavMeshJump()
+    {
+        if (_npcAgent.isOnOffMeshLink)
+        {
+            yield return StartCoroutine(ParabolaJump(_npcAgent, 1f, 1f));
+            _npcAgent.CompleteOffMeshLink();
+        }
+        yield return null;
+    }
+
+    IEnumerator ParabolaJump(NavMeshAgent agent, float height, float duration)
+    {
+        OffMeshLinkData data = agent.currentOffMeshLinkData;
+        Vector3 startPos = agent.transform.position;
+        Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
+        float normalizedTime = 0f;
+        while (normalizedTime < 1f)
+        {
+            float yOffset = height * 4f * (normalizedTime - normalizedTime * normalizedTime);
+            agent.transform.position = Vector3.Lerp(startPos, endPos, normalizedTime) + yOffset * Vector3.up;
+            normalizedTime += Time.deltaTime / duration;
+            yield return null;
         }
     }
 
@@ -361,6 +360,8 @@ public class CharacterControl : MonoBehaviour
             DeadTagAndLayer();
             _characterBody.freezeRotation = false;
             _characterBody.constraints = RigidbodyConstraints.None;
+            _npcAgent.enabled = false;
+            _characterBody.isKinematic = false; //FIXME
 
             if (_isPlayer)
             {
@@ -409,21 +410,16 @@ public class CharacterControl : MonoBehaviour
     {
         while (true)
         {
-            if (_targetCharacter == null)
-            {
-                // TODO: Require npc agent
-                _characterBody.velocity = new Vector3(Mathf.PingPong(Time.time, _speedScaler) - 0.5f * _speedScaler, _characterBody.velocity.y, 0);
-            }
+            if (!_npcAgent.hasPath && !_npcAgent.pathPending)
+                _npcAgent.velocity = (_targetCharacter == null) ?
+                    new Vector3(Mathf.PingPong(Time.time, _speedScaler) - 0.5f * _speedScaler, _characterBody.velocity.y, 0)
+                    : Vector3.zero;
 
             yield return new WaitForFixedUpdate();
         }
     }
 
-    private void ResetTargetCharacter()
-    {
-        _targetCharacter = null;
-        _targetPosition = _nullTargetPosition;
-    }
+    private void ResetTargetCharacter() => _targetCharacter = null;
 
     private void SwitchToTeamLayer(string teamTag, string enemyTag)
     {
@@ -442,7 +438,8 @@ public class CharacterControl : MonoBehaviour
     public void BecomePlayer()
     {
         _isPlayer = true;
-        _npcAgent.enabled = false;
+        _npcAgent.updatePosition = false;
+        _characterBody.isKinematic = true; // FIXME
         _weaponControl.IsPlayer = _isPlayer;
 
         if (_isNeutral && _isPlayer) Debug.LogWarning("Neutral Character becomes Player !");
@@ -461,7 +458,11 @@ public class CharacterControl : MonoBehaviour
         {
             yield return new WaitForSecondsRealtime(5f);
 
-            if (transform.position.y < -15) Destroy(gameObject);
+            if (transform.position.y < -15)
+            {
+                Destroy(gameObject);
+                break;
+            }
 
             if (!_isDead && !Mathf.Approximately(transform.position.z, 0))
                 transform.position = new Vector3(transform.position.x, transform.position.y, 0);

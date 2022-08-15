@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class WeaponControl : MonoBehaviour {
     private const int _barrelRotateSpeed = 45;
-    [HideInInspector] public static readonly float ShootRange = 10f;
+    public static readonly float ShootRange = 10f;
 
     private readonly Dictionary<string, AmmoData> _ammoInfos = new();
     private readonly string[] _ammoTypes =
