@@ -289,6 +289,7 @@ GameObject:
   - component: {fileID: 1172832186453526022}
   - component: {fileID: 842996165068396264}
   - component: {fileID: 5472782923705971827}
+  - component: {fileID: 4974826699732927038}
   m_Layer: 11
   m_Name: Character
   m_TagString: Neutral
@@ -411,7 +412,6 @@ MonoBehaviour:
   m_RedTeam: {fileID: 2100000, guid: 02803dd49c5e19c45a6662974455f9b7, type: 2}
   mainCamera: {fileID: 0}
   sceneMenu: {fileID: 0}
-  npcAgent: {fileID: 0}
 --- !u!114 &5472782923705971827
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -433,6 +433,28 @@ MonoBehaviour:
   grenadeSmoke: {fileID: 6013160954196469022}
   explosivePrefab: {fileID: 3799888855401227237, guid: 4180fbc38182b5847ad6ffc0913bb08a, type: 3}
   explosiveSmoke: {fileID: 5529207258796212492}
+--- !u!195 &4974826699732927038
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1172832186453526023}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 5
+  m_Acceleration: 100
+  avoidancePriority: 50
+  m_AngularSpeed: 45
+  m_StoppingDistance: 0.5
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &1172832186466110160
 GameObject:
   m_ObjectHideFlags: 0
