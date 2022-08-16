@@ -468,5 +468,25 @@ public class CharacterControl : MonoBehaviour
                 transform.position = new Vector3(transform.position.x, transform.position.y, 0);
         }
     }
+
+    public void TempAgentOff(float time = 1f)
+    {
+        if (_npcAgent.enabled)
+        {
+            _npcAgent.enabled = false;
+            _characterBody.isKinematic = false;
+            StartCoroutine(ReEnableAgent(time));
+        }
+    }
+
+    IEnumerator ReEnableAgent(float limit)
+    {
+        yield return new WaitForSeconds(limit);
+        if (!_isDead)
+        {
+            _npcAgent.enabled = true;
+            _characterBody.isKinematic = true;
+        }
+    }
 }
 
