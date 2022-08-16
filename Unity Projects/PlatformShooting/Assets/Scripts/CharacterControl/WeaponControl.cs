@@ -4,18 +4,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class WeaponControl : MonoBehaviour {
+public class WeaponControl : MonoBehaviour
+{
     private const int _barrelRotateSpeed = 45;
-    public static readonly float ShootRange = 10f;
+    public readonly float shootRange = 10f;
 
     private readonly Dictionary<string, AmmoData> _ammoInfos = new();
     private readonly string[] _ammoTypes =
         { "CommonBullet", "LaserBeam", "GrenadeLauncher", "ExplosivePayload" };
 
-    private AmmoData _commonBullet = new("CommonBullet", 20, 0.6f, true);
-    private AmmoData _laserBeam = new("LaserBeam", 100, 1f, false, true);
-    private AmmoData _grenadeLauncher = new("GrenadeLauncher", 10, 1.2f, true);
-    private AmmoData _explosivePayload = new("ExplosivePayload", 15, 0.8f);
+    private IMenuUI _gameMenu;
+    private CharacterControl _characterControl;
+    private TargetControl _targetControl;
     private Rigidbody _barrelShaft;
     private Transform _barrelTransform;
     private Quaternion _deltaRotation;
@@ -23,16 +23,19 @@ public class WeaponControl : MonoBehaviour {
     private bool _isFiring = false;
     private float _rotateSpeed = _barrelRotateSpeed;
     private int _ammoTypeNum = 0;
-    private IMenuUI _gameMenu;
+
+    private AmmoData _commonBullet = new("CommonBullet", 20, 0.6f, true);
+    private AmmoData _laserBeam = new("LaserBeam", 100, 1f, false, true);
+    private AmmoData _grenadeLauncher = new("GrenadeLauncher", 10, 1.2f, true);
+    private AmmoData _explosivePayload = new("ExplosivePayload", 15, 0.8f);
 
     public bool IsBarrelIdle { get; set; } = false;
-    public bool IsPlayer { get; set; } = false;
     public int AvoidLayer { get; set; } = -1;
     public AmmoData CurrentAmmo { get; private set; }
-    public Vector3 TargetPosition { get; set; }
 
-    [Header("In Game UI")]
+    [Header("In Game Components")]
     public GameObject sceneMenu;
+    public Camera mainCamera;
     [Header("Ammo Prefabs & VFX")]
     public Rigidbody bulletPrefab;
     public VisualEffect bulletSmoke;
@@ -48,6 +51,9 @@ public class WeaponControl : MonoBehaviour {
 
     void Awake()
     {
+        _characterControl = GetComponent<CharacterControl>();
+        _targetControl = GetComponent<TargetControl>();
+
         _gameMenu = sceneMenu.GetComponent<IMenuUI>();
         _barrelShaft = GetComponentsInChildren<Rigidbody>()[1];
         _barrelTransform = _barrelShaft.transform;
@@ -68,6 +74,7 @@ public class WeaponControl : MonoBehaviour {
         _ammoInfos.Add(_laserBeam.Tag, _laserBeam);
         _ammoInfos.Add(_grenadeLauncher.Tag, _grenadeLauncher);
         _ammoInfos.Add(_explosivePayload.Tag, _explosivePayload);
+
     }
 
     void Start()
@@ -75,6 +82,17 @@ public class WeaponControl : MonoBehaviour {
         SwitchCurrentAmmo(UnityEngine.Random.Range(0, _ammoTypes.Length));
 
         StartCoroutine(AutoBarrel());
+    }
+
+    void FixedUpdate()
+    {
+        if (_characterControl.IsPlayer)
+        {
+            // Rotate the barrel to point at the mouse position
+            Vector3 _rotateVector = Input.mousePosition - mainCamera.WorldToScreenPoint(_barrelShaft.position);
+            _rotateVector.z = 0;
+            _barrelShaft.rotation *= Quaternion.FromToRotation(_barrelShaft.transform.up, _rotateVector);
+        }
     }
 
     public void BarrelShoot()
@@ -111,7 +129,7 @@ public class WeaponControl : MonoBehaviour {
 
             if (Vector3.Angle(Vector3.up, _barrelTransform.up) > 135)
             {
-                if (IsPlayer && !MainCamera.IsGameOver) _gameMenu.ShowNotification("DeadZone");
+                if (_characterControl.IsPlayer && !MainCamera.IsGameOver) _gameMenu.ShowNotification("DeadZone");
                 yield return new WaitForSeconds(ammoType.FireInterval);
                 continue;
             }
@@ -135,7 +153,7 @@ public class WeaponControl : MonoBehaviour {
 
     IEnumerator AutoBarrel()
     {
-        while (!IsPlayer)
+        while (!_characterControl.IsPlayer)
         {
             yield return new WaitForFixedUpdate();
 
@@ -157,12 +175,12 @@ public class WeaponControl : MonoBehaviour {
     private void BarrelAim()
     {
         Quaternion targetRotation =
-            CurrentAmmo.IsParabola ? ParabolaAim(TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(TargetPosition);
+            CurrentAmmo.IsParabola ? ParabolaAim(_targetControl.TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(_targetControl.TargetPosition);
         _barrelShaft.rotation =
             Quaternion.RotateTowards(_barrelShaft.rotation, targetRotation, 3 * _barrelRotateSpeed * Time.fixedDeltaTime);
 
-        if (!Physics.Linecast(_barrelShaft.position, TargetPosition, AvoidLayer)
-            && (TargetPosition - transform.position).sqrMagnitude < ShootRange * ShootRange)
+        if (!Physics.Linecast(_barrelShaft.position, _targetControl.TargetPosition, AvoidLayer)
+            && ConstantSettings.TargetInRange(_targetControl.TargetPosition, transform.position, shootRange))
             BarrelShoot();
         else
             StopShoot();
@@ -206,7 +224,7 @@ public class WeaponControl : MonoBehaviour {
 
     private void SwitchCurrentAmmo(int ammoNum)
     {
-        if (IsPlayer) _gameMenu.SwitchWeaponIcon(ammoNum);
+        if (_characterControl.IsPlayer) _gameMenu.SwitchWeaponIcon(ammoNum);
         CurrentAmmo = _ammoInfos[_ammoTypes[ammoNum]];
     }
 

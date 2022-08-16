@@ -32,7 +32,7 @@ public class LaserBeam : MonoBehaviour
         {
             if (contact.tag != _neutralTag || _ownerTag != _neutralTag)
             {
-                contact.GetComponent<CharacterControl>().ReceiveDamage(_ammoDamage);
+                contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage);
             }
             Destroy(gameObject);
         }

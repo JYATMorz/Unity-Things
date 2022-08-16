@@ -6,10 +6,9 @@ public class TargetControl : MonoBehaviour
     private const float _seekInterval = 1f;
     private const float _seekRange = 30f;
 
-    private CharacterControl_TempBugFix _characterControl;
-    private WeaponControl_TempBugFix _weaponControl;
+    private CharacterControl _characterControl;
+    private WeaponControl _weaponControl;
     private HealthControl _healthControl;
-    private Vector3 _targetPos;
 
     public GameObject TargetCharacter { get; private set; } = null;
     public Vector3 TargetPosition { get; private set; }
@@ -17,8 +16,8 @@ public class TargetControl : MonoBehaviour
 
     void Awake()
     {
-        _characterControl = GetComponent<CharacterControl_TempBugFix>();
-        _weaponControl = GetComponent<WeaponControl_TempBugFix>();
+        _characterControl = GetComponent<CharacterControl>();
+        _weaponControl = GetComponent<WeaponControl>();
         _healthControl = GetComponent<HealthControl>();
 
         if (!_characterControl.IsNeutral)
@@ -29,17 +28,15 @@ public class TargetControl : MonoBehaviour
     }
     
     void FixedUpdate()
-    {
-        _targetPos = TargetCharacter.transform.position;
-        
+    {        
         if (TargetCharacter == null) 
             _weaponControl.IsBarrelIdle = true;
         else if (TargetCharacter.CompareTag(ConstantSettings.deadTag) || CompareTag(TargetCharacter.tag))
             TargetCharacter = null;
-        else if (!ConstantSettings.ObstacleBetween(_targetPos, transform.position))
+        else if (!ConstantSettings.ObstacleBetween(TargetCharacter.transform.position, transform.position))
         {
             _weaponControl.IsBarrelIdle = false;
-            TargetPosition = _targetPos;
+            TargetPosition = TargetCharacter.transform.position;
         }
     }
 

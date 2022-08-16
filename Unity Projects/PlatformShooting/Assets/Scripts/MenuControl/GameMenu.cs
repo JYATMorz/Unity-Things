@@ -27,10 +27,6 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     private TextMeshProUGUI _gameOverText;
     private Button[] _weaponButtons;
 
-    private const string _neutralTag = "Neutral";
-    private const string _blueTeamTag = "BlueTeam";
-    private const string _redTeamTag = "RedTeam";
-
     void Awake()
     {
         _weaponButtons = weaponPanel.GetComponentsInChildren<Button>();
@@ -45,9 +41,9 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     void Start()
     {
         _gameOverText = endGameUI.GetComponentInChildren<TextMeshProUGUI>(true);
-        _redTeamNum = GameObject.FindGameObjectsWithTag(_redTeamTag).Length;
-        _blueTeamNum = GameObject.FindGameObjectsWithTag(_blueTeamTag).Length;
-        _neutralNum = GameObject.FindGameObjectsWithTag(_neutralTag).Length;
+        _redTeamNum = GameObject.FindGameObjectsWithTag(ConstantSettings.redTeamTag).Length;
+        _blueTeamNum = GameObject.FindGameObjectsWithTag(ConstantSettings.blueTeamTag).Length;
+        _neutralNum = GameObject.FindGameObjectsWithTag(ConstantSettings.neutralTag).Length;
 
         UpdateGameUI();
     }
@@ -106,10 +102,10 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     {
         switch (tag)
         {
-            case _redTeamTag:
+            case ConstantSettings.redTeamTag:
                 _redTeamNum ++;
                 break;
-            case _blueTeamTag:
+            case ConstantSettings.blueTeamTag:
                 _blueTeamNum ++;
                 break;
             default:
@@ -127,11 +123,14 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     {
         switch (tag)
         {
-            case _redTeamTag:
+            case ConstantSettings.redTeamTag:
                 _redTeamNum --;
                 break;
-            case _blueTeamTag:
+            case ConstantSettings.blueTeamTag:
                 _blueTeamNum --;
+                break;
+            case ConstantSettings.neutralTag:
+                _neutralNum --;
                 break;
             default:
                 Debug.Log("Character didn't die Correctly !");
@@ -146,8 +145,8 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     private void UpdateGameUI()
     {
         string gameScore = 
-            "<#D0BDC7>Red: " + _redTeamNum.ToString().PadLeft(2, '0') + "\n" +
-            "<#B4BED1>Blue: " + _blueTeamNum.ToString().PadLeft(2, '0');
+            ConstantSettings.redColor + "Red: " + _redTeamNum.ToString().PadLeft(2, '0') + "\n" +
+            ConstantSettings.blueColor + "Blue: " + _blueTeamNum.ToString().PadLeft(2, '0');
         scoreText.text = gameScore;
     }
 
@@ -155,10 +154,10 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     {
         MainCamera.GameIsOver();
 
-        if ((_redTeamNum <= 0) && (_blueTeamNum <= 0)) _gameOverText.text = "<#C6A2D1>A Rare Tie !";
-        else if (_redTeamNum <= 0) _gameOverText.text = "<#B4BED1>Blue Wins";
-        else if (_blueTeamNum <= 0) _gameOverText.text = "<#D0BDC7>Red Wins";
-        else _gameOverText.text = "<#FFFFFF>Hmm...Something wrong with the result.";
+        if ((_redTeamNum <= 0) && (_blueTeamNum <= 0)) _gameOverText.text = ConstantSettings.purpleColor + "A Rare Tie !";
+        else if (_redTeamNum <= 0) _gameOverText.text = ConstantSettings.blueColor + "Blue Wins";
+        else if (_blueTeamNum <= 0) _gameOverText.text = ConstantSettings.redColor + "Red Wins";
+        else _gameOverText.text = ConstantSettings.whiteColor + "Hmm...Something wrong with the result.";
 
         inGameUI.SetActive(false);
         pauseMenuUI.SetActive(false);
@@ -169,12 +168,13 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     {
         string notifyText = noteType switch {
             "DeadZone" => "Shooting Dead Zone !\n",
-            (_blueTeamTag + "Die") => "One Blue Team Member Die.",
-            (_redTeamTag + "Die") => "One Red Team Member Die.",
-            (_blueTeamTag + "Born") => "New Blue Team Member.",
-            (_redTeamTag + "Born") => "New Red Team Member.",
-            "PlayerDie" => "You Are Dead. Wait For Reborn.",
-            "PlayerBorn" => "You Are Alive, Again.",
+            (ConstantSettings.blueTeamTag + "Die") => ConstantSettings.blueColor + "One Blue Team Member Die.",
+            (ConstantSettings.redTeamTag + "Die") => ConstantSettings.redColor + "One Red Team Member Die.",
+            (ConstantSettings.neutralTag + "Die") => ConstantSettings.whiteColor + "One Innocent Character Die.",
+            (ConstantSettings.blueTeamTag + "Born") => ConstantSettings.blueColor + "New Blue Team Member.",
+            (ConstantSettings.redTeamTag + "Born") => ConstantSettings.redColor + "New Red Team Member.",
+            "PlayerDie" => ConstantSettings.purpleColor + "You Are Dead. Wait For Reborn.",
+            "PlayerBorn" => ConstantSettings.purpleColor + "You Are Alive, Again.",
             _ => null,
         };
 

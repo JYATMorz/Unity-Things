@@ -5,8 +5,8 @@ public class HealthControl : MonoBehaviour
     private const int _initHealth = 100;
 
     private HealthBar _healthBar;
-    private WeaponControl_TempBugFix _weaponControl;
-    private CharacterControl_TempBugFix _characterControl;
+    private WeaponControl _weaponControl;
+    private CharacterControl _characterControl;
     private TargetControl _targetControl;
     private IMenuUI _gameMenu;
     private int _currentHealth = _initHealth;
@@ -18,9 +18,9 @@ public class HealthControl : MonoBehaviour
 
     void Awake()
     {
-        _weaponControl = GetComponent<WeaponControl_TempBugFix>();
+        _weaponControl = GetComponent<WeaponControl>();
         _targetControl = GetComponent<TargetControl>();
-        _characterControl = GetComponent<CharacterControl_TempBugFix>();
+        _characterControl = GetComponent<CharacterControl>();
 
         _gameMenu = sceneMenu.GetComponent<IMenuUI>();
 
@@ -64,7 +64,7 @@ public class HealthControl : MonoBehaviour
         {
             if (_targetControl.TargetCharacter.CompareTag(ConstantSettings.neutralTag))
             {
-                KillCharacter(); // FIXME: add neutral tag in GameMenu.cs
+                KillCharacter();
                 return;
             }
 

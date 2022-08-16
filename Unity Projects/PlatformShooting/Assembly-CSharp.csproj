@@ -36,16 +36,21 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\CharacterControl\CharacterControl.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\TargetControl.cs" />
      <Compile Include="Assets\Scripts\Other\MainCamera.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\ConstantSettings.cs" />
      <Compile Include="Assets\Scripts\MenuControl\IMenuUI.cs" />
      <Compile Include="Assets\Scripts\Environment\ForceElevator.cs" />
      <Compile Include="Assets\Scripts\MenuControl\GeneralLoadMenu.cs" />
      <Compile Include="Assets\Scripts\MenuControl\NotificationBlock.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\Grenade.cs" />
-     <Compile Include="Assets\Scripts\MenuControl\GameMenu.cs" />
-     <Compile Include="Assets\Scripts\Environment\TeleportWall.cs" />
-     <Compile Include="Assets\Scripts\CharacterControl\CharacterControl.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\WeaponControl.cs" />
+     <Compile Include="Assets\Scripts\MenuControl\GameMenu.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\HealthControl.cs" />
+     <Compile Include="Assets\Scripts\Environment\TeleportWall.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\Backup\CharacterControl_Backup.cs" />
+     <Compile Include="Assets\Scripts\CharacterControl\Backup\WeaponControl_Backup.cs" />
      <Compile Include="Assets\Scripts\MenuControl\MainMenu.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\ExplosivePayload.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\HealthBar.cs" />
@@ -56,7 +61,6 @@
      <Compile Include="Assets\Scripts\MenuControl\ButtonResize.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\BillboardCanvas.cs" />
      <Compile Include="Assets\Scripts\CharacterControl\AmmoTypes\LaserBeam.cs" />
-     <Compile Include="Assets\Scripts\CharacterControl\CharacterControl_TempBugFix.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />

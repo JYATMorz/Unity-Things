@@ -28,7 +28,7 @@ public class TemplateBullet : MonoBehaviour
         {
             if (contact.tag != _neutralTag || _ownerTag != _neutralTag)
             {
-                contact.GetComponent<CharacterControl>().ReceiveDamage(_ammoDamage);
+                contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage);
             }
         }
         Instantiate(bulletImpact, transform.position, transform.rotation * Quaternion.FromToRotation(Vector3.forward, Vector3.down));
