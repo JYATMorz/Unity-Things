@@ -28,9 +28,13 @@ public class HealthControl : MonoBehaviour
         _healthBar = GetComponentInChildren<HealthBar>();
     }
 
-    public void ReceiveDamage(int damage, Rigidbody attacker = null)
+    public void ReceiveDamage(int damage, Rigidbody attacker)
     {
-        if (!_characterControl.IsPlayer && attacker != null) _targetControl.SwitchTarget(attacker);
+        if (attacker == null)
+        {
+            Debug.LogWarning("Null Attacker Tag");
+            return;
+        } else if (!_characterControl.IsPlayer) _targetControl.SwitchTarget(attacker);
 
         _currentHealth -= Mathf.Clamp(damage, 0, 25);
 

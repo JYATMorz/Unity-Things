@@ -23,10 +23,14 @@ public class ConstantSettings
     public const float jumpScaler = 20f;
     public const int barrelRotateSpeed = 45;
     public const int initHealth = 100;
+    public const int ammoSelfDestruction = 10;
 
     public static readonly int floorLayer = LayerMask.GetMask(floorTag, elevatorTag);
+    public static readonly int characterLayer = LayerMask.GetMask(deadTag, neutralTag, redTeamTag, blueTeamTag);
     public static readonly int deadLayer = LayerMask.NameToLayer(deadTag);
     public static readonly string[] floorTags = { floorTag, elevatorTag };
+    public static readonly string[] aliveTags = { neutralTag, redTeamTag, blueTeamTag };
+    public static readonly string[] characterTags = { deadTag, neutralTag, redTeamTag, blueTeamTag };
 
     public static bool TargetInRange(Vector3 targetPos, Vector3 currentPos, float range)
         => (targetPos - currentPos).sqrMagnitude < range * range;
@@ -35,5 +39,20 @@ public class ConstantSettings
     {
         if (layer == -1) layer = floorLayer;
         return Physics.Linecast(currentPos, targetPos, layer);
+    }
+
+    public static int ExplosionDamage(int damage, Vector3 explodePos, Vector3 targetPos, float radius)
+    {
+        return Mathf.FloorToInt(damage * (1 - (explodePos - targetPos).sqrMagnitude / (radius * radius)));
+    }
+
+    public static bool AreBothNeutral(GameObject contact, Rigidbody owner)
+    {
+        return contact.CompareTag(neutralTag) && owner.CompareTag(neutralTag);
+    }
+
+    public static bool AreBothNeutral(Collider contact, Rigidbody owner)
+    {
+        return contact.CompareTag(neutralTag) && owner.CompareTag(neutralTag);
     }
 }

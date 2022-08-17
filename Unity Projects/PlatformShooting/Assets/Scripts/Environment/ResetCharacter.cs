@@ -3,8 +3,6 @@ using System;
 
 public class ResetCharacter : MonoBehaviour
 {
-    private readonly string[] _characterTags = { "Neutral", "BlueTeam", "RedTeam" };
-    private const string _bulletTag = "Bullet";
     private const float _freeHeightY = 23.5f;
     private const float _outOfBoundX = 49.5f;
 
@@ -14,7 +12,7 @@ public class ResetCharacter : MonoBehaviour
     {
         GameObject contact = other.gameObject;
 
-        if (Array.Exists(_characterTags, tag => contact.CompareTag(tag)))
+        if (Array.Exists(ConstantSettings.aliveTags, tag => contact.CompareTag(tag)))
         {
             if (Mathf.Abs(contact.transform.position.x) > _outOfBoundX)
             {

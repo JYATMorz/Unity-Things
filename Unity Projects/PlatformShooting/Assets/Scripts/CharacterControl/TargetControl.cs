@@ -42,17 +42,6 @@ public class TargetControl : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision other)
-    {
-        GameObject contact = other.gameObject;
-
-        if (contact.CompareTag(ConstantSettings.bulletTag))
-        {
-            if (!_characterControl.IsPlayer) SwitchTarget(contact.GetComponentsInParent<Rigidbody>()[2]);
-
-        }
-    }
-    
     IEnumerator SeekEnemy()
     {
         while(true && !_healthControl.IsDead)
@@ -66,7 +55,19 @@ public class TargetControl : MonoBehaviour
                     if (!ConstantSettings.TargetInRange(targetPos, transform.position, ConstantSettings.seekRange))
                         TargetCharacter = null;
                     else if (!ConstantSettings.TargetInRange(targetPos, transform.position, ConstantSettings.shootRange))
+                    {
+                        TargetPosition = targetPos;
                         _characterControl.ChaseMode = true;
+                    } else if (ConstantSettings.ObstacleBetween(targetPos, transform.position))
+                    {
+                        if (ConstantSettings.TargetInRange(targetPos, transform.position, 0.5f * ConstantSettings.shootRange))
+                            TargetCharacter = null;
+                        else
+                        {
+                            TargetPosition = targetPos;
+                            _characterControl.ChaseMode = true;
+                        }
+                    }
                 }
             }
             yield return new WaitForSeconds(ConstantSettings.seekInterval);
@@ -89,6 +90,7 @@ public class TargetControl : MonoBehaviour
     public void SwitchTarget(Rigidbody suspect)
     {
         Vector3 suspectPosition = suspect.position;
+        GameObject previousTarget = TargetCharacter;
 
         if (_characterControl.IsNeutral) // I'm a neutral character
         {
@@ -128,7 +130,11 @@ public class TargetControl : MonoBehaviour
             }
         }
 
-        if (TargetCharacter != null) _characterControl.ChaseMode = true;
+        if (TargetCharacter != null && previousTarget != TargetCharacter)
+        {
+            TargetPosition = TargetCharacter.transform.position;
+            _characterControl.ChaseMode = true;
+        }
     }
 
     public void BecomeTeamMember()

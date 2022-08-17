@@ -3,13 +3,11 @@ using System;
 using System.Collections;
 
 public class TeleportWall : MonoBehaviour {
-
-    private readonly string[] _characterTags = { "Neutral", "BlueTeam", "RedTeam", "Dead" };
     
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Bullet")) Destroy(other.gameObject);
-        else if (Array.Exists(_characterTags, tag => tag == other.tag))
+        else if (Array.Exists(ConstantSettings.characterTags, tag => other.CompareTag(tag)))
             StartCoroutine(TeleportCharacter(other.gameObject));
     }
 

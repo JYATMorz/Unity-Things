@@ -5,32 +5,21 @@ public class ExplosivePayload : MonoBehaviour
 {
     public GameObject explosionEffect;
 
-    private const int _selfDestructionTime = 10;
     private const int _ammoDamage = 15;
     private const float _explosionRadius = 2f;
-    private const string _deadTag = "Dead";
-    private const string _neutralTag = "Neutral";
 
-    private int _characterLayer;
-    private int _floorLayer;
-    private string _ownerTag;
     private Rigidbody _ownerBody;
 
     void Start()
     {
         _ownerBody = GetComponentsInParent<Rigidbody>()[2];
-        _ownerTag = _ownerBody.tag;
-
-        _characterLayer = LayerMask.GetMask("Neutral", "BlueTeam", "RedTeam", "Dead");
-        _floorLayer = LayerMask.GetMask("Floor", "Elevator");
 
         StartCoroutine(SelfDestruction());
     }
 
     void OnCollisionEnter()
     {
-        Explosion();
-        Destroy(gameObject);
+        StartCoroutine(Explosion());
     }
 
     void OnDestroy()
@@ -38,27 +27,27 @@ public class ExplosivePayload : MonoBehaviour
         Instantiate(explosionEffect, transform.position, transform.rotation);
     }
 
-    private void Explosion()
+    IEnumerator Explosion()
     {
-        foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, _characterLayer))
+        foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, ConstantSettings.characterLayer))
         {
-            if (Physics.Linecast(transform.position, character.transform.position, ~_floorLayer))
+            if (Physics.Linecast(transform.position, character.transform.position, ~ConstantSettings.floorLayer))
             {
-                if (!character.CompareTag(_deadTag) && !(_ownerTag == _neutralTag && character.CompareTag(_neutralTag)))
+                if (!character.CompareTag(ConstantSettings.deadTag) && !ConstantSettings.AreBothNeutral(character, _ownerBody))
                 {
-                    int damage = Mathf.FloorToInt(_ammoDamage * (1 - (transform.position - character.transform.position).sqrMagnitude / (_explosionRadius * _explosionRadius)));
+                    int damage = ConstantSettings.ExplosionDamage(_ammoDamage, transform.position, character.transform.position, _explosionRadius);
                     character.GetComponent<HealthControl>().ReceiveDamage(damage, _ownerBody);
                 }
                 character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0, ForceMode.Impulse);
             }
-            
+            yield return new WaitForFixedUpdate();
         }
+        Destroy(gameObject);
     }
-
 
     IEnumerator SelfDestruction()
     {
-        yield return new WaitForSeconds(_selfDestructionTime);
-        Destroy(gameObject);
+        yield return new WaitForSeconds(ConstantSettings.ammoSelfDestruction);
+        StartCoroutine(Explosion());
     }
 }

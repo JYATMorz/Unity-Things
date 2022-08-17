@@ -9,16 +9,13 @@ public class LaserBeam : MonoBehaviour
 
     private const int _ammoDamage = 10;
     private const float _lifeTime = 5f;
-    private const string _neutralTag = "Neutral";
-
-    private readonly string[] _characterTag = { "Neutral", "RedTeam", "BlueTeam" };
     
     private Rigidbody _laserBody;
-    private string _ownerTag;
+    private Rigidbody _ownerBody;
 
     void Start()
     {
-        _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
+        _ownerBody = GetComponentsInParent<Rigidbody>()[2];
         _laserBody = GetComponent<Rigidbody>();
 
         StartCoroutine(LifeTimeOver(_lifeTime));
@@ -27,17 +24,16 @@ public class LaserBeam : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
-        GameObject contact = other.gameObject;
-        if (Array.Exists(_characterTag, tag => tag == contact.tag))
-        {
-            if (contact.tag != _neutralTag || _ownerTag != _neutralTag)
-            {
-                contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage);
-            }
-            Destroy(gameObject);
-        }
-        
         laserImpact.Play();
+
+        GameObject contact = other.gameObject;
+        if (Array.Exists(ConstantSettings.aliveTags, tag => tag == contact.tag))
+        {
+            if (!ConstantSettings.AreBothNeutral(contact, _ownerBody))
+            {
+                contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage, _ownerBody);
+            }
+        }
     }
 
     IEnumerator LifeTimeOver(float lifeTime)

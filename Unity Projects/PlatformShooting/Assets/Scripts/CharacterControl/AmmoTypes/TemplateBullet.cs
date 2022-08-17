@@ -6,17 +6,13 @@ public class TemplateBullet : MonoBehaviour
 {
     public GameObject bulletImpact;
 
-    private const int _selfDestructionTime = 10;
     private const int _ammoDamage = 10;
-    private const string _neutralTag = "Neutral";
 
-    private readonly string[] _characterTag = { "Neutral", "RedTeam", "BlueTeam" };
-
-    private string _ownerTag;
+    private Rigidbody _ownerBody;
 
     void Start()
     {
-        _ownerTag = GetComponentsInParent<Rigidbody>()[2].tag;
+        _ownerBody = GetComponentsInParent<Rigidbody>()[2];
 
         StartCoroutine(SelfDestruction());
     }
@@ -24,11 +20,11 @@ public class TemplateBullet : MonoBehaviour
     void OnCollisionEnter(Collision other)
     {
         GameObject contact = other.gameObject;
-        if (Array.Exists(_characterTag, tag => tag == contact.tag))
+        if (Array.Exists(ConstantSettings.aliveTags, tag => tag == contact.tag))
         {
-            if (contact.tag != _neutralTag || _ownerTag != _neutralTag)
+            if (!ConstantSettings.AreBothNeutral(contact, _ownerBody))
             {
-                contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage);
+                contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage, _ownerBody);
             }
         }
         Instantiate(bulletImpact, transform.position, transform.rotation * Quaternion.FromToRotation(Vector3.forward, Vector3.down));
@@ -38,7 +34,7 @@ public class TemplateBullet : MonoBehaviour
 
     IEnumerator SelfDestruction()
     {
-        yield return new WaitForSeconds(_selfDestructionTime);
+        yield return new WaitForSeconds(ConstantSettings.ammoSelfDestruction);
         Destroy(gameObject);
     }
 }

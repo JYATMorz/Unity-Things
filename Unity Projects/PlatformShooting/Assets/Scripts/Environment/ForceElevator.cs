@@ -3,21 +3,17 @@ using UnityEngine.VFX;
 
 public class ForceElevator : MonoBehaviour
 {
-    public float _liftForce = 30f;
-    public ForceMode forceType = ForceMode.Impulse;
+    private readonly float _liftForce = 30f;
 
     public VisualEffect liftEffect;
 
-    void OnTriggerEnter() {
-        // liftEffect.Play();
-    }
-
-    void OnTriggerExit() {
-        // liftEffect.Stop();
+    void OnTriggerEnter()
+    {
+        // TODO: liftEffect.Play();
     }
 
     void OnTriggerStay(Collider other)
     {
-        other.attachedRigidbody.AddForce(transform.up * _liftForce, forceType);
+        other.attachedRigidbody.AddForce(transform.up * _liftForce, ForceMode.Impulse);
     }
 }

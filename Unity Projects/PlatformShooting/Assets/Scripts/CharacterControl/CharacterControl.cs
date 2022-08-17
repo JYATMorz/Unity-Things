@@ -13,11 +13,11 @@ public class CharacterControl : MonoBehaviour
     private TargetControl _targetControl;
 
     private Rigidbody _characterBody;
-    // private NavMeshAgent _npcAgent;
+    private NavMeshAgent _npcAgent;
     private IMenuUI _gameMenu;
     private bool _jumpPressed = false;
     private bool _onGround = false;
-    private bool _onElevator = false;
+    private bool _onForceElevator = false;
     private int _doubleJump = 2;
 
     public bool IsTeleported { get; set; } = false;
@@ -41,10 +41,10 @@ public class CharacterControl : MonoBehaviour
         _targetControl = GetComponent<TargetControl>();
 
         _characterBody = GetComponent<Rigidbody>();
-        // _npcAgent = GetComponent<NavMeshAgent>();
+        _npcAgent = GetComponent<NavMeshAgent>();
         _gameMenu = sceneMenu.GetComponent<IMenuUI>();
 
-        // _npcAgent.updateRotation = false;
+        _npcAgent.updateRotation = false;
         _weaponControl.IsBarrelIdle = !_isPlayer;
         IsPlayer = _isPlayer;
         IsNeutral = _isNeutral;
@@ -63,13 +63,13 @@ public class CharacterControl : MonoBehaviour
         if (IsPlayer)
         {
             _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();
-            // _npcAgent.updatePosition = false;
-            // _characterBody.isKinematic = false;
+            _npcAgent.updatePosition = false;
+            _characterBody.isKinematic = false;
             // FIXME: https://docs.unity.cn/2021.3/Documentation/Manual/nav-MixingComponents.html
             return;
         }
 
-        // StartCoroutine(WanderAround());
+        // StartCoroutine(StartNavMeshJump());
     }
 
     void Update()
@@ -113,7 +113,7 @@ public class CharacterControl : MonoBehaviour
             }
 
             // FIXME: character movement without clamping other forces
-            if (!_onElevator)
+            if (!_onForceElevator)
             {
                 if (_doubleJump < 2 || !_onGround)
                     _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * ConstantSettings.speedScaler, _characterBody.velocity.y, 0);
@@ -125,10 +125,13 @@ public class CharacterControl : MonoBehaviour
 
             }
 
+            _npcAgent.nextPosition = _characterBody.position;
+
             return;
         }
 
         if (ChaseMode) ChaseTarget();
+        else WanderAround();
     }
 
     void OnCollisionEnter(Collision other) 
@@ -139,13 +142,17 @@ public class CharacterControl : MonoBehaviour
         {
             if (IsPlayer) _doubleJump = 2;
             _onGround = true;
-            _onElevator = false;
+            _onForceElevator = false;
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag(ConstantSettings.elevatorTag)) _onElevator = true;
+        if (other.gameObject.CompareTag(ConstantSettings.elevatorTag))
+        {
+            _onForceElevator = true;
+            BecomeFree();
+        }
     }
 
     void OnCollisionStay()
@@ -155,7 +162,7 @@ public class CharacterControl : MonoBehaviour
 
     void OnCollisionExit(Collision other)
     {
-        if (Array.Exists(ConstantSettings.floorTags, tag => tag == other.gameObject.tag))
+        if (Array.Exists(ConstantSettings.floorTags, tag => other.gameObject.CompareTag(tag)))
         {
             _onGround = false;
         }
@@ -164,32 +171,29 @@ public class CharacterControl : MonoBehaviour
     private void ChaseTarget()
     {
         ChaseMode = false;
+        _npcAgent.SetDestination(_targetControl.TargetPosition);
+    }
 
-        if (_targetControl.TargetCharacter == null) return;
-
-        if (!ConstantSettings.TargetInRange(_targetControl.TargetPosition, transform.position, 0.5f * ConstantSettings.shootRange))
+    private void WanderAround()
+    {
+        if (!_npcAgent.hasPath && !_npcAgent.pathPending)
         {
-            // _npcAgent.SetDestination(_targetControl.TargetPosition);
+            float wanderSpeed = Mathf.PingPong(Time.time, ConstantSettings.speedScaler) - 0.5f * ConstantSettings.speedScaler;
+            _npcAgent.velocity = new Vector3(wanderSpeed, _characterBody.velocity.y, 0);
         }
+
     }
 
     // TODO: https://docs.unity3d.com/ScriptReference/AI.NavMeshAgent.CompleteOffMeshLink.html
-    private void JumpAcrossGap()
+    IEnumerator StartNavMeshJump()
     {
-        // FIXME: _npcAgent.autoTraverseOffMeshLink = false;
-
-        // in start(): StartCoroutine(StartNavMeshJump());
+        if (_npcAgent.isOnOffMeshLink)
+        {
+            yield return StartCoroutine(ParabolaJump(_npcAgent, 1f, 1f));
+            _npcAgent.CompleteOffMeshLink();
+        }
+        yield return null;
     }
-
-    // IEnumerator StartNavMeshJump()
-    // {
-    //     if (_npcAgent.isOnOffMeshLink)
-    //     {
-    //         yield return StartCoroutine(ParabolaJump(_npcAgent, 1f, 1f));
-    //         _npcAgent.CompleteOffMeshLink();
-    //     }
-    //     yield return null;
-    // }
 
     IEnumerator ParabolaJump(NavMeshAgent agent, float height, float duration)
     {
@@ -206,19 +210,6 @@ public class CharacterControl : MonoBehaviour
         }
     }
 
-    // private IEnumerator WanderAround()
-    // {
-    //     while (true)
-    //     {
-    //         if (!_npcAgent.hasPath && !_npcAgent.pathPending)
-    //             _npcAgent.velocity = (_targetControl.TargetCharacter == null) ?
-    //                 new Vector3(Mathf.PingPong(Time.time, _speedScaler) - 0.5f * _speedScaler, _characterBody.velocity.y, 0)
-    //                 : Vector3.zero;
-
-    //         yield return new WaitForFixedUpdate();
-    //     }
-    // }
-
     public void SwitchToTeamLayer(string teamTag, string enemyTag)
     {
         gameObject.tag = teamTag;
@@ -231,11 +222,12 @@ public class CharacterControl : MonoBehaviour
         GetComponent<Renderer>().material = _materialInfo[teamTag];
     }
 
+    // FIXME
     public void BecomePlayer()
     {
         IsPlayer = true;
-        // _npcAgent.updatePosition = false;
-        // _characterBody.isKinematic = false;
+        _npcAgent.updatePosition = false;
+        _characterBody.isKinematic = false;
 
         if (IsNeutral && IsPlayer) Debug.LogWarning("Neutral Character becomes Player !");
 
@@ -245,6 +237,7 @@ public class CharacterControl : MonoBehaviour
         StopAllCoroutines();
         _weaponControl.StopAllCoroutines();
 
+        StartCoroutine(OutOfMapCheck());
     }
 
     public void BecomeDead()
@@ -269,6 +262,28 @@ public class CharacterControl : MonoBehaviour
 
     }
 
+    public void BecomeFree()
+    {
+        if (_isPlayer) return;
+        // TODO: Adjust agent and kinematic to allow physics control character temporarily
+        _npcAgent.updatePosition = false;
+        _characterBody.isKinematic = false;
+
+        StartCoroutine(BecomeUnfree());
+    }
+
+    IEnumerator BecomeUnfree()
+    {
+        while (!_onGround || _onForceElevator)
+        {
+            _npcAgent.nextPosition = _characterBody.position;
+            yield return new WaitForFixedUpdate();
+        }
+
+        _npcAgent.updatePosition = true;
+        _characterBody.isKinematic = true;
+    }
+
     IEnumerator OutOfMapCheck()
     {
         while (true)
@@ -287,4 +302,3 @@ public class CharacterControl : MonoBehaviour
     }
 
 }
-
