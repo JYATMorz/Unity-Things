@@ -6,9 +6,6 @@ using System.Collections.Generic;
 
 public class CharacterControl : MonoBehaviour
 {
-    private const float _speedScaler = 5f;
-    private const float _jumpScaler = 20f;
-
     private readonly Dictionary<string, Material> _materialInfo = new();
 
     private WeaponControl _weaponControl;
@@ -65,7 +62,7 @@ public class CharacterControl : MonoBehaviour
 
         if (IsPlayer)
         {
-            _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();// FIXME
+            _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();
             // _npcAgent.updatePosition = false;
             // _characterBody.isKinematic = false;
             // FIXME: https://docs.unity.cn/2021.3/Documentation/Manual/nav-MixingComponents.html
@@ -109,7 +106,7 @@ public class CharacterControl : MonoBehaviour
         {
             if (_jumpPressed)
             {
-                _characterBody.AddForce(Vector3.up * _jumpScaler, ForceMode.Impulse);
+                _characterBody.AddForce(Vector3.up * ConstantSettings.jumpScaler, ForceMode.Impulse);
 
                 _doubleJump --;
                 _jumpPressed = false;
@@ -119,11 +116,11 @@ public class CharacterControl : MonoBehaviour
             if (!_onElevator)
             {
                 if (_doubleJump < 2 || !_onGround)
-                    _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0);
+                    _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * ConstantSettings.speedScaler, _characterBody.velocity.y, 0);
                 else
                 {
                     _characterBody.velocity = Vector3.ClampMagnitude(
-                        new Vector3(Input.GetAxis("Horizontal") * _speedScaler, _characterBody.velocity.y, 0), _speedScaler);
+                        new Vector3(Input.GetAxis("Horizontal") * ConstantSettings.speedScaler, _characterBody.velocity.y, 0), ConstantSettings.speedScaler);
                 }
 
             }
@@ -170,7 +167,7 @@ public class CharacterControl : MonoBehaviour
 
         if (_targetControl.TargetCharacter == null) return;
 
-        if (!ConstantSettings.TargetInRange(_targetControl.TargetPosition, transform.position, 0.5f * _weaponControl.shootRange))
+        if (!ConstantSettings.TargetInRange(_targetControl.TargetPosition, transform.position, 0.5f * ConstantSettings.shootRange))
         {
             // _npcAgent.SetDestination(_targetControl.TargetPosition);
         }

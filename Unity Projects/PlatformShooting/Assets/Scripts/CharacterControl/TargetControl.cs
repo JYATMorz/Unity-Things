@@ -3,9 +3,6 @@ using System.Collections;
 
 public class TargetControl : MonoBehaviour
 {
-    private const float _seekInterval = 1f;
-    private const float _seekRange = 30f;
-
     private CharacterControl _characterControl;
     private WeaponControl _weaponControl;
     private HealthControl _healthControl;
@@ -25,6 +22,11 @@ public class TargetControl : MonoBehaviour
             string enemyTag = CompareTag(ConstantSettings.blueTeamTag) ? ConstantSettings.redTeamTag : ConstantSettings.blueTeamTag;
             EnemyLayer = LayerMask.GetMask(enemyTag, ConstantSettings.neutralTag);
         }
+    }
+
+    void Start()
+    {
+        StartCoroutine(SeekEnemy());
     }
     
     void FixedUpdate()
@@ -51,35 +53,36 @@ public class TargetControl : MonoBehaviour
         }
     }
     
-    private IEnumerator SeekEnemy()
+    IEnumerator SeekEnemy()
     {
         while(true && !_healthControl.IsDead)
         {
             if(!_characterControl.IsNeutral)
             {
-                if (TargetCharacter == null) SearchTarget();
+                if (TargetCharacter == null) yield return StartCoroutine(SearchTarget());
                 else
                 {
                     Vector3 targetPos = TargetCharacter.transform.position;
-                    if (!ConstantSettings.TargetInRange(targetPos, transform.position, _seekRange))
+                    if (!ConstantSettings.TargetInRange(targetPos, transform.position, ConstantSettings.seekRange))
                         TargetCharacter = null;
-                    else
+                    else if (!ConstantSettings.TargetInRange(targetPos, transform.position, ConstantSettings.shootRange))
                         _characterControl.ChaseMode = true;
                 }
             }
-            yield return new WaitForSeconds(_seekInterval);
+            yield return new WaitForSeconds(ConstantSettings.seekInterval);
         }
     }
 
-    private void SearchTarget()
+    IEnumerator SearchTarget()
     {
-        foreach (Collider target in Physics.OverlapSphere(transform.position, _seekRange, EnemyLayer))
+        foreach (Collider target in Physics.OverlapSphere(transform.position, ConstantSettings.seekRange, EnemyLayer))
         {
             if (!ConstantSettings.ObstacleBetween(target.transform.position, transform.position))
             {
                 TargetCharacter = target.gameObject;
                 break;
             }
+            yield return null;
         }
     }
 
@@ -95,17 +98,17 @@ public class TargetControl : MonoBehaviour
             {
                 if (suspect.CompareTag(ConstantSettings.neutralTag))
                     // 50% chance to switch from one neutral target to another
-                    TargetCharacter = (UnityEngine.Random.value < 0.5f) ? suspect.gameObject : TargetCharacter;
+                    TargetCharacter = (Random.value < 0.5f) ? suspect.gameObject : TargetCharacter;
                 else
                     // 100% chance to switch from one neutral target to team target
                     TargetCharacter = suspect.gameObject;
             } else if (!suspect.CompareTag(ConstantSettings.neutralTag)) // Currently has team target & suspect is not neutral
             {
-                if (!ConstantSettings.TargetInRange(TargetCharacter.transform.position, transform.position, _seekRange)) // Current target is out of seek range
-                {
+                if (!ConstantSettings.TargetInRange(TargetCharacter.transform.position, transform.position, ConstantSettings.seekRange))
+                { // Current target is out of seek range
                     TargetCharacter = suspect.gameObject;
-                } else if (!ConstantSettings.TargetInRange(TargetCharacter.transform.position, transform.position, _weaponControl.shootRange)) // Current target is out of shoot range
-                {
+                } else if (!ConstantSettings.TargetInRange(TargetCharacter.transform.position, transform.position, ConstantSettings.shootRange))
+                { // Current target is out of shoot range
                     TargetCharacter = ConstantSettings.ObstacleBetween(suspectPosition, transform.position)
                         ? TargetCharacter : suspect.gameObject;
                 }
@@ -128,7 +131,7 @@ public class TargetControl : MonoBehaviour
         if (TargetCharacter != null) _characterControl.ChaseMode = true;
     }
 
-    public void ResetTarget()
+    public void BecomeTeamMember()
     {
         TargetCharacter.GetComponent<HealthControl>().FullHealth();
 

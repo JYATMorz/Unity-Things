@@ -2,14 +2,12 @@ using UnityEngine;
 
 public class HealthControl : MonoBehaviour
 {
-    private const int _initHealth = 100;
-
     private HealthBar _healthBar;
     private WeaponControl _weaponControl;
     private CharacterControl _characterControl;
     private TargetControl _targetControl;
     private IMenuUI _gameMenu;
-    private int _currentHealth = _initHealth;
+    private int _currentHealth = ConstantSettings.initHealth;
 
     public bool IsDead { get; private set; } = false;
 
@@ -42,13 +40,13 @@ public class HealthControl : MonoBehaviour
             ZeroHealth();
         } else
         {
-            _healthBar.SetHealthValue(_currentHealth / (float)_initHealth);
+            _healthBar.SetHealthValue(_currentHealth / (float) ConstantSettings.initHealth);
         }
     }
 
     public void FullHealth()
     {
-        _currentHealth = _initHealth;
+        _currentHealth = ConstantSettings.initHealth;
         _healthBar.SetMaxHealth();
     }
 
@@ -70,8 +68,7 @@ public class HealthControl : MonoBehaviour
 
             FullHealth();
             _gameMenu.TeamChanged(gameObject.tag);
-
-            _targetControl.ResetTarget();
+            _targetControl.BecomeTeamMember();
 
         } else Debug.Log("Target is null when changing team!");
     }
