@@ -23,8 +23,7 @@ public class BrickElevator : MonoBehaviour
     {
         while (true)
         {
-            if ((Mathf.Abs(transform.position.y - _targetTopPosition) < 0.01f) ||
-                (Mathf.Abs(transform.position.y - _targetDownPosition) < 0.01f))
+            if (IsCloseToStop(0.01f))
             {
                 yield return StartCoroutine(WaitBeforeMove());
             }
@@ -38,6 +37,18 @@ public class BrickElevator : MonoBehaviour
     {
         _randomSpeed = _moveSpeed * Random.Range(0.8f, 1.2f) * (- Mathf.Sign(_randomSpeed));
         yield return new WaitForSeconds(_waitTime * Random.Range(0.8f, 1.2f));
+
+        while (IsCloseToStop(2f))
+        {
+            brickRB.position += new Vector3(0, _randomSpeed * Time.deltaTime, 0);
+            yield return new WaitForFixedUpdate();
+        }
+    }
+
+    private bool IsCloseToStop(float distance)
+    {
+        return ((_targetTopPosition - transform.position.y) < distance) ||
+                ((transform.position.y - _targetDownPosition) < distance);
     }
 
 }

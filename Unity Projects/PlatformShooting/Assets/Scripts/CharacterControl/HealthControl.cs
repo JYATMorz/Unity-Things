@@ -34,7 +34,9 @@ public class HealthControl : MonoBehaviour
         {
             Debug.LogWarning("Null Attacker Tag");
             return;
-        } else if (!_characterControl.IsPlayer) _targetControl.SwitchTarget(attacker);
+        } else if (!_characterControl.IsPlayer
+                && ConstantSettings.TargetInRange(attacker.position, transform.position, ConstantSettings.seekRange))
+            _targetControl.SwitchTarget(attacker);
 
         _currentHealth -= Mathf.Clamp(damage, 0, 25);
 
@@ -71,7 +73,7 @@ public class HealthControl : MonoBehaviour
             }
 
             FullHealth();
-            _gameMenu.TeamChanged(gameObject.tag);
+            _gameMenu.TeamChanged(_targetControl.TargetCharacter.tag);
             _targetControl.BecomeTeamMember();
 
         } else Debug.Log("Target is null when changing team!");

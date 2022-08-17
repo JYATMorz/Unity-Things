@@ -102,7 +102,6 @@ public class WeaponControl : MonoBehaviour
 
     private void ShootOnce(AmmoData ammoType)
     {
-        // Prepare a Selected Ammo to shoot.
         Rigidbody newAmmo = Instantiate(ammoType.AmmoPrefab, 
             _barrelShaft.position + _barrelTransform.up * 0.55f, _barrelShaft.rotation, _barrelTransform);
 

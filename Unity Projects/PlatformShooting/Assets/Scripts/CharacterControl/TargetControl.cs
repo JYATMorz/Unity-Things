@@ -26,19 +26,20 @@ public class TargetControl : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(SeekEnemy());
+        if (!_characterControl.IsPlayer) StartCoroutine(SeekEnemy());
     }
     
     void FixedUpdate()
-    {        
-        if (TargetCharacter == null) 
-            _weaponControl.IsBarrelIdle = true;
+    {
+        if (_characterControl.IsPlayer) return;
+
+        if (TargetCharacter == null) _weaponControl.IsBarrelIdle = true;
         else if (TargetCharacter.CompareTag(ConstantSettings.deadTag) || CompareTag(TargetCharacter.tag))
-            TargetCharacter = null;
+            ResetTarget();
         else if (!ConstantSettings.ObstacleBetween(TargetCharacter.transform.position, transform.position))
         {
-            _weaponControl.IsBarrelIdle = false;
             TargetPosition = TargetCharacter.transform.position;
+            _weaponControl.IsBarrelIdle = false;
         }
     }
 
@@ -46,30 +47,20 @@ public class TargetControl : MonoBehaviour
     {
         while(true && !_healthControl.IsDead)
         {
-            if(!_characterControl.IsNeutral)
+            if (TargetCharacter == null)
             {
-                if (TargetCharacter == null) yield return StartCoroutine(SearchTarget());
-                else
-                {
-                    Vector3 targetPos = TargetCharacter.transform.position;
-                    if (!ConstantSettings.TargetInRange(targetPos, transform.position, ConstantSettings.seekRange))
-                        TargetCharacter = null;
-                    else if (!ConstantSettings.TargetInRange(targetPos, transform.position, ConstantSettings.shootRange))
-                    {
-                        TargetPosition = targetPos;
-                        _characterControl.ChaseMode = true;
-                    } else if (ConstantSettings.ObstacleBetween(targetPos, transform.position))
-                    {
-                        if (ConstantSettings.TargetInRange(targetPos, transform.position, 0.5f * ConstantSettings.shootRange))
-                            TargetCharacter = null;
-                        else
-                        {
-                            TargetPosition = targetPos;
-                            _characterControl.ChaseMode = true;
-                        }
-                    }
-                }
+                if(!_characterControl.IsNeutral) yield return StartCoroutine(SearchTarget());
+            } else
+            {
+                Vector3 targetPos = TargetCharacter.transform.position;
+                if (!ConstantSettings.TargetInRange(targetPos, transform.position, ConstantSettings.seekRange))
+                    ResetTarget();
+                else if (!ConstantSettings.TargetInRange(targetPos, transform.position, 0.5f * ConstantSettings.shootRange))
+                    ChaseTarget();
+                else if (ConstantSettings.ObstacleBetween(targetPos, transform.position))
+                    ResetTarget();
             }
+
             yield return new WaitForSeconds(ConstantSettings.seekInterval);
         }
     }
@@ -130,11 +121,7 @@ public class TargetControl : MonoBehaviour
             }
         }
 
-        if (TargetCharacter != null && previousTarget != TargetCharacter)
-        {
-            TargetPosition = TargetCharacter.transform.position;
-            _characterControl.ChaseMode = true;
-        }
+        if (TargetCharacter != null && previousTarget != TargetCharacter) ChaseTarget();
     }
 
     public void BecomeTeamMember()
@@ -149,6 +136,18 @@ public class TargetControl : MonoBehaviour
             _characterControl.SwitchToTeamLayer(ConstantSettings.redTeamTag, ConstantSettings.blueTeamTag);
         }
 
+        ResetTarget();
+    }
+
+    private void ResetTarget()
+    {
         TargetCharacter = null;
+        _weaponControl.IsBarrelIdle = true;
+    }
+
+    private void ChaseTarget()
+    {
+        TargetPosition = TargetCharacter.transform.position;
+        _characterControl.ChaseMode = true;
     }
 }

@@ -109,7 +109,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
                 _blueTeamNum ++;
                 break;
             default:
-                Debug.LogError("Switching Character's Tag isn't Correct !");
+                Debug.LogError("Switching Character's Tag isn't Correct: " + tag);
                 break;
         }
         _neutralNum --;

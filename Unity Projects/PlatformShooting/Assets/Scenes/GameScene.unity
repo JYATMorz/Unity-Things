@@ -3990,8 +3990,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fba71ea4f1e0d4a46afa38053fe4abb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _liftForce: 25
-  forceType: 1
   liftEffect: {fileID: 0}
 --- !u!1 &1074407374
 GameObject:
@@ -4595,11 +4593,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 37
+      value: 40.75
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6676,8 +6674,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fba71ea4f1e0d4a46afa38053fe4abb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _liftForce: 8
-  forceType: 2
   liftEffect: {fileID: 0}
 --- !u!65 &1719890280
 BoxCollider:
@@ -7715,8 +7711,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fba71ea4f1e0d4a46afa38053fe4abb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _liftForce: 25
-  forceType: 1
   liftEffect: {fileID: 0}
 --- !u!65 &2005109591
 BoxCollider:
@@ -7932,8 +7926,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fba71ea4f1e0d4a46afa38053fe4abb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _liftForce: 8
-  forceType: 2
   liftEffect: {fileID: 0}
 --- !u!65 &2060016939
 BoxCollider:

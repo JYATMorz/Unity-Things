@@ -45,9 +45,10 @@ public class CharacterControl : MonoBehaviour
         _gameMenu = sceneMenu.GetComponent<IMenuUI>();
 
         _npcAgent.updateRotation = false;
-        _weaponControl.IsBarrelIdle = !_isPlayer;
         IsPlayer = _isPlayer;
         IsNeutral = _isNeutral;
+
+        _weaponControl.IsBarrelIdle = !IsPlayer;
 
         if (IsNeutral && IsPlayer) Debug.LogWarning("Character Setting is Wrong !");
 
@@ -65,7 +66,6 @@ public class CharacterControl : MonoBehaviour
             _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();
             _npcAgent.updatePosition = false;
             _characterBody.isKinematic = false;
-            // FIXME: https://docs.unity.cn/2021.3/Documentation/Manual/nav-MixingComponents.html
             return;
         }
 
@@ -112,17 +112,16 @@ public class CharacterControl : MonoBehaviour
                 _jumpPressed = false;
             }
 
-            // FIXME: character movement without clamping other forces
             if (!_onForceElevator)
             {
                 if (_doubleJump < 2 || !_onGround)
-                    _characterBody.velocity = new Vector3(Input.GetAxis("Horizontal") * ConstantSettings.speedScaler, _characterBody.velocity.y, 0);
+                    _characterBody.velocity = new Vector3(
+                            Input.GetAxis("Horizontal") * ConstantSettings.speedScaler,
+                            _characterBody.velocity.y, 0);
                 else
-                {
                     _characterBody.velocity = Vector3.ClampMagnitude(
-                        new Vector3(Input.GetAxis("Horizontal") * ConstantSettings.speedScaler, _characterBody.velocity.y, 0), ConstantSettings.speedScaler);
-                }
-
+                            new Vector3(Input.GetAxis("Horizontal") * ConstantSettings.speedScaler, _characterBody.velocity.y, 0),
+                            ConstantSettings.speedScaler);
             }
 
             _npcAgent.nextPosition = _characterBody.position;
@@ -130,7 +129,7 @@ public class CharacterControl : MonoBehaviour
             return;
         }
 
-        if (ChaseMode) ChaseTarget();
+        if (ChaseMode) FindTarget();
         else WanderAround();
     }
 
@@ -168,7 +167,7 @@ public class CharacterControl : MonoBehaviour
         }
     }
 
-    private void ChaseTarget()
+    private void FindTarget()
     {
         ChaseMode = false;
         _npcAgent.SetDestination(_targetControl.TargetPosition);
@@ -222,7 +221,6 @@ public class CharacterControl : MonoBehaviour
         GetComponent<Renderer>().material = _materialInfo[teamTag];
     }
 
-    // FIXME
     public void BecomePlayer()
     {
         IsPlayer = true;
@@ -242,6 +240,8 @@ public class CharacterControl : MonoBehaviour
 
     public void BecomeDead()
     {
+        _npcAgent.enabled = false;
+        _characterBody.isKinematic = false;
         _characterBody.freezeRotation = false;
         _characterBody.constraints = RigidbodyConstraints.None;
 
@@ -264,8 +264,7 @@ public class CharacterControl : MonoBehaviour
 
     public void BecomeFree()
     {
-        if (_isPlayer) return;
-        // TODO: Adjust agent and kinematic to allow physics control character temporarily
+        if (IsPlayer) return;
         _npcAgent.updatePosition = false;
         _characterBody.isKinematic = false;
 
@@ -279,7 +278,7 @@ public class CharacterControl : MonoBehaviour
             _npcAgent.nextPosition = _characterBody.position;
             yield return new WaitForFixedUpdate();
         }
-
+        // FIXME: Update agent position to closest nav mesh point
         _npcAgent.updatePosition = true;
         _characterBody.isKinematic = true;
     }
