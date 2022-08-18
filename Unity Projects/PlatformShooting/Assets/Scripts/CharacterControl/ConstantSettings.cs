@@ -31,6 +31,13 @@ public class ConstantSettings
     public static readonly string[] floorTags = { floorTag, elevatorTag };
     public static readonly string[] aliveTags = { neutralTag, redTeamTag, blueTeamTag };
     public static readonly string[] characterTags = { deadTag, neutralTag, redTeamTag, blueTeamTag };
+    public static readonly string[] tipsText = {
+        "You can climb the wall! Try to keep pressing the space bar when on it.",
+        "Kill a yellow (neutral) character and turn it into your teammate.",
+        "You will \"respawn\" after being killed, as long as you have a teammate.",
+        "Use the scroll wheel or number buttons or click the button to switch weapons.",
+        "Make good use of teleportation and elevators. NPCs are not skilled at those (maybe :p)."
+    };
 
     public static bool TargetInRange(Vector3 targetPos, Vector3 currentPos, float range)
         => (targetPos - currentPos).sqrMagnitude < range * range;

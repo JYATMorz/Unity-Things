@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GeneralLoadMenu : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class GeneralLoadMenu : MonoBehaviour
 
     public Animator fadeTransition;
     public GameObject loadingPanel;
+    public TextMeshProUGUI tipsText;
 
     void Awake()
     {
@@ -29,6 +31,7 @@ public class GeneralLoadMenu : MonoBehaviour
     IEnumerator LoadGameAsync(int sceneIndex)
     {
         loadingPanel.SetActive(true);
+        tipsText.text = ConstantSettings.tipsText[Random.Range(0, ConstantSettings.tipsText.Length)];
         fadeTransition.SetTrigger("FadeIn");
 
         yield return new WaitForSeconds(1f);
