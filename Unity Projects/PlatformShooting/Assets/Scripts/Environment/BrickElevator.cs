@@ -8,14 +8,17 @@ public class BrickElevator : MonoBehaviour
     private const float _targetTopPosition = 21.25f;
     private const float _targetDownPosition = 2.25f;
 
-    private float _randomSpeed;
+    private float _randomSpeed = _moveSpeed;
     private Rigidbody brickRB;
 
-    void Start()
+    void Awake()
     {
         brickRB = GetComponent<Rigidbody>();
         _randomSpeed = _moveSpeed * Random.Range(0.8f, 1.2f) * Mathf.Sign(Random.value - 0.5f);
+    }
 
+    void Start()
+    {  
         StartCoroutine(MoveBackAndForth());
     }
 

@@ -265,6 +265,8 @@ public class CharacterControl : MonoBehaviour
     public void BecomeFree()
     {
         if (IsPlayer) return;
+        // FIXME: _npcAgent.ResetPath();
+        _npcAgent.isStopped = true;
         _npcAgent.updatePosition = false;
         _characterBody.isKinematic = false;
 
@@ -273,12 +275,20 @@ public class CharacterControl : MonoBehaviour
 
     IEnumerator BecomeUnfree()
     {
+        float deltaDistance = _targetControl.TargetPosition.x - _characterBody.position.x;
+        float horizontalForce = ConstantSettings.speedScaler * Mathf.Sign(deltaDistance);
+        _characterBody.AddForce(horizontalForce, 0, 0, ForceMode.Impulse);
+
         while (!_onGround || _onForceElevator)
         {
             _npcAgent.nextPosition = _characterBody.position;
             yield return new WaitForFixedUpdate();
         }
+        if (_npcAgent.isOnNavMesh) _npcAgent.nextPosition = _characterBody.position;
+
         // FIXME: Update agent position to closest nav mesh point
+        _npcAgent.SetDestination(_targetControl.TargetPosition);
+        _npcAgent.isStopped = false;
         _npcAgent.updatePosition = true;
         _characterBody.isKinematic = true;
     }
