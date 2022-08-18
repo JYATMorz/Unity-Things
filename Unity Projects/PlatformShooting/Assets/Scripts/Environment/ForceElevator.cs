@@ -3,7 +3,7 @@ using UnityEngine.VFX;
 
 public class ForceElevator : MonoBehaviour
 {
-    private readonly float _liftForce = 30f;
+    private readonly float _liftForce = 40f;
 
     public VisualEffect liftEffect;
 

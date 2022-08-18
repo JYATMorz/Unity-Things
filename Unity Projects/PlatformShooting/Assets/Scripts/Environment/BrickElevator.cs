@@ -3,7 +3,7 @@ using System.Collections;
 
 public class BrickElevator : MonoBehaviour
 {
-    private const int _moveSpeed = 2;
+    private const float _moveSpeed = 0.8f;
     private const float _waitTime = 3f;
     private const float _targetTopPosition = 21.25f;
     private const float _targetDownPosition = 2.25f;

@@ -65,11 +65,13 @@ public class CharacterControl : MonoBehaviour
         {
             _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();
             _npcAgent.updatePosition = false;
+            _npcAgent.avoidancePriority = 99;
             _characterBody.isKinematic = false;
             return;
         }
 
-        // StartCoroutine(StartNavMeshJump());
+        if (IsNeutral) _npcAgent.avoidancePriority = 80;
+
     }
 
     void Update()
@@ -104,6 +106,7 @@ public class CharacterControl : MonoBehaviour
 
         if (IsPlayer)
         {
+            float userInput = Input.GetAxis("Horizontal");
             if (_jumpPressed)
             {
                 _characterBody.AddForce(Vector3.up * ConstantSettings.jumpScaler, ForceMode.Impulse);
@@ -116,18 +119,22 @@ public class CharacterControl : MonoBehaviour
             {
                 if (_doubleJump < 2 || !_onGround)
                     _characterBody.velocity = new Vector3(
-                            Input.GetAxis("Horizontal") * ConstantSettings.speedScaler,
+                            userInput * ConstantSettings.speedScaler,
                             _characterBody.velocity.y, 0);
                 else
                     _characterBody.velocity = Vector3.ClampMagnitude(
-                            new Vector3(Input.GetAxis("Horizontal") * ConstantSettings.speedScaler, _characterBody.velocity.y, 0),
+                            new Vector3(userInput * ConstantSettings.speedScaler, _characterBody.velocity.y, 0),
                             ConstantSettings.speedScaler);
             }
 
-            _npcAgent.nextPosition = _characterBody.position;
+            if (!Mathf.Approximately(userInput, 0))
+                if (!_npcAgent.Warp(_characterBody.position)) _npcAgent.nextPosition = _characterBody.position;
 
             return;
         }
+
+        // FIXME: if (_npcAgent.isOnOffMeshLink) _npcAgent.speed = 2f;
+        // FIXME: else _npcAgent.speed = 3.5f;
 
         if (ChaseMode) FindTarget();
         else WanderAround();
@@ -143,6 +150,8 @@ public class CharacterControl : MonoBehaviour
             _onGround = true;
             _onForceElevator = false;
         }
+
+        if (!IsPlayer && contact.CompareTag(ConstantSettings.elevatorTag)) _npcAgent.Warp(_characterBody.position);
     }
 
     void OnTriggerEnter(Collider other)
@@ -178,34 +187,7 @@ public class CharacterControl : MonoBehaviour
         if (!_npcAgent.hasPath && !_npcAgent.pathPending)
         {
             float wanderSpeed = Mathf.PingPong(Time.time, ConstantSettings.speedScaler) - 0.5f * ConstantSettings.speedScaler;
-            _npcAgent.velocity = new Vector3(wanderSpeed, _characterBody.velocity.y, 0);
-        }
-
-    }
-
-    // TODO: https://docs.unity3d.com/ScriptReference/AI.NavMeshAgent.CompleteOffMeshLink.html
-    IEnumerator StartNavMeshJump()
-    {
-        if (_npcAgent.isOnOffMeshLink)
-        {
-            yield return StartCoroutine(ParabolaJump(_npcAgent, 1f, 1f));
-            _npcAgent.CompleteOffMeshLink();
-        }
-        yield return null;
-    }
-
-    IEnumerator ParabolaJump(NavMeshAgent agent, float height, float duration)
-    {
-        OffMeshLinkData data = agent.currentOffMeshLinkData;
-        Vector3 startPos = agent.transform.position;
-        Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
-        float normalizedTime = 0f;
-        while (normalizedTime < 1f)
-        {
-            float yOffset = height * 4f * (normalizedTime - normalizedTime * normalizedTime);
-            agent.transform.position = Vector3.Lerp(startPos, endPos, normalizedTime) + yOffset * Vector3.up;
-            normalizedTime += Time.deltaTime / duration;
-            yield return null;
+            _npcAgent.velocity = new Vector3(wanderSpeed * (UnityEngine.Random.value / 2 + 0.75f), _characterBody.velocity.y, 0);
         }
     }
 
@@ -265,9 +247,10 @@ public class CharacterControl : MonoBehaviour
     public void BecomeFree()
     {
         if (IsPlayer) return;
-        // FIXME: _npcAgent.ResetPath();
+
         _npcAgent.isStopped = true;
         _npcAgent.updatePosition = false;
+        _npcAgent.ResetPath();
         _characterBody.isKinematic = false;
 
         StartCoroutine(BecomeUnfree());
@@ -275,19 +258,23 @@ public class CharacterControl : MonoBehaviour
 
     IEnumerator BecomeUnfree()
     {
-        float deltaDistance = _targetControl.TargetPosition.x - _characterBody.position.x;
+        yield return new WaitForSeconds(0.2f);
+
+        float deltaDistance = (_targetControl.TargetCharacter != null)
+                            ? (_targetControl.TargetPosition.x - _characterBody.position.x)
+                            : (UnityEngine.Random.value - 0.5f);
         float horizontalForce = ConstantSettings.speedScaler * Mathf.Sign(deltaDistance);
-        _characterBody.AddForce(horizontalForce, 0, 0, ForceMode.Impulse);
+        _characterBody.AddForce(horizontalForce * (UnityEngine.Random.value + 1f), 0, 0, ForceMode.Impulse);
 
         while (!_onGround || _onForceElevator)
         {
-            _npcAgent.nextPosition = _characterBody.position;
             yield return new WaitForFixedUpdate();
         }
-        if (_npcAgent.isOnNavMesh) _npcAgent.nextPosition = _characterBody.position;
+        if (_npcAgent.isOnNavMesh) _npcAgent.Warp(_characterBody.position);
 
-        // FIXME: Update agent position to closest nav mesh point
-        _npcAgent.SetDestination(_targetControl.TargetPosition);
+        if (_targetControl.TargetCharacter != null 
+            && ConstantSettings.TargetInRange(_targetControl.TargetPosition, _characterBody.position, ConstantSettings.seekRange))
+            _npcAgent.SetDestination(_targetControl.TargetPosition);
         _npcAgent.isStopped = false;
         _npcAgent.updatePosition = true;
         _characterBody.isKinematic = true;

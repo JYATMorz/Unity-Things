@@ -11,6 +11,8 @@ public class GeneralLoadMenu : MonoBehaviour
     public GameObject loadingPanel;
     public TextMeshProUGUI tipsText;
 
+    // TODO: Audio Control
+
     void Awake()
     {
         if (Instance != null)
