@@ -14,6 +14,8 @@ public class ExplosivePayload : MonoBehaviour
     {
         _ownerBody = GetComponentsInParent<Rigidbody>()[2];
 
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.explosiveTag, transform.position);
+
         StartCoroutine(SelfDestruction());
     }
 
@@ -29,6 +31,8 @@ public class ExplosivePayload : MonoBehaviour
 
     IEnumerator Explosion()
     {
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.explodeTag, transform.position, 0.2f);
+
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, ConstantSettings.characterLayer))
         {
             if (Physics.Linecast(transform.position, character.transform.position, ~ConstantSettings.floorLayer))
@@ -42,6 +46,7 @@ public class ExplosivePayload : MonoBehaviour
             }
             yield return new WaitForFixedUpdate();
         }
+
         Destroy(gameObject);
     }
 

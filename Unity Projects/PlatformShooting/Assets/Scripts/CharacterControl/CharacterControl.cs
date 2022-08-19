@@ -18,6 +18,8 @@ public class CharacterControl : MonoBehaviour
     private bool _jumpPressed = false;
     private bool _onGround = false;
     private bool _onForceElevator = false;
+    private bool _onNavLink = false;
+    private bool _onNavMesh = true;
     private int _doubleJump = 2;
 
     public bool IsTeleported { get; set; } = false;
@@ -127,14 +129,31 @@ public class CharacterControl : MonoBehaviour
                             ConstantSettings.speedScaler);
             }
 
-            if (!Mathf.Approximately(userInput, 0))
-                if (!_npcAgent.Warp(_characterBody.position)) _npcAgent.nextPosition = _characterBody.position;
+            if (!_onNavMesh && _npcAgent.isOnNavMesh)
+            {
+                if (_npcAgent.Warp(_characterBody.position)) _onNavMesh = true;
+            } else if (_onNavMesh && !NavMesh.SamplePosition(_characterBody.position, out NavMeshHit _, 1f, NavMesh.AllAreas))
+            {
+                _onNavMesh = false;
+            } else
+            {
+                _npcAgent.nextPosition = _characterBody.position;
+            }
 
             return;
         }
 
-        // FIXME: if (_npcAgent.isOnOffMeshLink) _npcAgent.speed = 2f;
-        // FIXME: else _npcAgent.speed = 3.5f;
+        if (_npcAgent.isOnOffMeshLink && !_onNavLink)
+        {
+            _onNavLink = true;
+
+            float distanceSqr = (_npcAgent.currentOffMeshLinkData.startPos - _npcAgent.currentOffMeshLinkData.endPos).sqrMagnitude;
+            _npcAgent.speed = Mathf.LerpUnclamped(0.6f, 1.2f, distanceSqr / 25f);
+        } else if (_npcAgent.isOnNavMesh && _onNavLink)
+        {
+            _onNavLink = false;
+            _npcAgent.speed = ConstantSettings.speedOnNav;
+        }
 
         if (ChaseMode) FindTarget();
         else WanderAround();
@@ -246,7 +265,7 @@ public class CharacterControl : MonoBehaviour
 
     public void BecomeFree()
     {
-        if (IsPlayer) return;
+        if (IsPlayer || MainCamera.IsGameOver) return;
 
         _npcAgent.isStopped = true;
         _npcAgent.updatePosition = false;
@@ -270,7 +289,11 @@ public class CharacterControl : MonoBehaviour
         {
             yield return new WaitForFixedUpdate();
         }
-        if (_npcAgent.isOnNavMesh) _npcAgent.Warp(_characterBody.position);
+        if (_npcAgent.isOnNavMesh)
+        {
+            if (!_npcAgent.Warp(_characterBody.position) && _npcAgent.FindClosestEdge(out NavMeshHit hit))
+                _npcAgent.Warp(hit.position);
+        }
 
         if (_targetControl.TargetCharacter != null 
             && ConstantSettings.TargetInRange(_targetControl.TargetPosition, _characterBody.position, ConstantSettings.seekRange))

@@ -696,6 +696,7 @@ GameObject:
   - component: {fileID: 3769103249978232802}
   - component: {fileID: 3769103249978232801}
   - component: {fileID: 3769103249978232800}
+  - component: {fileID: 3698462601957870143}
   - component: {fileID: 3769103249978232805}
   m_Layer: 5
   m_Name: LoadSceneController
@@ -801,6 +802,19 @@ MonoBehaviour:
   fadeTransition: {fileID: 3769103249978232805}
   loadingPanel: {fileID: 3769103251099660950}
   tipsText: {fileID: 2393980778059859798}
+--- !u!114 &3698462601957870143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3769103249978232607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 141757aec0f38864c9d121cdae5ff3b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClips: []
 --- !u!95 &3769103249978232805
 Animator:
   serializedVersion: 4

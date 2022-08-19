@@ -1,8 +1,8 @@
-using System;
 using UnityEngine;
 
 public class ConstantSettings
 {
+    // Tags for character statuses management
     public const string bulletTag = "Bullet";
     public const string deadTag = "Dead";
     public const string neutralTag = "Neutral";
@@ -11,18 +11,35 @@ public class ConstantSettings
     public const string floorTag = "Floor";
     public const string elevatorTag = "Elevator";
 
+    // Color suffixes for notification text
     public const string blueColor = "<#B4BED1>";
     public const string redColor = "<#D0BDC7>";
     public const string purpleColor = "<#C6A2D1>";
     public const string whiteColor = "<#FFFFFF>";
 
+    // Tags for ammo types management & ammo launching audios management
+    public const string commonTag = "CommonBullet";
+    public const string laserTag = "LaserBeam";
+    public const string grenadeTag = "GrenadeLauncher";
+    public const string explosiveTag = "ExplosivePayload";
+
+    // Tags for audio management (haven't been reused)
+    public const string explodeTag = "Explode";
+    public const string hurtTag = "Hurt";
+    public const string reviveTag = "Revive";
+    public const string themeTag = "Theme";
+    public const string endTag = "GameOver";
+
+    // Const number variables for character setting
+    public const int barrelRotateSpeed = 45;
+    public const int initHealth = 100;
     public const int shootRange = 7;
     public const int seekRange = 12;
     public const float seekInterval = 1f;
     public const float speedScaler = 5f;
+    public const float speedOnNav = 3.5f;
     public const float jumpScaler = 20f;
-    public const int barrelRotateSpeed = 45;
-    public const int initHealth = 100;
+
     public const int ammoSelfDestruction = 10;
 
     public static readonly int floorLayer = LayerMask.GetMask(floorTag, elevatorTag);

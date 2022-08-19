@@ -17,6 +17,8 @@ public class Grenade : MonoBehaviour
     {
         _ownerBody = GetComponentsInParent<Rigidbody>()[2];
 
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.grenadeTag, transform.position);
+
         StartCoroutine(LifeTimeOver(_lifeTime));
 
         GetComponent<Rigidbody>().AddTorque(Random.value, Random.value, Random.value, ForceMode.Impulse);
@@ -40,6 +42,8 @@ public class Grenade : MonoBehaviour
 
     IEnumerator Explosion()
     {
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.explodeTag, transform.position);
+
         foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, ConstantSettings.characterLayer))
         {
             if (Physics.Linecast(transform.position, character.transform.position, ~ConstantSettings.floorLayer))
@@ -53,6 +57,7 @@ public class Grenade : MonoBehaviour
             }
             yield return new WaitForFixedUpdate();
         }
+
         Destroy(gameObject);
     }
 }

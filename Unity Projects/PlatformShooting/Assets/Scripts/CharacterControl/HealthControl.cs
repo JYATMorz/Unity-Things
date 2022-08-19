@@ -39,6 +39,7 @@ public class HealthControl : MonoBehaviour
             _targetControl.SwitchTarget(attacker);
 
         _currentHealth -= Mathf.Clamp(damage, 0, 25);
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.hurtTag, transform.position);
 
         if (_currentHealth <= 0)
         {
@@ -76,6 +77,8 @@ public class HealthControl : MonoBehaviour
             _gameMenu.TeamChanged(_targetControl.TargetCharacter.tag);
             _targetControl.BecomeTeamMember();
 
+            GeneralAudioControl.Instance.PlayAudio(ConstantSettings.reviveTag, transform.position);
+
         } else Debug.Log("Target is null when changing team!");
     }
 
@@ -86,6 +89,8 @@ public class HealthControl : MonoBehaviour
         _gameMenu.CharacterDie(gameObject.tag);
         _weaponControl.StopShoot();
         _weaponControl.StopAllCoroutines();
+
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.deadTag, transform.position);
 
         DeadTagAndLayer();
 

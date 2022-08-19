@@ -11,8 +11,6 @@ public class GeneralLoadMenu : MonoBehaviour
     public GameObject loadingPanel;
     public TextMeshProUGUI tipsText;
 
-    // TODO: Audio Control
-
     void Awake()
     {
         if (Instance != null)
@@ -50,6 +48,7 @@ public class GeneralLoadMenu : MonoBehaviour
 
         loadingPanel.SetActive(false);
         GameMenu.IsPause = false;
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag);
     }
 
 }

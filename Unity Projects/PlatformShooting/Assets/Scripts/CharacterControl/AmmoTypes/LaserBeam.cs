@@ -18,6 +18,8 @@ public class LaserBeam : MonoBehaviour
         _ownerBody = GetComponentsInParent<Rigidbody>()[2];
         _laserBody = GetComponent<Rigidbody>();
 
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.laserTag, transform.position);
+
         StartCoroutine(LifeTimeOver(_lifeTime));
         StartCoroutine(TooSlowToLive());
     }

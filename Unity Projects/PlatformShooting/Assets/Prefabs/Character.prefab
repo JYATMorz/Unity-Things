@@ -472,6 +472,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59753e6e8f9bc524bb8f031f4398fe84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _ammoTests: []
   sceneMenu: {fileID: 0}
   mainCamera: {fileID: 0}
   bulletPrefab: {fileID: 5988814899565253455, guid: 5b433ac54dd98a3448ce9ed5db8fe743, type: 3}

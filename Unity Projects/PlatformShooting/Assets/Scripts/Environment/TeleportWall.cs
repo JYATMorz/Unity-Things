@@ -6,7 +6,7 @@ public class TeleportWall : MonoBehaviour {
     
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Bullet")) Destroy(other.gameObject);
+        if (other.CompareTag(ConstantSettings.bulletTag)) Destroy(other.gameObject);
         else if (Array.Exists(ConstantSettings.characterTags, tag => other.CompareTag(tag)))
             StartCoroutine(TeleportCharacter(other.gameObject));
     }
