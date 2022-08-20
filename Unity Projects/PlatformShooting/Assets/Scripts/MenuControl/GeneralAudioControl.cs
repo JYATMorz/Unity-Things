@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// TODO: Add 4 ammo launch audio, 1 explode audio, 1 theme audio, 1 game over audio, 1 hurt audio, 1 die audio, 1 respawn audio
 public class GeneralAudioControl : MonoBehaviour
 {
     public static GeneralAudioControl Instance { get; private set; } = null;
@@ -30,7 +29,7 @@ public class GeneralAudioControl : MonoBehaviour
         }
     }
 
-    public void PlayAudio(string audioTag)
+    public void PlayAudio(string audioTag, float wait = float.NaN)
     {
         if (!_audioInfos.TryGetValue(audioTag, out AudioData audio))
         {
@@ -41,7 +40,8 @@ public class GeneralAudioControl : MonoBehaviour
         if (audio.isLoop && !audio.source.isPlaying)
         {
             if (audio.source.time != 0f) audio.source.UnPause();
-            else audio.source.Play();
+            else if (float.IsNaN(wait)) audio.source.Play();
+            else audio.source.PlayDelayed(wait);
         }
         else Debug.LogWarning("Trying To play a non-looping / non-playing audio clip !");
     }

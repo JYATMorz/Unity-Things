@@ -167,7 +167,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
         inGameUI.SetActive(false);
         pauseMenuUI.SetActive(false);
         endGameUI.SetActive(true);
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.endTag);
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.endTag, 0.5f);
     }
 
     public void ShowNotification(string noteType)

@@ -115,6 +115,8 @@ public class CharacterControl : MonoBehaviour
 
                 _doubleJump --;
                 _jumpPressed = false;
+
+                GeneralAudioControl.Instance.PlayAudio(ConstantSettings.jumpTag, _characterBody.position);
             }
 
             if (!_onForceElevator)
@@ -146,9 +148,11 @@ public class CharacterControl : MonoBehaviour
         if (_npcAgent.isOnOffMeshLink && !_onNavLink)
         {
             _onNavLink = true;
+            GeneralAudioControl.Instance.PlayAudio(ConstantSettings.jumpTag, _characterBody.position, 0.1f);
 
             float distanceSqr = (_npcAgent.currentOffMeshLinkData.startPos - _npcAgent.currentOffMeshLinkData.endPos).sqrMagnitude;
             _npcAgent.speed = Mathf.LerpUnclamped(0.6f, 1.2f, distanceSqr / 25f);
+
         } else if (_npcAgent.isOnNavMesh && _onNavLink)
         {
             _onNavLink = false;

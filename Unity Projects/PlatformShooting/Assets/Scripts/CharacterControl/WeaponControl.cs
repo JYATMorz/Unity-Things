@@ -124,6 +124,7 @@ public class WeaponControl : MonoBehaviour
             }
 
             ammoType.ShootEffect.Play();
+            GeneralAudioControl.Instance.PlayAudio(CurrentAmmo.Tag, transform.position);
 
             if (ammoType.RequireCharge)
             {

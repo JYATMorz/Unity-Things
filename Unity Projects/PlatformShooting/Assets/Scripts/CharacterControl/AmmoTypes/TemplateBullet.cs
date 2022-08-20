@@ -14,8 +14,6 @@ public class TemplateBullet : MonoBehaviour
     {
         _ownerBody = GetComponentsInParent<Rigidbody>()[2];
 
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.commonTag, transform.position);
-
         StartCoroutine(SelfDestruction());
     }
 

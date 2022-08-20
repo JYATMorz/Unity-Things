@@ -24,6 +24,7 @@ public class ConstantSettings
     public const string explosiveTag = "ExplosivePayload";
 
     // Tags for audio management (haven't been reused)
+    public const string jumpTag = "Jump";
     public const string explodeTag = "Explode";
     public const string hurtTag = "Hurt";
     public const string reviveTag = "Revive";

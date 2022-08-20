@@ -17,8 +17,6 @@ public class Grenade : MonoBehaviour
     {
         _ownerBody = GetComponentsInParent<Rigidbody>()[2];
 
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.grenadeTag, transform.position);
-
         StartCoroutine(LifeTimeOver(_lifeTime));
 
         GetComponent<Rigidbody>().AddTorque(Random.value, Random.value, Random.value, ForceMode.Impulse);

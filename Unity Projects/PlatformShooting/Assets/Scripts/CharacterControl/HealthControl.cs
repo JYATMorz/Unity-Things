@@ -39,7 +39,9 @@ public class HealthControl : MonoBehaviour
             _targetControl.SwitchTarget(attacker);
 
         _currentHealth -= Mathf.Clamp(damage, 0, 25);
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.hurtTag, transform.position);
+
+        GeneralAudioControl.Instance.PlayAudio(
+            ConstantSettings.hurtTag, transform.position, _characterControl.IsPlayer ? float.NaN : 0.2f);
 
         if (_currentHealth <= 0)
         {
@@ -90,7 +92,8 @@ public class HealthControl : MonoBehaviour
         _weaponControl.StopShoot();
         _weaponControl.StopAllCoroutines();
 
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.deadTag, transform.position);
+        GeneralAudioControl.Instance.PlayAudio(
+            ConstantSettings.deadTag, transform.position, _characterControl.IsPlayer ? float.NaN : 0.2f);
 
         DeadTagAndLayer();
 

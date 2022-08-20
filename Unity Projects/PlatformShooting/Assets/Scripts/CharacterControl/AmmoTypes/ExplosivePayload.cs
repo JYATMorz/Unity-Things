@@ -14,8 +14,6 @@ public class ExplosivePayload : MonoBehaviour
     {
         _ownerBody = GetComponentsInParent<Rigidbody>()[2];
 
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.explosiveTag, transform.position);
-
         StartCoroutine(SelfDestruction());
     }
 

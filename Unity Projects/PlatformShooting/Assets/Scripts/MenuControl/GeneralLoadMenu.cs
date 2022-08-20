@@ -25,6 +25,8 @@ public class GeneralLoadMenu : MonoBehaviour
 
     public void StartLoadScene(int sceneIndex)
     {
+        GeneralAudioControl.Instance.StopAudio(ConstantSettings.themeTag);
+        GeneralAudioControl.Instance.StopAudio(ConstantSettings.endTag);
         StartCoroutine(LoadGameAsync(sceneIndex));
     }
 
@@ -48,7 +50,7 @@ public class GeneralLoadMenu : MonoBehaviour
 
         loadingPanel.SetActive(false);
         GameMenu.IsPause = false;
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag);
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag, 0.5f);
     }
 
 }

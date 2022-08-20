@@ -814,7 +814,73 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 141757aec0f38864c9d121cdae5ff3b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioClips: []
+  audioClips:
+  - tag: CommonBullet
+    volume: 0.8
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: a104669646fd18040940860dccf738de, type: 3}
+    source: {fileID: 0}
+  - tag: LaserBeam
+    volume: 0.8
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: 3c188897ce9954f43bf9a3a495241b92, type: 3}
+    source: {fileID: 0}
+  - tag: GrenadeLauncher
+    volume: 0.8
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: 430f2b96f1fb7fd48baf82d189576fa8, type: 3}
+    source: {fileID: 0}
+  - tag: ExplosivePayload
+    volume: 0.8
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: 02f994bf114af5843ae2a33c31b25f53, type: 3}
+    source: {fileID: 0}
+  - tag: Explode
+    volume: 0.4
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: bf074d95c33a4114fbdb8ed2bdf21143, type: 3}
+    source: {fileID: 0}
+  - tag: Hurt
+    volume: 0.6
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: fc11bfee9566667418f3f37d45811011, type: 3}
+    source: {fileID: 0}
+  - tag: Jump
+    volume: 0.3
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: 587fa905070c60d499a83b2b0e5379f9, type: 3}
+    source: {fileID: 0}
+  - tag: Revive
+    volume: 0.8
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: 61500d1897efd204395f448f5d4e5cb8, type: 3}
+    source: {fileID: 0}
+  - tag: Dead
+    volume: 0.8
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: f81db90274e4a104db648080e64199b8, type: 3}
+    source: {fileID: 0}
+  - tag: GameOver
+    volume: 0.3
+    isLoop: 1
+    onAwake: 0
+    clip: {fileID: 8300000, guid: 73e8a926ec92eee48bc4c56757194b23, type: 3}
+    source: {fileID: 0}
+  - tag: Theme
+    volume: 0.2
+    isLoop: 1
+    onAwake: 1
+    clip: {fileID: 8300000, guid: a728380032f1e0c47a102140c29b80da, type: 3}
+    source: {fileID: 0}
 --- !u!95 &3769103249978232805
 Animator:
   serializedVersion: 4
