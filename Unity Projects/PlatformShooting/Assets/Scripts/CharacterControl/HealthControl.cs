@@ -57,6 +57,8 @@ public class HealthControl : MonoBehaviour
     {
         _currentHealth = ConstantSettings.initHealth;
         _healthBar.SetMaxHealth();
+
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.reviveTag, transform.position, 0.2f);
     }
 
    private void ZeroHealth()
@@ -78,8 +80,6 @@ public class HealthControl : MonoBehaviour
             FullHealth();
             _gameMenu.TeamChanged(_targetControl.TargetCharacter.tag);
             _targetControl.BecomeTeamMember();
-
-            GeneralAudioControl.Instance.PlayAudio(ConstantSettings.reviveTag, transform.position);
 
         } else Debug.Log("Target is null when changing team!");
     }

@@ -10,6 +10,7 @@ public class ForceElevator : MonoBehaviour
     void OnTriggerEnter()
     {
         // TODO: liftEffect.Play();
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.jumpTag, transform.position);
     }
 
     void OnTriggerStay(Collider other)

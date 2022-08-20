@@ -156,6 +156,8 @@ public class GameMenu : MonoBehaviour, IMenuUI {
 
     private void GameOver()
     {
+        if (MainCamera.IsGameOver) return;
+
         GeneralAudioControl.Instance.StopAudio(ConstantSettings.themeTag);
         MainCamera.GameIsOver();
 

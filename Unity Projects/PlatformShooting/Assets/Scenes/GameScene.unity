@@ -386,8 +386,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AgentTypeID: 0
-  m_StartPoint: {x: -1.75, y: 4.675, z: 0}
-  m_EndPoint: {x: 0.75, y: -6, z: 0}
+  m_StartPoint: {x: 0.75, y: -6, z: 0}
+  m_EndPoint: {x: -1.75, y: 4.675, z: 0}
   m_Width: 0
   m_CostModifier: 1
   m_Bidirectional: 1
@@ -442,7 +442,7 @@ MonoBehaviour:
   m_EndPoint: {x: -3, y: -2.75, z: 0}
   m_Width: 0
   m_CostModifier: 1
-  m_Bidirectional: 1
+  m_Bidirectional: 0
   m_AutoUpdatePosition: 0
   m_Area: 2
 --- !u!1 &93242672
@@ -733,7 +733,7 @@ MonoBehaviour:
   m_EndPoint: {x: -3, y: -2.75, z: 0}
   m_Width: 0
   m_CostModifier: 1
-  m_Bidirectional: 1
+  m_Bidirectional: 0
   m_AutoUpdatePosition: 0
   m_Area: 2
 --- !u!1 &188931672
@@ -2468,11 +2468,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.5
+      value: 41.5
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 3.75
       objectReference: {fileID: 0}
     - target: {fileID: 1172832186453526026, guid: 5b692873c8035c84496d3bdaee267fcd, type: 3}
       propertyPath: m_LocalPosition.z

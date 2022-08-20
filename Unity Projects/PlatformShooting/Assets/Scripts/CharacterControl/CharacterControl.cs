@@ -131,7 +131,7 @@ public class CharacterControl : MonoBehaviour
                             ConstantSettings.speedScaler);
             }
 
-            if (!_onNavMesh && _npcAgent.isOnNavMesh)
+            if (!_onNavMesh && NavMesh.SamplePosition(_characterBody.position, out NavMeshHit _, 1f, NavMesh.AllAreas))
             {
                 if (_npcAgent.Warp(_characterBody.position)) _onNavMesh = true;
             } else if (_onNavMesh && !NavMesh.SamplePosition(_characterBody.position, out NavMeshHit _, 1f, NavMesh.AllAreas))
@@ -148,10 +148,9 @@ public class CharacterControl : MonoBehaviour
         if (_npcAgent.isOnOffMeshLink && !_onNavLink)
         {
             _onNavLink = true;
-            GeneralAudioControl.Instance.PlayAudio(ConstantSettings.jumpTag, _characterBody.position, 0.1f);
 
             float distanceSqr = (_npcAgent.currentOffMeshLinkData.startPos - _npcAgent.currentOffMeshLinkData.endPos).sqrMagnitude;
-            _npcAgent.speed = Mathf.LerpUnclamped(0.6f, 1.2f, distanceSqr / 25f);
+            _npcAgent.speed = Mathf.LerpUnclamped(0.5f, 1.25f, distanceSqr / 64f) * ConstantSettings.speedOnNav;
 
         } else if (_npcAgent.isOnNavMesh && _onNavLink)
         {
@@ -240,6 +239,7 @@ public class CharacterControl : MonoBehaviour
         StopAllCoroutines();
         _weaponControl.StopAllCoroutines();
 
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.reviveTag, transform.position);
         StartCoroutine(OutOfMapCheck());
     }
 
@@ -293,15 +293,15 @@ public class CharacterControl : MonoBehaviour
         {
             yield return new WaitForFixedUpdate();
         }
-        if (_npcAgent.isOnNavMesh)
-        {
-            if (!_npcAgent.Warp(_characterBody.position) && _npcAgent.FindClosestEdge(out NavMeshHit hit))
-                _npcAgent.Warp(hit.position);
-        }
+        if (_npcAgent.isOnNavMesh) _npcAgent.Warp(_characterBody.position);
+        else if (!_npcAgent.Warp(_characterBody.position)
+                && NavMesh.SamplePosition(_characterBody.position, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+            _npcAgent.Warp(hit.position);
 
         if (_targetControl.TargetCharacter != null 
             && ConstantSettings.TargetInRange(_targetControl.TargetPosition, _characterBody.position, ConstantSettings.seekRange))
             _npcAgent.SetDestination(_targetControl.TargetPosition);
+
         _npcAgent.isStopped = false;
         _npcAgent.updatePosition = true;
         _characterBody.isKinematic = true;
