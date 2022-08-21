@@ -5,11 +5,14 @@ using System.Collections;
 
 public class TeleportWall : MonoBehaviour {
     
+    private const float _upPositionY = 14.625f;
+    private const float _downPositionY = 0.75f;
+
     private VisualEffect _teleportVFX;
 
     void Awake()
     {
-        // FIXME: _teleportVFX = GetComponentInChildren<VisualEffect>();
+        _teleportVFX = GetComponentInChildren<VisualEffect>();
     }
 
     void OnTriggerEnter(Collider other)
@@ -24,13 +27,16 @@ public class TeleportWall : MonoBehaviour {
         character.GetComponent<CharacterControl>().IsTeleported = true;
         Vector3 oldPosition = character.transform.position;
 
-        // FIXME: _teleportVFX.Play();
+        _teleportVFX.Play();
         yield return new WaitForSeconds(0.5f);
 
-        character.transform.position = new Vector3(- oldPosition.x * 0.96f, oldPosition.y, oldPosition.z);
+        character.transform.position = new Vector3(
+            - oldPosition.x * 0.96f,
+            UnityEngine.Random.value < 0.5f ? _upPositionY : _downPositionY,
+            oldPosition.z
+        );
 
         yield return new WaitForSeconds(0.5f);
         character.GetComponent<CharacterControl>().IsTeleported = false;
-        // FIXME: _teleportVFX.Stop();
     }
 }
