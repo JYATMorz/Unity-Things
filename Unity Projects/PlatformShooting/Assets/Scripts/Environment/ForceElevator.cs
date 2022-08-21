@@ -4,7 +4,7 @@ using System.Collections;
 
 public class ForceElevator : MonoBehaviour
 {
-    private const float _liftForce = 40f;
+    private const float _liftForce = 30f;
     private const float _initAlpha = 0.75f;
 
     private bool _playingEffect = false;

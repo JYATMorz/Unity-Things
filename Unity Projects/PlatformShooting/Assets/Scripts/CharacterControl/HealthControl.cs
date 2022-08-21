@@ -2,12 +2,15 @@ using UnityEngine;
 
 public class HealthControl : MonoBehaviour
 {
+    private const int _healthScalar = 3;
+
     private HealthBar _healthBar;
     private WeaponControl _weaponControl;
     private CharacterControl _characterControl;
     private TargetControl _targetControl;
     private IMenuUI _gameMenu;
     private int _currentHealth = ConstantSettings.initHealth;
+    private int _fullHealth = ConstantSettings.initHealth;
 
     public bool IsDead { get; private set; } = false;
 
@@ -26,19 +29,26 @@ public class HealthControl : MonoBehaviour
     void Start()
     {
         _healthBar = GetComponentInChildren<HealthBar>();
+        if (!_characterControl.IsNeutral)
+        {
+            _currentHealth = _healthScalar * ConstantSettings.initHealth;
+            _fullHealth = _healthScalar * ConstantSettings.initHealth;
+        }
     }
 
     public void ReceiveDamage(int damage, Rigidbody attacker)
     {
         if (attacker == null)
         {
-            Debug.LogWarning("Null Attacker Tag");
+            ZeroHealth();
             return;
-        } else if (!_characterControl.IsPlayer
+        } else if (attacker.CompareTag(ConstantSettings.deadTag)) return;
+
+        if (!_characterControl.IsPlayer
                 && ConstantSettings.TargetInRange(attacker.position, transform.position, ConstantSettings.seekRange))
             _targetControl.SwitchTarget(attacker);
 
-        _currentHealth -= Mathf.Clamp(damage, 0, 25);
+        if (!attacker.CompareTag(gameObject.tag)) _currentHealth -= Mathf.Clamp(damage, 0, 25);
 
         GeneralAudioControl.Instance.PlayAudio(
             ConstantSettings.hurtTag, transform.position, _characterControl.IsPlayer ? float.NaN : 0.2f);
@@ -49,13 +59,14 @@ public class HealthControl : MonoBehaviour
             ZeroHealth();
         } else
         {
-            _healthBar.SetHealthValue(_currentHealth / (float) ConstantSettings.initHealth);
+            _healthBar.SetHealthValue(_currentHealth / (float) _fullHealth);
         }
     }
 
     public void FullHealth()
     {
-        _currentHealth = ConstantSettings.initHealth;
+        _currentHealth = _healthScalar * ConstantSettings.initHealth;
+        _fullHealth = _healthScalar * ConstantSettings.initHealth;
         _healthBar.SetMaxHealth();
 
         GeneralAudioControl.Instance.PlayAudio(ConstantSettings.reviveTag, transform.position, 0.2f);
@@ -81,7 +92,7 @@ public class HealthControl : MonoBehaviour
             _gameMenu.TeamChanged(_targetControl.TargetCharacter.tag);
             _targetControl.BecomeTeamMember();
 
-        } else Debug.Log("Target is null when changing team!");
+        } else KillCharacter();
     }
 
     private void KillCharacter()

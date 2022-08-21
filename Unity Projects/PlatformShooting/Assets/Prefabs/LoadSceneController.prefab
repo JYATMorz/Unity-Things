@@ -869,6 +869,12 @@ MonoBehaviour:
     onAwake: 0
     clip: {fileID: 8300000, guid: f81db90274e4a104db648080e64199b8, type: 3}
     source: {fileID: 0}
+  - tag: Teleport
+    volume: 0.8
+    isLoop: 0
+    onAwake: 0
+    clip: {fileID: 8300000, guid: 77260da5730f76a41aefcf1731365512, type: 3}
+    source: {fileID: 0}
   - tag: GameOver
     volume: 0.3
     isLoop: 1

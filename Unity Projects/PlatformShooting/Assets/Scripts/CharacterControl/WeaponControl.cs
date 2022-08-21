@@ -164,13 +164,25 @@ public class WeaponControl : MonoBehaviour
 
     private void BarrelAim()
     {
-        Quaternion targetRotation =
-            CurrentAmmo.IsParabola ? ParabolaAim(_targetControl.TargetPosition, CurrentAmmo.AmmoSpeed) : DirectAim(_targetControl.TargetPosition);
-        _barrelShaft.rotation =
-            Quaternion.RotateTowards(_barrelShaft.rotation, targetRotation, 3 * ConstantSettings.barrelRotateSpeed * Time.fixedDeltaTime);
+        if (_targetControl.TargetCharacter == null)
+        {
+            StopShoot();
+            return;
+        }
 
-        if (!Physics.Linecast(_barrelShaft.position, _targetControl.TargetPosition, AvoidLayer)
-            && ConstantSettings.TargetInRange(_targetControl.TargetPosition, transform.position, ConstantSettings.shootRange))
+        Quaternion targetRotation =
+            CurrentAmmo.IsParabola
+            ? ParabolaAim(_targetControl.TargetCharacter.transform.position, CurrentAmmo.AmmoSpeed)
+            : DirectAim(_targetControl.TargetCharacter.transform.position);
+        _barrelShaft.rotation =
+            Quaternion.RotateTowards(
+                _barrelShaft.rotation, targetRotation,
+                3 * ConstantSettings.barrelRotateSpeed * Time.fixedDeltaTime
+            );
+
+        if (ConstantSettings.TargetInRange(
+                _targetControl.TargetCharacter.transform.position,
+                transform.position, ConstantSettings.shootRange))
             BarrelShoot();
         else
             StopShoot();

@@ -28,6 +28,7 @@ public class ConstantSettings
     public const string explodeTag = "Explode";
     public const string hurtTag = "Hurt";
     public const string reviveTag = "Revive";
+    public const string teleportTag = "Teleport";
     public const string themeTag = "Theme";
     public const string endTag = "GameOver";
 
@@ -43,6 +44,8 @@ public class ConstantSettings
 
     public const int ammoSelfDestruction = 10;
 
+    public static readonly Vector3 rightIdlePosition = new (42f, 20.5f, 0);
+    public static readonly Vector3 leftIdlePosition = new (4f, 8.5f, 0);
     public static readonly int floorLayer = LayerMask.GetMask(floorTag, elevatorTag);
     public static readonly int characterLayer = LayerMask.GetMask(deadTag, neutralTag, redTeamTag, blueTeamTag);
     public static readonly int deadLayer = LayerMask.NameToLayer(deadTag);

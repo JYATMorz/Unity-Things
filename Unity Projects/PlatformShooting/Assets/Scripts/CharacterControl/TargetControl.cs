@@ -89,21 +89,13 @@ public class TargetControl : MonoBehaviour
                 TargetCharacter = suspect.gameObject;
             else if (TargetCharacter.CompareTag(ConstantSettings.neutralTag)) // Currently has neutral target
             {
-                if (suspect.CompareTag(ConstantSettings.neutralTag))
-                    // 50% chance to switch from one neutral target to another
-                    TargetCharacter = (Random.value < 0.5f) ? suspect.gameObject : TargetCharacter;
-                else
-                    // 100% chance to switch from one neutral target to team target
+                if (!suspect.CompareTag(ConstantSettings.neutralTag)) // 100% chance to switch from one neutral target to team target
                     TargetCharacter = suspect.gameObject;
             } else if (!suspect.CompareTag(ConstantSettings.neutralTag)) // Currently has team target & suspect is not neutral
             {
-                if (!ConstantSettings.TargetInRange(TargetCharacter.transform.position, transform.position, ConstantSettings.seekRange))
-                { // Current target is out of seek range
-                    TargetCharacter = suspect.gameObject;
-                } else if (!ConstantSettings.TargetInRange(TargetCharacter.transform.position, transform.position, ConstantSettings.shootRange))
+                if (!ConstantSettings.TargetInRange(TargetCharacter.transform.position, transform.position, ConstantSettings.shootRange))
                 { // Current target is out of shoot range
-                    TargetCharacter = ConstantSettings.ObstacleBetween(suspectPosition, transform.position)
-                        ? TargetCharacter : suspect.gameObject;
+                    TargetCharacter = suspect.gameObject;
                 }
             }
         } else // I'm a team character
@@ -115,8 +107,7 @@ public class TargetControl : MonoBehaviour
             {
                 if (TargetCharacter.CompareTag(ConstantSettings.neutralTag)) TargetCharacter = suspect.gameObject;
                 else TargetCharacter =
-                        (ConstantSettings.ObstacleBetween(TargetCharacter.transform.position, transform.position)
-                        && !ConstantSettings.ObstacleBetween(suspectPosition, transform.position))
+                        ConstantSettings.ObstacleBetween(TargetCharacter.transform.position, transform.position)
                         ? suspect.gameObject : TargetCharacter;
             }
         }

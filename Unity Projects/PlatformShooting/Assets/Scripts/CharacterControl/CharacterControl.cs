@@ -133,7 +133,7 @@ public class CharacterControl : MonoBehaviour
 
             if (!_onNavMesh && NavMesh.SamplePosition(_characterBody.position, out NavMeshHit _, 1f, NavMesh.AllAreas))
             {
-                if (_npcAgent.Warp(_characterBody.position)) _onNavMesh = true;
+                if (_npcAgent.Warp(ValidPosition(_characterBody.position))) _onNavMesh = true;
             } else if (_onNavMesh && !NavMesh.SamplePosition(_characterBody.position, out NavMeshHit _, 1f, NavMesh.AllAreas))
             {
                 _onNavMesh = false;
@@ -174,7 +174,7 @@ public class CharacterControl : MonoBehaviour
         }
 
         if (!IsPlayer && contact.CompareTag(ConstantSettings.elevatorTag))
-            if (!_npcAgent.Warp(_characterBody.position)) _npcAgent.nextPosition = _characterBody.position;
+            if (!_npcAgent.Warp(ValidPosition(_characterBody.position))) _npcAgent.nextPosition = _characterBody.position;
     }
 
     void OnTriggerEnter(Collider other)
@@ -209,8 +209,25 @@ public class CharacterControl : MonoBehaviour
     {
         if (!_npcAgent.hasPath && !_npcAgent.pathPending)
         {
+            if (!IsNeutral)
+            {
+                _npcAgent.SetDestination(UnityEngine.Random.value < 0.5f
+                        ? new Vector3(
+                            Mathf.Sign(UnityEngine.Random.value - 0.5f) * ConstantSettings.leftIdlePosition.x,
+                            ConstantSettings.leftIdlePosition.y, 0)
+                        : new Vector3(
+                            Mathf.Sign(UnityEngine.Random.value - 0.5f) * ConstantSettings.rightIdlePosition.x,
+                            ConstantSettings.rightIdlePosition.y, 0)
+                );
+                return;
+            }
+
             float wanderSpeed = Mathf.PingPong(Time.time, ConstantSettings.speedScaler) - 0.5f * ConstantSettings.speedScaler;
             _npcAgent.velocity = new Vector3(wanderSpeed * (UnityEngine.Random.value / 2 + 0.75f), _characterBody.velocity.y, 0);
+
+        } else if (!IsNeutral && (_npcAgent.remainingDistance < 2f))
+        {
+            _npcAgent.ResetPath();
         }
     }
 
@@ -270,7 +287,7 @@ public class CharacterControl : MonoBehaviour
 
     public void BecomeFree()
     {
-        if (IsPlayer || MainCamera.IsGameOver) return;
+        if (IsPlayer || MainCamera.IsGameOver || CompareTag(ConstantSettings.deadTag)) return;
 
         _npcAgent.isStopped = true;
         _npcAgent.updatePosition = false;
@@ -294,10 +311,12 @@ public class CharacterControl : MonoBehaviour
         {
             yield return new WaitForFixedUpdate();
         }
-        if (_npcAgent.isOnNavMesh) _npcAgent.Warp(_characterBody.position);
-        else if (!_npcAgent.Warp(_characterBody.position)
+        if (_npcAgent.isOnNavMesh)
+        {
+            if (!_npcAgent.Warp(ValidPosition(_characterBody.position))
                 && NavMesh.SamplePosition(_characterBody.position, out NavMeshHit hit, 1f, NavMesh.AllAreas))
-            _npcAgent.Warp(hit.position);
+            _npcAgent.Warp(ValidPosition(hit.position));
+        }
 
         if (_targetControl.TargetCharacter != null 
             && ConstantSettings.TargetInRange(_targetControl.TargetPosition, _characterBody.position, ConstantSettings.seekRange))
@@ -312,12 +331,18 @@ public class CharacterControl : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSecondsRealtime(5f);
+            yield return new WaitForSecondsRealtime(3f);
 
-            if (transform.position.y < -15)
+            if (transform.position.y < -15 || transform.position.y > 25)
             {
-                Destroy(gameObject);
-                break;
+                if (CompareTag(ConstantSettings.deadTag))
+                {
+                    Destroy(gameObject);
+                    break;
+                } else
+                {
+                    _healthControl.ReceiveDamage(1000, null);
+                }
             }
 
             if (!_healthControl.IsDead && !Mathf.Approximately(transform.position.z, 0))
@@ -325,4 +350,10 @@ public class CharacterControl : MonoBehaviour
         }
     }
 
+    private Vector3 ValidPosition(Vector3 targetPos)
+    {
+        Vector3 position = targetPos;
+        if (position.y > 23) position.y = 22.5f;
+        return position;
+    }
 }
