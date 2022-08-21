@@ -173,7 +173,8 @@ public class CharacterControl : MonoBehaviour
             _onForceElevator = false;
         }
 
-        if (!IsPlayer && contact.CompareTag(ConstantSettings.elevatorTag)) _npcAgent.Warp(_characterBody.position);
+        if (!IsPlayer && contact.CompareTag(ConstantSettings.elevatorTag))
+            if (!_npcAgent.Warp(_characterBody.position)) _npcAgent.nextPosition = _characterBody.position;
     }
 
     void OnTriggerEnter(Collider other)

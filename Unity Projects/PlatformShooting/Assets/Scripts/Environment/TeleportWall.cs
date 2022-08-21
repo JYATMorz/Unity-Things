@@ -1,9 +1,17 @@
 using UnityEngine;
+using UnityEngine.VFX;
 using System;
 using System.Collections;
 
 public class TeleportWall : MonoBehaviour {
     
+    private VisualEffect _teleportVFX;
+
+    void Awake()
+    {
+        // FIXME: _teleportVFX = GetComponentInChildren<VisualEffect>();
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(ConstantSettings.bulletTag)) Destroy(other.gameObject);
@@ -13,17 +21,16 @@ public class TeleportWall : MonoBehaviour {
 
     IEnumerator TeleportCharacter(GameObject character)
     {
-        // TODO: need teleport character VFX
         character.GetComponent<CharacterControl>().IsTeleported = true;
         Vector3 oldPosition = character.transform.position;
 
-        Debug.Log("VFX Start!");
+        // FIXME: _teleportVFX.Play();
         yield return new WaitForSeconds(0.5f);
 
         character.transform.position = new Vector3(- oldPosition.x * 0.96f, oldPosition.y, oldPosition.z);
 
         yield return new WaitForSeconds(0.5f);
         character.GetComponent<CharacterControl>().IsTeleported = false;
-        Debug.Log("VFX Complete!");
+        // FIXME: _teleportVFX.Stop();
     }
 }
