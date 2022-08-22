@@ -38,9 +38,9 @@ public class ConstantSettings
     public const int shootRange = 7;
     public const int seekRange = 12;
     public const float seekInterval = 1f;
-    public const float speedScaler = 5f;
+    public const float speedScalar = 5f;
     public const float speedOnNav = 3.5f;
-    public const float jumpScaler = 20f;
+    public const float jumpScalar = 20f;
 
     public const int ammoSelfDestruction = 10;
 

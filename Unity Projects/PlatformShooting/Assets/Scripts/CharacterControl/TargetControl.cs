@@ -80,7 +80,6 @@ public class TargetControl : MonoBehaviour
 
     public void SwitchTarget(Rigidbody suspect)
     {
-        Vector3 suspectPosition = suspect.position;
         GameObject previousTarget = TargetCharacter;
 
         if (_characterControl.IsNeutral) // I'm a neutral character

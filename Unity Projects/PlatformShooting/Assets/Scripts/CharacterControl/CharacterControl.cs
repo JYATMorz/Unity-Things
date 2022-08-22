@@ -21,6 +21,7 @@ public class CharacterControl : MonoBehaviour
     private bool _onNavLink = false;
     private bool _onNavMesh = true;
     private int _doubleJump = 2;
+    private float _wanderScalar;
 
     public bool IsTeleported { get; set; } = false;
     public bool ChaseMode { get; set; } = false;
@@ -57,6 +58,7 @@ public class CharacterControl : MonoBehaviour
         _materialInfo.Add(ConstantSettings.redTeamTag, m_RedTeam);
         _materialInfo.Add(ConstantSettings.blueTeamTag, m_BlueTeam);
 
+        _wanderScalar = (UnityEngine.Random.value + 1f) * ConstantSettings.speedScalar;
     }
 
     void Start()
@@ -111,7 +113,7 @@ public class CharacterControl : MonoBehaviour
             float userInput = Input.GetAxis("Horizontal");
             if (_jumpPressed)
             {
-                _characterBody.AddForce(Vector3.up * ConstantSettings.jumpScaler, ForceMode.Impulse);
+                _characterBody.AddForce(Vector3.up * ConstantSettings.jumpScalar, ForceMode.Impulse);
 
                 _doubleJump --;
                 _jumpPressed = false;
@@ -123,12 +125,12 @@ public class CharacterControl : MonoBehaviour
             {
                 if (_doubleJump < 2 || !_onGround)
                     _characterBody.velocity = new Vector3(
-                            userInput * ConstantSettings.speedScaler,
+                            userInput * ConstantSettings.speedScalar,
                             _characterBody.velocity.y, 0);
                 else
                     _characterBody.velocity = Vector3.ClampMagnitude(
-                            new Vector3(userInput * ConstantSettings.speedScaler, _characterBody.velocity.y, 0),
-                            ConstantSettings.speedScaler);
+                            new Vector3(userInput * ConstantSettings.speedScalar, _characterBody.velocity.y, 0),
+                            ConstantSettings.speedScalar);
             }
 
             if (!_onNavMesh && NavMesh.SamplePosition(_characterBody.position, out NavMeshHit _, 1f, NavMesh.AllAreas))
@@ -222,10 +224,10 @@ public class CharacterControl : MonoBehaviour
                 return;
             }
 
-            float wanderSpeed = Mathf.PingPong(Time.time, ConstantSettings.speedScaler) - 0.5f * ConstantSettings.speedScaler;
-            _npcAgent.velocity = new Vector3(wanderSpeed * (UnityEngine.Random.value / 2 + 0.75f), _characterBody.velocity.y, 0);
+            float wanderSpeed = Mathf.PingPong(Time.time, _wanderScalar) - 0.5f * _wanderScalar;
+            _npcAgent.velocity = new Vector3(wanderSpeed, _characterBody.velocity.y, 0);
 
-        } else if (!IsNeutral && (_npcAgent.remainingDistance < 2f))
+        } else if (!IsNeutral && (_npcAgent.remainingDistance < 1f))
         {
             _npcAgent.ResetPath();
         }
@@ -304,7 +306,7 @@ public class CharacterControl : MonoBehaviour
         float deltaDistance = (_targetControl.TargetCharacter != null)
                             ? (_targetControl.TargetPosition.x - _characterBody.position.x)
                             : (UnityEngine.Random.value - 0.5f);
-        float horizontalForce = ConstantSettings.speedScaler * Mathf.Sign(deltaDistance);
+        float horizontalForce = ConstantSettings.speedScalar * Mathf.Sign(deltaDistance);
         _characterBody.AddForce(horizontalForce * (UnityEngine.Random.value + 1f), 0, 0, ForceMode.Impulse);
 
         while (!_onGround || _onForceElevator)

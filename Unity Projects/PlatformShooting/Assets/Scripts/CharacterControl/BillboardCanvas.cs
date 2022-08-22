@@ -7,6 +7,8 @@ public class BillboardCanvas : MonoBehaviour
 
     void LateUpdate()
     {
+        if (mainCamera == null) return;
+
         transform.LookAt(transform.position + mainCamera.forward);
     }
 }

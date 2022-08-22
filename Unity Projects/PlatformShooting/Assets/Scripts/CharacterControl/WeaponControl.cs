@@ -180,9 +180,8 @@ public class WeaponControl : MonoBehaviour
                 3 * ConstantSettings.barrelRotateSpeed * Time.fixedDeltaTime
             );
 
-        if (ConstantSettings.TargetInRange(
-                _targetControl.TargetCharacter.transform.position,
-                transform.position, ConstantSettings.shootRange))
+        if (!Physics.Linecast(_barrelShaft.position, _targetControl.TargetPosition, AvoidLayer)
+            && ConstantSettings.TargetInRange(_targetControl.TargetCharacter.transform.position, transform.position, ConstantSettings.shootRange))
             BarrelShoot();
         else
             StopShoot();

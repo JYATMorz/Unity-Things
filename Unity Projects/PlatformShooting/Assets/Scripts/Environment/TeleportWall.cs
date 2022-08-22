@@ -32,9 +32,9 @@ public class TeleportWall : MonoBehaviour {
         Vector3 oldPosition = character.transform.position;
 
         _teleportVFX.Play();
-        for (float scaler = 0f; scaler < _freezeTime; scaler += Time.deltaTime)
+        for (float Scalar = 0f; Scalar < _freezeTime; Scalar += Time.deltaTime)
         {
-            _teleportLight.intensity += scaler * 10f;
+            _teleportLight.intensity += Scalar * 10f;
             yield return null;
         }
 
