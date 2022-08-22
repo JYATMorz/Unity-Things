@@ -27,6 +27,9 @@ public class TemplateBullet : MonoBehaviour
                 contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage, _ownerBody);
             }
         }
+
+        if (GeneralLoadMenu.Instance.IsLoadingScene) return;
+
         Instantiate(bulletImpact, transform.position, transform.rotation * Quaternion.FromToRotation(Vector3.forward, Vector3.down));
 
         Destroy(gameObject);

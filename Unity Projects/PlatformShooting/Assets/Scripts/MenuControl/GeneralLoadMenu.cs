@@ -7,6 +7,8 @@ public class GeneralLoadMenu : MonoBehaviour
 {
     public static GeneralLoadMenu Instance { get; private set;} = null;
 
+    public bool IsLoadingScene {get; private set; } = false;
+
     public Animator fadeTransition;
     public GameObject loadingPanel;
     public TextMeshProUGUI tipsText;
@@ -30,8 +32,10 @@ public class GeneralLoadMenu : MonoBehaviour
 
     public void StartLoadScene(int sceneIndex)
     {
+        IsLoadingScene = true;
         GeneralAudioControl.Instance.StopAudio(ConstantSettings.themeTag);
         GeneralAudioControl.Instance.StopAudio(ConstantSettings.endTag);
+
         StartCoroutine(LoadGameAsync(sceneIndex));
     }
 
@@ -54,6 +58,7 @@ public class GeneralLoadMenu : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         loadingPanel.SetActive(false);
+        IsLoadingScene = false;
         GameMenu.IsPause = false;
         GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag, 0.2f);
     }

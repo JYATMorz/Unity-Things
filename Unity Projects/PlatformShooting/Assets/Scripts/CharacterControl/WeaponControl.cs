@@ -18,6 +18,7 @@ public class WeaponControl : MonoBehaviour
     private Rigidbody _barrelShaft;
     private Transform _barrelTransform;
     private Quaternion _deltaRotation;
+    private Vector3 _pointerDirection;
     private bool _fireConfirm = false;
     private bool _isFiring = false;
     private float _rotateSpeed = ConstantSettings.barrelRotateSpeed;
@@ -79,9 +80,9 @@ public class WeaponControl : MonoBehaviour
         if (_characterControl.IsPlayer)
         {
             // Rotate the barrel to point at the mouse position
-            Vector3 _rotateVector = Input.mousePosition - mainCamera.WorldToScreenPoint(_barrelShaft.position);
-            _rotateVector.z = 0;
-            _barrelShaft.rotation *= Quaternion.FromToRotation(_barrelShaft.transform.up, _rotateVector);
+            _pointerDirection = Input.mousePosition - mainCamera.WorldToScreenPoint(_barrelShaft.position);
+            _pointerDirection.z = 0;
+            _barrelShaft.rotation = Quaternion.FromToRotation(Vector3.up, _pointerDirection);
         }
     }
 
@@ -104,6 +105,8 @@ public class WeaponControl : MonoBehaviour
 
     private void ShootOnce(AmmoData ammoType)
     {
+        if (GeneralLoadMenu.Instance.IsLoadingScene) return;
+
         Rigidbody newAmmo = Instantiate(ammoType.AmmoPrefab, 
             _barrelShaft.position + _barrelTransform.up * 0.55f, _barrelShaft.rotation, _barrelTransform);
 
@@ -164,7 +167,7 @@ public class WeaponControl : MonoBehaviour
 
     private void BarrelAim()
     {
-        if (_targetControl.TargetCharacter == null)
+        if (_targetControl.TargetCharacter == null || _characterControl.IsPlayer)
         {
             StopShoot();
             return;
@@ -221,6 +224,12 @@ public class WeaponControl : MonoBehaviour
         } else _ammoTypeNum = num;
 
         SwitchCurrentAmmo(_ammoTypeNum);
+    }
+
+    public void ResetWeaponStatus()
+    {
+        _isFiring = false;
+        _fireConfirm = false;
     }
 
     private void SwitchCurrentAmmo(int ammoNum)

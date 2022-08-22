@@ -63,7 +63,7 @@ public class CharacterControl : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(OutOfMapCheck());
+        StartCoroutine(ExceptionCheck());
 
         if (IsPlayer)
         {
@@ -204,38 +204,36 @@ public class CharacterControl : MonoBehaviour
     private void FindTarget()
     {
         ChaseMode = false;
+        ResetNavMeshPath();
         _npcAgent.SetDestination(_targetControl.TargetPosition);
     }
 
     private void WanderAround()
     {
-        if (!_npcAgent.hasPath && !_npcAgent.pathPending)
+        if (!IsNeutral)
         {
-            if (!IsNeutral)
+            if (!_npcAgent.hasPath && !_npcAgent.pathPending)
             {
                 _npcAgent.SetDestination(UnityEngine.Random.value < 0.5f
                         ? new Vector3(
-                            Mathf.Sign(UnityEngine.Random.value - 0.5f) * ConstantSettings.leftIdlePosition.x,
+                            Mathf.Sign(transform.position.x) * ConstantSettings.leftIdlePosition.x,
                             ConstantSettings.leftIdlePosition.y, 0)
                         : new Vector3(
-                            Mathf.Sign(UnityEngine.Random.value - 0.5f) * ConstantSettings.rightIdlePosition.x,
+                            Mathf.Sign(-transform.position.x) * ConstantSettings.rightIdlePosition.x,
                             ConstantSettings.rightIdlePosition.y, 0)
                 );
-                return;
-            }
-
+                // _npcAgent.autoBraking = false;
+            } else if (_npcAgent.hasPath && (_npcAgent.remainingDistance < 3f)) ResetNavMeshPath();
+        } else if (_targetControl.TargetCharacter == null)
+        {
             float wanderSpeed = Mathf.PingPong(Time.time, _wanderScalar) - 0.5f * _wanderScalar;
             _npcAgent.velocity = new Vector3(wanderSpeed, _characterBody.velocity.y, 0);
-
-        } else if (!IsNeutral && (_npcAgent.remainingDistance < 1f))
-        {
-            _npcAgent.ResetPath();
         }
     }
 
     public void SwitchToTeamLayer(string teamTag, string enemyTag)
     {
-        gameObject.tag = teamTag;
+        tag = teamTag;
         IsNeutral = false;
 
         gameObject.layer = LayerMask.NameToLayer(teamTag);
@@ -250,6 +248,7 @@ public class CharacterControl : MonoBehaviour
         IsPlayer = true;
         _npcAgent.updatePosition = false;
         _characterBody.isKinematic = false;
+        _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, 0);
 
         if (IsNeutral && IsPlayer) Debug.LogWarning("Neutral Character becomes Player !");
 
@@ -258,9 +257,11 @@ public class CharacterControl : MonoBehaviour
 
         StopAllCoroutines();
         _weaponControl.StopAllCoroutines();
+        _weaponControl.ResetWeaponStatus();
+        _targetControl.StopAllCoroutines();
 
         GeneralAudioControl.Instance.PlayAudio(ConstantSettings.reviveTag, transform.position);
-        StartCoroutine(OutOfMapCheck());
+        StartCoroutine(ExceptionCheck());
     }
 
     public void BecomeDead()
@@ -283,7 +284,7 @@ public class CharacterControl : MonoBehaviour
             new Vector3(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value) * 0.1f, 
             ForceMode.Impulse);
 
-        StartCoroutine(OutOfMapCheck());
+        StartCoroutine(ExceptionCheck());
 
     }
 
@@ -293,7 +294,7 @@ public class CharacterControl : MonoBehaviour
 
         _npcAgent.isStopped = true;
         _npcAgent.updatePosition = false;
-        _npcAgent.ResetPath();
+        ResetNavMeshPath();
         _characterBody.isKinematic = false;
 
         StartCoroutine(BecomeUnfree());
@@ -322,14 +323,23 @@ public class CharacterControl : MonoBehaviour
 
         if (_targetControl.TargetCharacter != null 
             && ConstantSettings.TargetInRange(_targetControl.TargetPosition, _characterBody.position, ConstantSettings.seekRange))
+        {
+            ResetNavMeshPath();
             _npcAgent.SetDestination(_targetControl.TargetPosition);
+        } else ChaseMode = false;
 
         _npcAgent.isStopped = false;
         _npcAgent.updatePosition = true;
         _characterBody.isKinematic = true;
     }
 
-    IEnumerator OutOfMapCheck()
+    private void ResetNavMeshPath()
+    {
+        // _npcAgent.autoBraking = true;
+        if (_npcAgent.hasPath || _npcAgent.pathPending) _npcAgent.ResetPath();
+    }
+
+    IEnumerator ExceptionCheck()
     {
         while (true)
         {
@@ -349,6 +359,12 @@ public class CharacterControl : MonoBehaviour
 
             if (!_healthControl.IsDead && !Mathf.Approximately(transform.position.z, 0))
                 transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+
+            if (_targetControl.TargetCharacter == null || _targetControl.TargetCharacter.CompareTag(tag) || _targetControl.TargetCharacter.CompareTag(ConstantSettings.deadTag))
+            {
+                ChaseMode = false;
+                ResetNavMeshPath();
+            }
         }
     }
 

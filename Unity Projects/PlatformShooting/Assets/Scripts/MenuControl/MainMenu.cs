@@ -1,10 +1,20 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MainMenu : MonoBehaviour, IMenuUI {
 
     public static bool IsPause { get; set; } = false;
     public WeaponControl CurrentWeaponControl { get; set; } = null;
+
+    public GameObject titleTextPanel;
+
+    private TextMeshProUGUI[] _titleTexts;
+
+    void Awake()
+    {
+        _titleTexts = titleTextPanel.GetComponentsInChildren<TextMeshProUGUI>();
+    }
 
     public void StartGame()
     {
@@ -16,24 +26,30 @@ public class MainMenu : MonoBehaviour, IMenuUI {
         Application.Quit();
     }
 
-    // Basically do nothing, maybe change text rotation
+    // Basically do nothing, change text rotation for fun
     public void CharacterDie(string tag)
     {
-        Debug.Log(tag);
+        RotateText();
     }
 
     public void TeamChanged(string tag)
     {
-        Debug.Log(tag);
+        RotateText();
     }
 
     public void ShowNotification(string noteType)
     {
-        Debug.Log(noteType);
+        RotateText();
     }
 
     public void SwitchWeaponIcon(int num)
     {
-        Debug.Log(num);
+        RotateText();
+    }
+
+    private void RotateText()
+    {
+        _titleTexts[Random.Range(0, _titleTexts.Length)].rectTransform.rotation
+            *= Quaternion.AngleAxis(Random.value - 0.5f, Vector3.forward);
     }
 }

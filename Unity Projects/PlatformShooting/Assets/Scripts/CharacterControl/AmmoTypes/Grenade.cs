@@ -29,6 +29,8 @@ public class Grenade : MonoBehaviour
 
     void OnDestroy()
     {
+        if (GeneralLoadMenu.Instance.IsLoadingScene) return;
+
         Instantiate(explosionEffect, transform.position, transform.rotation);
     }
 

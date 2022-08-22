@@ -56,7 +56,7 @@ public class MainCamera : MonoBehaviour
 
         } else
         {
-            transform.position = Vector3.MoveTowards(transform.position, player.position + _cameraOffset, 10 * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, player.position + _cameraOffset, 20 * Time.deltaTime);
 
             if (CameraIsClose(transform.position, player.position))
             {
@@ -104,11 +104,6 @@ public class MainCamera : MonoBehaviour
     {
         if ((current - target - _cameraOffset).sqrMagnitude < limit) return true;
         else return false;
-    }
-
-    public void ForceUpdateCamera()
-    {
-        transform.position = new Vector3(Mathf.Sign(player.position.x) * _limitPositionX, player.position.y, player.position.z) + _cameraOffset;
     }
 
     public static void GameIsOver()

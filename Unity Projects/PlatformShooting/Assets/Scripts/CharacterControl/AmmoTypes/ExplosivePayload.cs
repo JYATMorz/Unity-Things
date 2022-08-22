@@ -24,6 +24,8 @@ public class ExplosivePayload : MonoBehaviour
 
     void OnDestroy()
     {
+        if (GeneralLoadMenu.Instance.IsLoadingScene) return;
+
         Instantiate(explosionEffect, transform.position, transform.rotation);
     }
 

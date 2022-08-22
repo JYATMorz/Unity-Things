@@ -45,7 +45,7 @@ public class TargetControl : MonoBehaviour
 
     IEnumerator SeekEnemy()
     {
-        while(true && !_healthControl.IsDead)
+        while(true && !_healthControl.IsDead && !_characterControl.IsPlayer)
         {
             if (TargetCharacter == null)
             {

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class HealthControl : MonoBehaviour
 {
-    private const int _healthScalar = 3;
+    private const int _healthScalar = 2;
 
     private HealthBar _healthBar;
     private WeaponControl _weaponControl;
@@ -48,7 +48,7 @@ public class HealthControl : MonoBehaviour
                 && ConstantSettings.TargetInRange(attacker.position, transform.position, ConstantSettings.seekRange))
             _targetControl.SwitchTarget(attacker);
 
-        if (!attacker.CompareTag(gameObject.tag)) _currentHealth -= Mathf.Clamp(damage, 0, 25);
+        if (!attacker.CompareTag(tag)) _currentHealth -= Mathf.Clamp(damage, 0, 25);
 
         GeneralAudioControl.Instance.PlayAudio(
             ConstantSettings.hurtTag, transform.position, _characterControl.IsPlayer ? float.NaN : 0.2f);
@@ -99,7 +99,7 @@ public class HealthControl : MonoBehaviour
     {
         IsDead = true;
 
-        _gameMenu.CharacterDie(gameObject.tag);
+        _gameMenu.CharacterDie(tag);
         _weaponControl.StopShoot();
         _weaponControl.StopAllCoroutines();
 
@@ -113,7 +113,7 @@ public class HealthControl : MonoBehaviour
 
     private void DeadTagAndLayer()
     {
-        gameObject.tag = ConstantSettings.deadTag;
+        tag = ConstantSettings.deadTag;
         gameObject.layer = ConstantSettings.deadLayer;
     }
 }

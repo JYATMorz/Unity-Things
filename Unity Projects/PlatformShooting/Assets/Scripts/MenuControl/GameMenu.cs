@@ -174,6 +174,8 @@ public class GameMenu : MonoBehaviour, IMenuUI {
 
     public void ShowNotification(string noteType)
     {
+        if (GeneralLoadMenu.Instance.IsLoadingScene) return;
+
         string notifyText = noteType switch {
             "DeadZone" => "Shooting Dead Zone !\n",
             (ConstantSettings.blueTeamTag + "Die") => ConstantSettings.blueColor + "One Blue Team Member Die.",
