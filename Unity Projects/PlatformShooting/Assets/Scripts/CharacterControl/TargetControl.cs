@@ -47,6 +47,9 @@ public class TargetControl : MonoBehaviour
     {
         while(true && !_healthControl.IsDead && !_characterControl.IsPlayer)
         {
+            yield return new WaitForSeconds(ConstantSettings.seekInterval);
+            if (GameMenu.IsPause) continue;
+
             if (TargetCharacter == null)
             {
                 if(!_characterControl.IsNeutral) yield return StartCoroutine(SearchTarget());
@@ -61,7 +64,6 @@ public class TargetControl : MonoBehaviour
                     ResetTarget();
             }
 
-            yield return new WaitForSeconds(ConstantSettings.seekInterval);
         }
     }
 

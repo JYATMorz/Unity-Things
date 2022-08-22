@@ -149,6 +149,7 @@ public class WeaponControl : MonoBehaviour
         while (!_characterControl.IsPlayer)
         {
             yield return new WaitForFixedUpdate();
+            if (GameMenu.IsPause) continue;
 
             if (IsBarrelIdle) BarrelIdle();
             else BarrelAim();

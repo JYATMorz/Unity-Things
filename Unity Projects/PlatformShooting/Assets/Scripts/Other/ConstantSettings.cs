@@ -12,9 +12,9 @@ public class ConstantSettings
     public const string elevatorTag = "Elevator";
 
     // Color suffixes for notification text
-    public const string blueColor = "<#B4BED1>";
-    public const string redColor = "<#D0BDC7>";
-    public const string purpleColor = "<#C6A2D1>";
+    public const string blueColor = "<#C4EAFF>";
+    public const string redColor = "<#FFB9B1>";
+    public const string purpleColor = "<#F2B6FF>";
     public const string whiteColor = "<#FFFFFF>";
 
     // Tags for ammo types management & ammo launching audios management

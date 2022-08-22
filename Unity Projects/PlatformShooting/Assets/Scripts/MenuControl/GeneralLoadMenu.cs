@@ -9,9 +9,14 @@ public class GeneralLoadMenu : MonoBehaviour
 
     public bool IsLoadingScene {get; private set; } = false;
 
+    [Header("Loading Panel Transition")]
     public Animator fadeTransition;
     public GameObject loadingPanel;
+    [Header("Loading Scene Tips")]
+    public TextMeshProUGUI completeText;
     public TextMeshProUGUI tipsText;
+
+    private bool _isLoadComplete = false;
 
     void Awake()
     {
@@ -48,13 +53,19 @@ public class GeneralLoadMenu : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneIndex);
-        while (!asyncLoad.isDone)
+        while (!asyncLoad.isDone || !Input.anyKeyDown)
         {
             yield return null;
+
+            if (!_isLoadComplete && asyncLoad.isDone)
+            {
+                _isLoadComplete = true;
+                StartCoroutine(FlashingText());
+            }
         }
 
         fadeTransition.SetTrigger("FadeOut");
-
+        _isLoadComplete = false;
         yield return new WaitForSeconds(1f);
 
         loadingPanel.SetActive(false);
@@ -63,4 +74,31 @@ public class GeneralLoadMenu : MonoBehaviour
         GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag, 0.2f);
     }
 
+    IEnumerator FlashingText()
+    {
+        yield return null;
+
+        while (_isLoadComplete)
+        {
+            for (float a = 0f; a <= 1f; a += Time.deltaTime / 1.2f)
+            {
+                completeText.alpha = a;
+                yield return null;
+            }
+
+            completeText.alpha = 1f;
+            yield return null;
+
+            for (float a = 1f; a >= 0f; a -= Time.deltaTime / 1.2f)
+            {
+                completeText.alpha = a;
+                yield return null;
+            }
+
+            completeText.alpha = 0f;
+            yield return null;
+        }
+
+        completeText.alpha = 0f;
+    }
 }

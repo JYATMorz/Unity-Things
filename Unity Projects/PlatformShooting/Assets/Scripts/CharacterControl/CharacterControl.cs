@@ -106,7 +106,7 @@ public class CharacterControl : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (IsTeleported || _healthControl.IsDead) return;
+        if (GameMenu.IsPause || IsTeleported || _healthControl.IsDead) return;
 
         if (IsPlayer)
         {
