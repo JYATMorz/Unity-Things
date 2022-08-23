@@ -12,17 +12,11 @@ public class EnemyInstruction : MonoBehaviour
     private Vector3 _targetDirection;
     private Image _directionRing;
     private int _enemyLayer;
+    private bool _inRange = false;
 
     void Start()
     {
         _directionRing = GetComponentInChildren<Image>();
-
-        // FIXME: string enemyTag = CompareTag(ConstantSettings.blueTeamTag) ? ConstantSettings.redTeamTag : ConstantSettings.redTeamTag;
-        string enemyTag = ConstantSettings.redTeamTag;
-        _enemyLayer = LayerMask.NameToLayer(enemyTag);
-
-        // FIXME: rotation test, enable when become player
-        StartCoroutine(FindClosestEnemy());
     }
 
     void Update()
@@ -32,16 +26,16 @@ public class EnemyInstruction : MonoBehaviour
             if (!Mathf.Approximately(_directionRing.color.a, 0f))
             {
                 Color transparent = _directionRing.color;
-                transparent.a = 0;
+                transparent.a = 0f;
                 _directionRing.color = transparent;
             }
             return;
         }
 
-        if (!Mathf.Approximately(_directionRing.color.a, 1f))
+        if (!Mathf.Approximately(_directionRing.color.a, 0.8f))
         {
             Color opaque = _directionRing.color;
-            opaque.a = 1;
+            opaque.a = 0.8f;
             _directionRing.color = opaque;
         }
 
@@ -53,23 +47,24 @@ public class EnemyInstruction : MonoBehaviour
                 Quaternion.FromToRotation(Vector3.up, _targetDirection.normalized),
                 ConstantSettings.barrelRotateSpeed * Time.deltaTime * 5f
             );
-        // FIXME: Debug.Log(_targetTransform.position); (0,-10,0) Reset Plane
     }
 
     IEnumerator FindClosestEnemy()
     {
         while (gameObject.activeInHierarchy)
         {
+            _inRange = false;
             for (int range = 1; range <=  2 * ConstantSettings.seekRange; range ++)
             {
-                // BUG: What is the layer used for?
                 if (Physics.OverlapSphereNonAlloc(transform.position, range, _targetColliders, _enemyLayer) > 0)
                 {
                     _enemyCollider = _targetColliders[0];
+                    _inRange = true;
                     break;
-                } else
-                    yield return new WaitForFixedUpdate();
+                } else yield return new WaitForFixedUpdate();
             }
+
+            if (!_inRange) _enemyCollider = null;
 
             yield return new WaitForSeconds(1f);
         }
@@ -77,6 +72,10 @@ public class EnemyInstruction : MonoBehaviour
 
     public void StartDirectionRing()
     {
+        string enemyTag = GetComponentInParent<Collider>()
+            .CompareTag(ConstantSettings.blueTeamTag) ? ConstantSettings.redTeamTag : ConstantSettings.redTeamTag;
+        _enemyLayer = LayerMask.GetMask(enemyTag);
+
         StartCoroutine(FindClosestEnemy());
     }
 }

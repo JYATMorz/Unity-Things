@@ -36,6 +36,7 @@ public class CharacterControl : MonoBehaviour
 
     [Header("Game Scene Elements")]
     public GameObject sceneMenu;
+    public GameObject enemyDirection;
 
     void Awake()
     {
@@ -67,6 +68,9 @@ public class CharacterControl : MonoBehaviour
 
         if (IsPlayer)
         {
+            enemyDirection.SetActive(true);
+            enemyDirection.GetComponent<EnemyInstruction>().StartDirectionRing();
+
             _gameMenu.CurrentWeaponControl = GetComponent<WeaponControl>();
             _npcAgent.updatePosition = false;
             _npcAgent.avoidancePriority = 99;
@@ -262,6 +266,9 @@ public class CharacterControl : MonoBehaviour
 
         GeneralAudioControl.Instance.PlayAudio(ConstantSettings.reviveTag, transform.position);
         StartCoroutine(ExceptionCheck());
+
+        enemyDirection.SetActive(true);
+        enemyDirection.GetComponent<EnemyInstruction>().StartDirectionRing();
     }
 
     public void BecomeDead()
@@ -275,6 +282,9 @@ public class CharacterControl : MonoBehaviour
         {
             IsPlayer = false;
             _gameMenu.ShowNotification("PlayerDie");
+
+            enemyDirection.SetActive(false);
+            enemyDirection.GetComponent<EnemyInstruction>().StopAllCoroutines();
         }
 
         StopAllCoroutines();
