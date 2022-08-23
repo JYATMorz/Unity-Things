@@ -4,31 +4,30 @@ using System.Collections;
 
 public class EnemyInstruction : MonoBehaviour
 {
-    public GameObject targetInstruction;
-
-    private readonly Collider[] _targetCollider = new Collider[1];
+    private readonly Collider[] _targetColliders = new Collider[1];
 
     private const float _angularSpeed = 60f;
 
-    private Transform _targetTransform = null;
+    private Collider _enemyCollider = null;
     private Vector3 _targetDirection;
     private Image _directionRing;
-    private int _enemyLayer = -1;
+    private int _enemyLayer;
 
     void Start()
     {
         _directionRing = GetComponentInChildren<Image>();
 
-        string enemyTag = CompareTag(ConstantSettings.blueTeamTag) ? ConstantSettings.redTeamTag : ConstantSettings.redTeamTag;
+        // FIXME: string enemyTag = CompareTag(ConstantSettings.blueTeamTag) ? ConstantSettings.redTeamTag : ConstantSettings.redTeamTag;
+        string enemyTag = ConstantSettings.redTeamTag;
         _enemyLayer = LayerMask.NameToLayer(enemyTag);
 
-        // FIXME: rotation test
+        // FIXME: rotation test, enable when become player
         StartCoroutine(FindClosestEnemy());
     }
 
     void Update()
     {
-        if (!gameObject.activeInHierarchy || _targetTransform == null) 
+        if (!gameObject.activeInHierarchy || _enemyCollider == null) 
         {
             if (!Mathf.Approximately(_directionRing.color.a, 0f))
             {
@@ -46,30 +45,30 @@ public class EnemyInstruction : MonoBehaviour
             _directionRing.color = opaque;
         }
 
-        // BUG: Wrong Computation
-        _targetDirection = _targetTransform.position - transform.position;
+        _targetDirection = _enemyCollider.transform.position - transform.position;
         _targetDirection.z = 0;
-        targetInstruction.transform.rotation = 
-            Quaternion.LookRotation(
-                Vector3.RotateTowards(transform.up, _targetDirection.normalized, _angularSpeed * Time.deltaTime * Mathf.Deg2Rad, 0f)
+        transform.rotation = 
+            Quaternion.RotateTowards(
+                transform.rotation,
+                Quaternion.FromToRotation(Vector3.up, _targetDirection.normalized),
+                ConstantSettings.barrelRotateSpeed * Time.deltaTime * 5f
             );
+        // FIXME: Debug.Log(_targetTransform.position); (0,-10,0) Reset Plane
     }
 
     IEnumerator FindClosestEnemy()
     {
         while (gameObject.activeInHierarchy)
         {
-            for (int range = 3; range <= ConstantSettings.seekRange; range ++)
+            for (int range = 1; range <=  2 * ConstantSettings.seekRange; range ++)
             {
-                if (Physics.OverlapSphereNonAlloc(transform.position, range, _targetCollider, _enemyLayer) > 0)
+                // BUG: What is the layer used for?
+                if (Physics.OverlapSphereNonAlloc(transform.position, range, _targetColliders, _enemyLayer) > 0)
                 {
-                    _targetTransform = _targetCollider[0].transform;
+                    _enemyCollider = _targetColliders[0];
                     break;
                 } else
-                {
-                    _targetTransform = null;
                     yield return new WaitForFixedUpdate();
-                }
             }
 
             yield return new WaitForSeconds(1f);
