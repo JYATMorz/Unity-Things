@@ -30,6 +30,7 @@ public class ConstantSettings
     public const string reviveTag = "Revive";
     public const string teleportTag = "Teleport";
     public const string themeTag = "Theme";
+    public const string inGameTag = "Game";
     public const string endTag = "GameOver";
 
     // Const number variables for character setting

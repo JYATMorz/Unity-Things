@@ -74,7 +74,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
         Time.timeScale = 1f;
         IsPause = false;
 
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag);
+        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.inGameTag);
     }
 
     public void PauseGame()
@@ -83,7 +83,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
         Time.timeScale = 0f;
         IsPause = true;
 
-        GeneralAudioControl.Instance.PauseAudio(ConstantSettings.themeTag);
+        GeneralAudioControl.Instance.PauseAudio(ConstantSettings.inGameTag);
     }
 
     public void LoadMainAsync()
@@ -158,7 +158,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     {
         if (MainCamera.IsGameOver) return;
 
-        GeneralAudioControl.Instance.StopAudio(ConstantSettings.themeTag);
+        GeneralAudioControl.Instance.StopAudio(ConstantSettings.inGameTag);
         MainCamera.GameIsOver();
 
         if ((_redTeamNum <= 0) && (_blueTeamNum <= 0)) _gameOverText.text = ConstantSettings.purpleColor + "A Rare Tie !";

@@ -32,13 +32,14 @@ public class GeneralLoadMenu : MonoBehaviour
 
     void Start()
     {
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag, 0.2f);
+        PlayThemeAudio(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void StartLoadScene(int sceneIndex)
     {
         IsLoadingScene = true;
         GeneralAudioControl.Instance.StopAudio(ConstantSettings.themeTag);
+        GeneralAudioControl.Instance.StopAudio(ConstantSettings.inGameTag);
         GeneralAudioControl.Instance.StopAudio(ConstantSettings.endTag);
 
         StartCoroutine(LoadGameAsync(sceneIndex));
@@ -71,7 +72,7 @@ public class GeneralLoadMenu : MonoBehaviour
         loadingPanel.SetActive(false);
         IsLoadingScene = false;
         GameMenu.IsPause = false;
-        GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag, 0.2f);
+        PlayThemeAudio(sceneIndex);
     }
 
     IEnumerator FlashingText()
@@ -100,5 +101,13 @@ public class GeneralLoadMenu : MonoBehaviour
         }
 
         completeText.alpha = 0f;
+    }
+
+    private void PlayThemeAudio(int sceneIndex)
+    {
+        if (sceneIndex == 0)
+            GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag, 0.1f);
+        else
+            GeneralAudioControl.Instance.PlayAudio(ConstantSettings.inGameTag, 0.1f);
     }
 }

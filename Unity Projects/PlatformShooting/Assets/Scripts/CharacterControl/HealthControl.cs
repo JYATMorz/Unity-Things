@@ -48,7 +48,7 @@ public class HealthControl : MonoBehaviour
                 && ConstantSettings.TargetInRange(attacker.position, transform.position, ConstantSettings.seekRange))
             _targetControl.SwitchTarget(attacker);
 
-        if (!attacker.CompareTag(tag)) _currentHealth -= Mathf.Clamp(damage, 0, 25);
+        if (!attacker.CompareTag(tag)) _currentHealth -= Mathf.Clamp(damage, 0, 30);
 
         GeneralAudioControl.Instance.PlayAudio(
             ConstantSettings.hurtTag, transform.position, _characterControl.IsPlayer ? float.NaN : 0.2f);

@@ -119,7 +119,7 @@ public class WeaponControl : MonoBehaviour
         {
             _isFiring = true;
 
-            if (Vector3.Angle(Vector3.up, _barrelTransform.up) > 135)
+            if (Vector3.Angle(Vector3.up, _barrelTransform.up) > 150)
             {
                 if (_characterControl.IsPlayer && !MainCamera.IsGameOver) _gameMenu.ShowNotification("DeadZone");
                 yield return new WaitForSeconds(ammoType.FireInterval);

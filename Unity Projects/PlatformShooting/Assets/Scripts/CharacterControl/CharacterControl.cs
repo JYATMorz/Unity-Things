@@ -381,7 +381,7 @@ public class CharacterControl : MonoBehaviour
     private Vector3 ValidPosition(Vector3 targetPos)
     {
         Vector3 position = targetPos;
-        if (position.y > 23) position.y = 22.5f;
+        if (position.y > 23.5f) position.y = 23f;
         return position;
     }
 }

@@ -66,8 +66,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<u><b>Grenade</b></u><size=60%>\n - Medium Gravity\n - Explode After Countdown\n
-    - High Damage"
+  m_text: "<u><b>Grenade</b></u><size=60%>\n - Medium Gravity\n - Explode After Countdown\n-
+    High Damage"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1619,10 +1619,16 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 73e8a926ec92eee48bc4c56757194b23, type: 3}
     source: {fileID: 0}
   - tag: Theme
-    volume: 0.2
+    volume: 0.3
     isLoop: 1
     onAwake: 1
     clip: {fileID: 8300000, guid: a728380032f1e0c47a102140c29b80da, type: 3}
+    source: {fileID: 0}
+  - tag: Game
+    volume: 0.4
+    isLoop: 1
+    onAwake: 1
+    clip: {fileID: 8300000, guid: ba677b86562b6684ca7a096cee9a9bd7, type: 3}
     source: {fileID: 0}
 --- !u!95 &3769103249978232805
 Animator:
@@ -2767,8 +2773,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<u><b>Rocket</b></u><size=60%>\n - Zero Gravity\n - Explode When Hit\n
-    - Average Damage"
+  m_text: "<u><b>Rocket</b></u><size=60%>\n - Zero Gravity\n - Explode When Hit\n-
+    Average Damage"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2903,8 +2909,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<u><b>Common Bullet</b></u><size=60%>\n - Low Gravity\n - Hit to Do Damage\n
-    - Average Damage"
+  m_text: "<u><b>Common Bullet</b></u><size=60%>\n - Low Gravity\n - Hit to Do Damage\n-
+    Average Damage"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

@@ -7,9 +7,9 @@ public class Grenade : MonoBehaviour
     public GameObject explosionEffect;
     public VisualEffect hitEffect;
 
-    private const int _ammoDamage = 20;
+    private const int _ammoDamage = 30;
     private const float _explosionRadius = 5f;
-    private const float _lifeTime = 3f;
+    private const float _lifeTime = 2f;
 
     private Rigidbody _ownerBody;
 
