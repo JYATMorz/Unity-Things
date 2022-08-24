@@ -18,6 +18,7 @@ public class MainMenu : MonoBehaviour, IMenuUI {
 
     public void StartGame()
     {
+        GameMenu.IsPause = true;
         GeneralLoadMenu.Instance.StartLoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 

@@ -15,6 +15,8 @@ public class GeneralLoadMenu : MonoBehaviour
     [Header("Loading Scene Tips")]
     public TextMeshProUGUI completeText;
     public TextMeshProUGUI tipsText;
+    [Header("Cursor Setting")]
+    public Texture2D cursorTexture;
 
     private bool _isLoadComplete = false;
 
@@ -28,6 +30,8 @@ public class GeneralLoadMenu : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        ChangeCursor(SceneManager.GetActiveScene().buildIndex);
     }
 
     void Start()
@@ -62,6 +66,8 @@ public class GeneralLoadMenu : MonoBehaviour
             {
                 _isLoadComplete = true;
                 StartCoroutine(FlashingText());
+
+                ChangeCursor(sceneIndex);
             }
         }
 
@@ -109,5 +115,16 @@ public class GeneralLoadMenu : MonoBehaviour
             GeneralAudioControl.Instance.PlayAudio(ConstantSettings.themeTag, 0.1f);
         else
             GeneralAudioControl.Instance.PlayAudio(ConstantSettings.inGameTag, 0.1f);
+    }
+
+    private void ChangeCursor(int sceneIndex = 0)
+    {
+        if (sceneIndex == 0)
+        {
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        } else
+        {
+            Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
+        }
     }
 }

@@ -89,6 +89,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     public void LoadMainAsync()
     {
         Time.timeScale = 1f;
+        IsPause = true;
         GeneralLoadMenu.Instance.StartLoadScene(0);
     }
 
@@ -99,6 +100,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
 
     public void RestartGame()
     {
+        IsPause = true;
         GeneralLoadMenu.Instance.StartLoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

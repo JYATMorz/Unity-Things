@@ -105,8 +105,6 @@ public class WeaponControl : MonoBehaviour
 
     private void ShootOnce(AmmoData ammoType)
     {
-        if (GeneralLoadMenu.Instance.IsLoadingScene) return;
-
         Rigidbody newAmmo = Instantiate(ammoType.AmmoPrefab, 
             _barrelShaft.position + _barrelTransform.up * 0.55f, _barrelShaft.rotation, _barrelTransform);
 
@@ -117,6 +115,12 @@ public class WeaponControl : MonoBehaviour
     {
         while(_fireConfirm)
         {
+            if (GameMenu.IsPause || GeneralLoadMenu.Instance.IsLoadingScene)
+            {
+                yield return new WaitForFixedUpdate();
+                continue;
+            }
+
             _isFiring = true;
 
             if (Vector3.Angle(Vector3.up, _barrelTransform.up) > 150)

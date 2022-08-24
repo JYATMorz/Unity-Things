@@ -1539,6 +1539,7 @@ MonoBehaviour:
   loadingPanel: {fileID: 3769103251099660950}
   completeText: {fileID: 1565202945164945839}
   tipsText: {fileID: 2393980778059859798}
+  cursorTexture: {fileID: 2800000, guid: 798255785ffa2d348bffdb48cc4e1e5f, type: 3}
 --- !u!114 &3698462601957870143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1613,19 +1614,19 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 77260da5730f76a41aefcf1731365512, type: 3}
     source: {fileID: 0}
   - tag: GameOver
-    volume: 0.3
+    volume: 0.2
     isLoop: 1
     onAwake: 0
     clip: {fileID: 8300000, guid: 73e8a926ec92eee48bc4c56757194b23, type: 3}
     source: {fileID: 0}
   - tag: Theme
-    volume: 0.3
+    volume: 0.2
     isLoop: 1
     onAwake: 1
     clip: {fileID: 8300000, guid: a728380032f1e0c47a102140c29b80da, type: 3}
     source: {fileID: 0}
   - tag: Game
-    volume: 0.4
+    volume: 0.3
     isLoop: 1
     onAwake: 1
     clip: {fileID: 8300000, guid: ba677b86562b6684ca7a096cee9a9bd7, type: 3}

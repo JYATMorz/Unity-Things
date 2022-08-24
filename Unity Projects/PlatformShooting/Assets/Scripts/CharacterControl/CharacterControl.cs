@@ -129,7 +129,7 @@ public class CharacterControl : MonoBehaviour
             {
                 if (!_onGround)
                 {
-                    _characterBody.velocity = new Vector3(userInput * ConstantSettings.speedScalar, _characterBody.velocity.y, 0);
+                    _characterBody.velocity = new Vector3(userInput * ConstantSettings.speedScalar * 0.8f, _characterBody.velocity.y, 0);
                 } else
                 {
                     if (Physics.Raycast(_characterBody.position, Vector3.down, out RaycastHit hit, 2f))
@@ -199,7 +199,12 @@ public class CharacterControl : MonoBehaviour
 
     void OnCollisionStay()
     {
-        if (IsPlayer && (Physics.Raycast(_characterBody.position, Vector3.left, 0.5f) || Physics.Raycast(_characterBody.position, Vector3.right, 0.5f)))
+        if (!IsPlayer) return;
+
+        if (Physics.Raycast(_characterBody.position + Vector3.down * 0.1f, Vector3.left, 0.5f) ||
+            Physics.Raycast(_characterBody.position + Vector3.down * 0.1f, Vector3.right, 0.5f) ||
+            Physics.Raycast(_characterBody.position + Vector3.up * 0.1f, Vector3.left, 0.5f) ||
+            Physics.Raycast(_characterBody.position + Vector3.up * 0.1f, Vector3.right, 0.5f))
             _doubleJump = 1;
     }
 
@@ -232,8 +237,8 @@ public class CharacterControl : MonoBehaviour
                             Mathf.Sign(-transform.position.x) * ConstantSettings.rightIdlePosition.x,
                             ConstantSettings.rightIdlePosition.y, 0)
                 );
-                // _npcAgent.autoBraking = false;
             } else if (_npcAgent.hasPath && (_npcAgent.remainingDistance < 3f)) ResetNavMeshPath();
+
         } else if (_targetControl.TargetCharacter == null)
         {
             float wanderSpeed = Mathf.PingPong(Time.time, _wanderScalar) - 0.5f * _wanderScalar;
@@ -381,7 +386,6 @@ public class CharacterControl : MonoBehaviour
                 ChaseMode = false;
                 ResetNavMeshPath();
             }
-
         }
     }
 
