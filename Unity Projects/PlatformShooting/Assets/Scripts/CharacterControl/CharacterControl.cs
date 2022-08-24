@@ -127,14 +127,18 @@ public class CharacterControl : MonoBehaviour
 
             if (!_onForceElevator)
             {
-                if (_doubleJump < 2 || !_onGround)
-                    _characterBody.velocity = new Vector3(
-                            userInput * ConstantSettings.speedScalar,
+                if (!_onGround)
+                {
+                    _characterBody.velocity = new Vector3(userInput * ConstantSettings.speedScalar, _characterBody.velocity.y, 0);
+                } else
+                {
+                    if (Physics.Raycast(_characterBody.position, Vector3.down, out RaycastHit hit, 2f))
+                    {
+                        _characterBody.velocity = new Vector3(
+                            Mathf.Sin(Mathf.Deg2Rad * Vector3.Angle(Vector3.right, hit.normal)) * ConstantSettings.speedScalar * userInput,
                             _characterBody.velocity.y, 0);
-                else
-                    _characterBody.velocity = Vector3.ClampMagnitude(
-                            new Vector3(userInput * ConstantSettings.speedScalar, _characterBody.velocity.y, 0),
-                            ConstantSettings.speedScalar);
+                    }
+                }
             }
 
             if (!_onNavMesh && NavMesh.SamplePosition(_characterBody.position, out NavMeshHit _, 1f, NavMesh.AllAreas))
@@ -172,7 +176,8 @@ public class CharacterControl : MonoBehaviour
     {
         GameObject contact = other.gameObject;
 
-        if (Array.Exists(ConstantSettings.floorTags, tag => tag == contact.tag))
+        if (Array.Exists(ConstantSettings.floorTags, tag => contact.CompareTag(tag))
+            && Physics.Raycast(_characterBody.position, Vector3.down, 1f))
         {
             if (IsPlayer) _doubleJump = 2;
             _onGround = true;
@@ -194,7 +199,8 @@ public class CharacterControl : MonoBehaviour
 
     void OnCollisionStay()
     {
-        if (IsPlayer && _doubleJump == 0) _doubleJump = 2;
+        if (IsPlayer && (Physics.Raycast(_characterBody.position, Vector3.left, 0.5f) || Physics.Raycast(_characterBody.position, Vector3.right, 0.5f)))
+            _doubleJump = 1;
     }
 
     void OnCollisionExit(Collision other)
@@ -375,6 +381,7 @@ public class CharacterControl : MonoBehaviour
                 ChaseMode = false;
                 ResetNavMeshPath();
             }
+
         }
     }
 
