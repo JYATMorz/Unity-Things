@@ -19,6 +19,7 @@ public class GeneralLoadMenu : MonoBehaviour
     public Texture2D cursorTexture;
 
     private bool _isLoadComplete = false;
+    private Vector2 _cursorOffset;
 
     void Awake()
     {
@@ -31,6 +32,7 @@ public class GeneralLoadMenu : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        _cursorOffset = new (cursorTexture.width * 0.5f, cursorTexture.height * 0.5f);
         ChangeCursor(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -121,10 +123,10 @@ public class GeneralLoadMenu : MonoBehaviour
     {
         if (sceneIndex == 0)
         {
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(null, _cursorOffset, CursorMode.Auto);
         } else
         {
-            Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(cursorTexture, _cursorOffset, CursorMode.Auto);
         }
     }
 }

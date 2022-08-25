@@ -356,7 +356,6 @@ public class CharacterControl : MonoBehaviour
 
     private void ResetNavMeshPath()
     {
-        // _npcAgent.autoBraking = true;
         if (_npcAgent.hasPath || _npcAgent.pathPending) _npcAgent.ResetPath();
     }
 

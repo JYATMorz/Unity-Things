@@ -66,8 +66,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<u><b>Grenade</b></u><size=60%>\n - Medium Gravity\n - Explode After Countdown\n-
-    High Damage"
+  m_text: '<u><b>Grenade</b></u><size=60%>
+
+    - Medium Gravity
+
+    - Explode After
+    Countdown
+
+    - High Damage'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -278,8 +284,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<u><b>Laser Beam</b></u><size=60%>\n - Zero Gravity & Reflection\n - Hit
-    to Do Damage\n - Low Damage"
+  m_text: '<u><b>Laser Beam</b></u><size=60%>
+
+    - Zero Gravity & Reflection
+
+    -
+    Hit to Do Damage
+
+    - Low Damage'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2774,8 +2786,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<u><b>Rocket</b></u><size=60%>\n - Zero Gravity\n - Explode When Hit\n-
-    Average Damage"
+  m_text: '<u><b>Rocket</b></u><size=60%>
+
+    - Zero Gravity
+
+    - Explode When
+    Hit
+
+    - Average Damage'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2910,8 +2928,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<u><b>Common Bullet</b></u><size=60%>\n - Low Gravity\n - Hit to Do Damage\n-
-    Average Damage"
+  m_text: '<u><b>Common Bullet</b></u><size=60%>
+
+    - Low Gravity
+
+    - Hit to
+    Do Damage
+
+    - Average Damage'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

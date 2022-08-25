@@ -16,6 +16,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     public TextMeshProUGUI scoreText;
     public GameObject weaponPanel;
     [Header("Pause Menu UI Elements")]
+    public Button pauseButton;
     public GameObject pauseMenuUI;
     public Animator pauseToResume;
     [Header("Game Over UI Elements")]
@@ -36,6 +37,8 @@ public class GameMenu : MonoBehaviour, IMenuUI {
             int buttonIndex = i;
             _weaponButtons[i].onClick.AddListener(() => CurrentWeaponControl.ChangeWeapon(buttonIndex));
         }
+
+        pauseButton.onClick.AddListener(() => PauseGame());
     }
 
     void Start()
