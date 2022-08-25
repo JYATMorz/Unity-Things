@@ -205,7 +205,7 @@ public class CharacterControl : MonoBehaviour
             Physics.Raycast(_characterBody.position + Vector3.down * 0.1f, Vector3.right, 0.5f) ||
             Physics.Raycast(_characterBody.position + Vector3.up * 0.1f, Vector3.left, 0.5f) ||
             Physics.Raycast(_characterBody.position + Vector3.up * 0.1f, Vector3.right, 0.5f))
-            _doubleJump = 1;
+            _doubleJump = 2;
     }
 
     void OnCollisionExit(Collision other)
