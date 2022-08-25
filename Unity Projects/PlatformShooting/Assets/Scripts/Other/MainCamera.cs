@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class MainCamera : MonoBehaviour
 {
@@ -12,12 +13,15 @@ public class MainCamera : MonoBehaviour
     private Vector3 _endGamePos = Vector3.zero;
     private string _playerTag;
     private string _enemyTag;
-    private bool _onPosition = true;
+    private static bool _onPosition = true;
+    private bool _waitDeath = false;
 
     void Awake()
     {
         _playerTag = player.tag;
-        _enemyTag = (_playerTag == "BlueTeam") ? "RedTeam" : "BlueTeam";
+        _enemyTag = player.CompareTag(ConstantSettings.blueTeamTag)
+                    ? ConstantSettings.redTeamTag
+                    : ConstantSettings.blueTeamTag;
     }
 
     void Start()
@@ -30,38 +34,32 @@ public class MainCamera : MonoBehaviour
 
     void LateUpdate()
     {
-        if (IsGameOver)
-        {
-            if (player != null && !player.CompareTag("Dead")) FocusOnPlayer();
-
-            if (_onPosition) return;
-
-            if (!CameraIsClose(transform.position, _endGamePos))
-                transform.position = Vector3.MoveTowards(transform.position, _endGamePos + _cameraOffset, 5 * Time.deltaTime);
-            else _onPosition = true;
-
-            return;
-        }
-
         if (_onPosition)
         {
             if (player == null || player.CompareTag("Dead"))
             {
                 _onPosition = false;
-                ChangePlayer();
+                _waitDeath = true;
+
+                if (_endGamePos == Vector3.zero) StartCoroutine(ChangePlayer());
+                else if (!CameraIsClose(transform.position, _endGamePos + _cameraOffset))
+                {
+                    transform.position = 
+                        Vector3.MoveTowards(transform.position, _endGamePos + _cameraOffset, 5 * Time.deltaTime);
+                }
                 return;
             }
 
             FocusOnPlayer();
 
-        } else
+        } else if (!_waitDeath)
         {
             transform.position = Vector3.MoveTowards(transform.position, player.position + _cameraOffset, 20 * Time.deltaTime);
 
             if (CameraIsClose(transform.position, player.position))
             {
                 _onPosition = true;
-                player.GetComponent<CharacterControl>().BecomePlayer();
+                if (!IsGameOver) player.GetComponent<CharacterControl>().BecomePlayer();
             }
 
             transform.LookAt(player);
@@ -69,23 +67,29 @@ public class MainCamera : MonoBehaviour
         }
     }
 
-    private void ChangePlayer()
+    IEnumerator ChangePlayer()
     {
-        GameObject nextPlayer = GameObject.FindWithTag(_playerTag);
+        yield return new WaitForSeconds(1f);
 
+        GameObject nextPlayer = GameObject.FindWithTag(_playerTag);
         if (nextPlayer == null)
         {
-            // transform camera to alive team members
-            GameObject[] aliveEnemies = GameObject.FindGameObjectsWithTag(_enemyTag);
-            foreach (GameObject aliveEnemy in aliveEnemies)
+            // transform camera to alive enemy
+            nextPlayer = GameObject.FindWithTag(_enemyTag);
+            if (nextPlayer != null)
             {
-                _endGamePos += aliveEnemy.transform.position;
+                _playerTag = _enemyTag;
+                player = nextPlayer.transform;
+            } else
+            {
+                _endGamePos = new Vector3(0, 5, 0);
             }
-            _endGamePos /= aliveEnemies.Length;
-
-        } else {
+        } else
+        {
             player = nextPlayer.transform;
         }
+
+        _waitDeath = false;
     }
 
     private void FocusOnPlayer()
@@ -109,5 +113,6 @@ public class MainCamera : MonoBehaviour
     public static void GameIsOver()
     {
         IsGameOver = true;
+        _onPosition = false;
     }
 }

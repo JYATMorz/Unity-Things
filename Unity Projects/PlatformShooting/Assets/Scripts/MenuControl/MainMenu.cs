@@ -24,6 +24,8 @@ public class MainMenu : MonoBehaviour, IMenuUI {
 
     public void QuitGame()
     {
+        if (Application.platform == RuntimePlatform.WebGLPlayer) return;
+
         Application.Quit();
     }
 

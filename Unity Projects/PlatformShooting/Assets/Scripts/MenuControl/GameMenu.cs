@@ -98,6 +98,12 @@ public class GameMenu : MonoBehaviour, IMenuUI {
 
     public void QuitGame()
     {
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
+        {
+            LoadMainAsync();
+            return;
+        }
+
         Application.Quit();
     }
 
