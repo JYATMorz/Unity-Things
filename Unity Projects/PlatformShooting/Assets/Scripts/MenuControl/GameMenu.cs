@@ -199,7 +199,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
             _ => null,
         };
 
-        if (notifyText == null)
+        if (notifyText is null)
         {
             Debug.LogWarning("Wrong Notification Input");
             return;

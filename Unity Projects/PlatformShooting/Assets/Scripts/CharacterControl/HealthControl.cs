@@ -38,7 +38,7 @@ public class HealthControl : MonoBehaviour
 
     public void ReceiveDamage(int damage, Rigidbody attacker)
     {
-        if (attacker == null)
+        if (attacker is null)
         {
             ZeroHealth();
             return;
@@ -80,7 +80,7 @@ public class HealthControl : MonoBehaviour
             return;
         }
 
-        if (_targetControl.TargetCharacter != null)
+        if (_targetControl.TargetCharacter is not null)
         {
             if (_targetControl.TargetCharacter.CompareTag(ConstantSettings.neutralTag))
             {

@@ -23,7 +23,7 @@ public class GeneralLoadMenu : MonoBehaviour
 
     void Awake()
     {
-        if (Instance != null)
+        if (Instance is not null)
         {
             Destroy(gameObject);
             return;

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class CharacterControl : MonoBehaviour
 {
-    private readonly Dictionary<string, Material> _materialInfo = new();
+    private readonly Dictionary<string, Material> _materialInfo = new ();
 
     private WeaponControl _weaponControl;
     private HealthControl _healthControl;
@@ -239,7 +239,7 @@ public class CharacterControl : MonoBehaviour
                 );
             } else if (_npcAgent.hasPath && (_npcAgent.remainingDistance < 3f)) ResetNavMeshPath();
 
-        } else if (_targetControl.TargetCharacter == null)
+        } else if (_targetControl.TargetCharacter is null)
         {
             float wanderSpeed = Mathf.PingPong(Time.time, _wanderScalar) - 0.5f * _wanderScalar;
             _npcAgent.velocity = new Vector3(wanderSpeed, _characterBody.velocity.y, 0);
@@ -325,7 +325,7 @@ public class CharacterControl : MonoBehaviour
     {
         yield return new WaitForSeconds(0.2f);
 
-        float deltaDistance = (_targetControl.TargetCharacter != null)
+        float deltaDistance = (_targetControl.TargetCharacter is not null)
                             ? (_targetControl.TargetPosition.x - _characterBody.position.x)
                             : (UnityEngine.Random.value - 0.5f);
         float horizontalForce = ConstantSettings.speedScalar * Mathf.Sign(deltaDistance);
@@ -342,7 +342,7 @@ public class CharacterControl : MonoBehaviour
             _npcAgent.Warp(ValidPosition(hit.position));
         }
 
-        if (_targetControl.TargetCharacter != null 
+        if (_targetControl.TargetCharacter is not null 
             && ConstantSettings.TargetInRange(_targetControl.TargetPosition, _characterBody.position, ConstantSettings.seekRange))
         {
             ResetNavMeshPath();
@@ -380,7 +380,7 @@ public class CharacterControl : MonoBehaviour
             if (!_healthControl.IsDead && !Mathf.Approximately(transform.position.z, 0))
                 transform.position = new Vector3(transform.position.x, transform.position.y, 0);
 
-            if (_targetControl.TargetCharacter == null || _targetControl.TargetCharacter.CompareTag(tag) || _targetControl.TargetCharacter.CompareTag(ConstantSettings.deadTag))
+            if (_targetControl.TargetCharacter is null || _targetControl.TargetCharacter.CompareTag(tag) || _targetControl.TargetCharacter.CompareTag(ConstantSettings.deadTag))
             {
                 ChaseMode = false;
                 ResetNavMeshPath();

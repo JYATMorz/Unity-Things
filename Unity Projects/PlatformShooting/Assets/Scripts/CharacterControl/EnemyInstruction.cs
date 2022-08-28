@@ -21,7 +21,7 @@ public class EnemyInstruction : MonoBehaviour
 
     void Update()
     {
-        if (!gameObject.activeInHierarchy || _enemyCollider == null) 
+        if (!gameObject.activeInHierarchy || _enemyCollider is null) 
         {
             if (!Mathf.Approximately(_directionRing.color.a, 0f))
             {

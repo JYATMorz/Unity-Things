@@ -9,7 +9,7 @@ public class MainCamera : MonoBehaviour
 
     private const float _limitPositionX = 45f;
 
-    private Vector3 _cameraOffset = new(0, 1, -8);
+    private Vector3 _cameraOffset = new (0, 1, -8);
     private Vector3 _endGamePos = Vector3.zero;
     private string _playerTag;
     private string _enemyTag;
@@ -36,7 +36,7 @@ public class MainCamera : MonoBehaviour
     {
         if (_onPosition)
         {
-            if (player == null || player.CompareTag("Dead"))
+            if (player is null || player.CompareTag("Dead"))
             {
                 _onPosition = false;
                 _waitDeath = true;
@@ -72,11 +72,11 @@ public class MainCamera : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         GameObject nextPlayer = GameObject.FindWithTag(_playerTag);
-        if (nextPlayer == null)
+        if (nextPlayer is null)
         {
             // transform camera to alive enemy
             nextPlayer = GameObject.FindWithTag(_enemyTag);
-            if (nextPlayer != null)
+            if (nextPlayer is not null)
             {
                 _playerTag = _enemyTag;
                 player = nextPlayer.transform;

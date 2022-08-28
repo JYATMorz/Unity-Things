@@ -7,11 +7,11 @@ public class GeneralAudioControl : MonoBehaviour
 
     public AudioData[] audioClips;
 
-    private readonly Dictionary<string, AudioData> _audioInfos = new();
+    private readonly Dictionary<string, AudioData> _audioInfos = new ();
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance is null) Instance = this;
 
         for (int i = 0; i < audioClips.Length; i ++)
         {

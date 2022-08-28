@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class WeaponControl : MonoBehaviour
 {
-    private readonly Dictionary<string, AmmoData> _ammoInfos = new();
+    private readonly Dictionary<string, AmmoData> _ammoInfos = new ();
     private readonly string[] _ammoTypes = { 
         ConstantSettings.commonTag, ConstantSettings.laserTag,
         ConstantSettings.grenadeTag, ConstantSettings.explosiveTag
@@ -24,10 +24,10 @@ public class WeaponControl : MonoBehaviour
     private float _rotateSpeed = ConstantSettings.barrelRotateSpeed;
     private int _ammoTypeNum = 0;
 
-    private AmmoData _commonBullet = new(ConstantSettings.commonTag, 20, 0.6f, true);
-    private AmmoData _laserBeam = new(ConstantSettings.laserTag, 100, 1f, false, true);
-    private AmmoData _grenadeLauncher = new(ConstantSettings.grenadeTag, 10, 1.2f, true);
-    private AmmoData _explosivePayload = new(ConstantSettings.explosiveTag, 15, 0.8f);
+    private AmmoData _commonBullet = new (ConstantSettings.commonTag, 20, 0.6f, true);
+    private AmmoData _laserBeam = new (ConstantSettings.laserTag, 100, 1f, false, true);
+    private AmmoData _grenadeLauncher = new (ConstantSettings.grenadeTag, 10, 1.2f, true);
+    private AmmoData _explosivePayload = new (ConstantSettings.explosiveTag, 15, 0.8f);
 
     public bool IsBarrelIdle { get; set; } = false;
     public int AvoidLayer { get; set; } = -1;
@@ -172,7 +172,7 @@ public class WeaponControl : MonoBehaviour
 
     private void BarrelAim()
     {
-        if (_targetControl.TargetCharacter == null || _characterControl.IsPlayer)
+        if (_targetControl.TargetCharacter is null || _characterControl.IsPlayer)
         {
             StopShoot();
             return;

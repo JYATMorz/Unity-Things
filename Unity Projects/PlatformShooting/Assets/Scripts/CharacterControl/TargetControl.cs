@@ -33,7 +33,7 @@ public class TargetControl : MonoBehaviour
     {
         if (_characterControl.IsPlayer) return;
 
-        if (TargetCharacter == null) _weaponControl.IsBarrelIdle = true;
+        if (TargetCharacter is null) _weaponControl.IsBarrelIdle = true;
         else if (TargetCharacter.CompareTag(ConstantSettings.deadTag) || CompareTag(TargetCharacter.tag))
             ResetTarget();
         else if (!ConstantSettings.ObstacleBetween(TargetCharacter.transform.position, transform.position))
@@ -50,7 +50,7 @@ public class TargetControl : MonoBehaviour
             yield return new WaitForSeconds(ConstantSettings.seekInterval);
             if (GameMenu.IsPause) continue;
 
-            if (TargetCharacter == null)
+            if (TargetCharacter is null)
             {
                 if(!_characterControl.IsNeutral) yield return StartCoroutine(SearchTarget());
             } else
@@ -86,7 +86,7 @@ public class TargetControl : MonoBehaviour
 
         if (_characterControl.IsNeutral) // I'm a neutral character
         {
-            if (TargetCharacter == null) // Currently has no target
+            if (TargetCharacter is null) // Currently has no target
                 TargetCharacter = suspect.gameObject;
             else if (TargetCharacter.CompareTag(ConstantSettings.neutralTag)) // Currently has neutral target
             {
@@ -103,7 +103,7 @@ public class TargetControl : MonoBehaviour
         {
             if (CompareTag(suspect.tag)) return; // Attack by teammate
 
-            if (TargetCharacter == null) TargetCharacter = suspect.gameObject;
+            if (TargetCharacter is null) TargetCharacter = suspect.gameObject;
             else if (!suspect.CompareTag(ConstantSettings.neutralTag))
             {
                 if (TargetCharacter.CompareTag(ConstantSettings.neutralTag)) TargetCharacter = suspect.gameObject;
@@ -113,7 +113,7 @@ public class TargetControl : MonoBehaviour
             }
         }
 
-        if (TargetCharacter != null && previousTarget != TargetCharacter) ChaseTarget();
+        if (TargetCharacter is not null && previousTarget != TargetCharacter) ChaseTarget();
     }
 
     public void BecomeTeamMember()
