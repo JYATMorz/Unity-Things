@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public interface IMenuUI
 {
     public static bool IsPause { get; set; } = false;
