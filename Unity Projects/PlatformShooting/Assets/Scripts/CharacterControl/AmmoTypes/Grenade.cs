@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.VFX;
 using System.Collections;
 
-public class Grenade : MonoBehaviour
+public class Grenade : MonoBehaviour, IDamage
 {
     public GameObject explosionEffect;
     public VisualEffect hitEffect;
@@ -44,19 +44,7 @@ public class Grenade : MonoBehaviour
     {
         GeneralAudioControl.Instance.PlayAudio(ConstantSettings.explodeTag, transform.position);
 
-        foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, ConstantSettings.characterLayer))
-        {
-            if (Physics.Linecast(transform.position, character.transform.position, ~ConstantSettings.floorLayer))
-            {
-                if (!character.CompareTag(ConstantSettings.deadTag) && !ConstantSettings.AreBothNeutral(character, _ownerBody))
-                {
-                    int damage = ConstantSettings.ExplosionDamage(_ammoDamage, transform.position, character.transform.position, _explosionRadius);
-                    character.GetComponent<HealthControl>().ReceiveDamage(damage, _ownerBody);
-                }
-                character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0.1f * _ammoDamage, ForceMode.Impulse);
-            }
-            yield return new WaitForFixedUpdate();
-        }
+        yield return StartCoroutine(IDamage.ExplosionAttack(_ownerBody, transform.position, _explosionRadius, _ammoDamage, 0.1f * _ammoDamage));
 
         Destroy(gameObject);
     }

@@ -296,6 +296,13 @@ public class CharacterControl : MonoBehaviour
 
             enemyDirection.SetActive(false);
             enemyDirection.GetComponent<EnemyInstruction>().StopAllCoroutines();
+
+            // TODO: Tell _gameMenu to add previous player data, and dead counts ++;
+            Debug.Log("Total Damage: " + _weaponControl.TotalDamage + "; Total Kill: " + _weaponControl.TotalKill + "; Total Ammo Fired: " + _weaponControl.TotalAmmo);
+        } else
+        {
+            // TODO: Tell _gameMenu to update previous NPC data;
+            Debug.Log("Total Damage: " + _weaponControl.TotalDamage + "; Total Kill: " + _weaponControl.TotalKill + "; Total Ammo Fired: " + _weaponControl.TotalAmmo);
         }
 
         StopAllCoroutines();

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class ExplosivePayload : MonoBehaviour
+public class ExplosivePayload : MonoBehaviour, IDamage
 {
     public GameObject explosionEffect;
 
@@ -33,19 +33,7 @@ public class ExplosivePayload : MonoBehaviour
     {
         GeneralAudioControl.Instance.PlayAudio(ConstantSettings.explodeTag, transform.position, 0.2f);
 
-        foreach (Collider character in Physics.OverlapSphere(transform.position, _explosionRadius, ConstantSettings.characterLayer))
-        {
-            if (Physics.Linecast(transform.position, character.transform.position, ~ConstantSettings.floorLayer))
-            {
-                if (!character.CompareTag(ConstantSettings.deadTag) && !ConstantSettings.AreBothNeutral(character, _ownerBody))
-                {
-                    int damage = ConstantSettings.ExplosionDamage(_ammoDamage, transform.position, character.transform.position, _explosionRadius);
-                    character.GetComponent<HealthControl>().ReceiveDamage(damage, _ownerBody);
-                }
-                character.attachedRigidbody.AddExplosionForce(_ammoDamage, transform.position, _explosionRadius, 0, ForceMode.Impulse);
-            }
-            yield return new WaitForFixedUpdate();
-        }
+        yield return StartCoroutine(IDamage.ExplosionAttack(_ownerBody, transform.position, _explosionRadius, _ammoDamage));
 
         Destroy(gameObject);
     }

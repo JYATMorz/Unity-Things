@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-public class TemplateBullet : MonoBehaviour
+public class TemplateBullet : MonoBehaviour, IDamage
 {
     public GameObject bulletImpact;
 
@@ -18,15 +18,8 @@ public class TemplateBullet : MonoBehaviour
     }
 
     void OnCollisionEnter(Collision other)
-    {
-        GameObject contact = other.gameObject;
-        if (Array.Exists(ConstantSettings.aliveTags, tag => tag == contact.tag))
-        {
-            if (!ConstantSettings.AreBothNeutral(contact, _ownerBody))
-            {
-                contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage, _ownerBody);
-            }
-        }
+    {       
+        IDamage.DirectAttack(_ownerBody, other.gameObject, _ammoDamage);
 
         if (GeneralLoadMenu.Instance.IsLoadingScene) return;
 

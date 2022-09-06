@@ -195,7 +195,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
             (ConstantSettings.blueTeamTag + "Born") => ConstantSettings.blueColor + "New Blue Team Member.",
             (ConstantSettings.redTeamTag + "Born") => ConstantSettings.redColor + "New Red Team Member.",
             "PlayerDie" => ConstantSettings.purpleColor + "You Are Dead. Wait For Reborn.",
-            "PlayerBorn" => ConstantSettings.purpleColor + "You Are Alive, Again.",
+            "PlayerBorn" => ConstantSettings.purpleColor + "You Are Alive. Try Again.",
             _ => null,
         };
 

@@ -3,7 +3,7 @@ using UnityEngine.VFX;
 using System;
 using System.Collections;
 
-public class LaserBeam : MonoBehaviour
+public class LaserBeam : MonoBehaviour, IDamage
 {
     public VisualEffect laserImpact;
 
@@ -26,14 +26,7 @@ public class LaserBeam : MonoBehaviour
     {
         laserImpact.Play();
 
-        GameObject contact = other.gameObject;
-        if (Array.Exists(ConstantSettings.aliveTags, tag => tag == contact.tag))
-        {
-            if (!ConstantSettings.AreBothNeutral(contact, _ownerBody))
-            {
-                contact.GetComponent<HealthControl>().ReceiveDamage(_ammoDamage, _ownerBody);
-            }
-        }
+        IDamage.DirectAttack(_ownerBody, other.gameObject, _ammoDamage);
     }
 
     IEnumerator LifeTimeOver(float lifeTime)

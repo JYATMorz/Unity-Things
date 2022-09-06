@@ -42,13 +42,19 @@ public class HealthControl : MonoBehaviour
         {
             ZeroHealth();
             return;
-        } else if (attacker.CompareTag(ConstantSettings.deadTag)) return;
+        } else
+        {
+            attacker.GetComponent<WeaponControl>().CausedDeath();
+
+            // Dead character won't be benefited from killing anything
+            if (attacker.CompareTag(ConstantSettings.deadTag)) return;
+        }
 
         if (!_characterControl.IsPlayer
                 && ConstantSettings.TargetInRange(attacker.position, transform.position, ConstantSettings.seekRange))
             _targetControl.SwitchTarget(attacker);
 
-        if (!attacker.CompareTag(tag)) _currentHealth -= Mathf.Clamp(damage, 0, 30);
+        if (!attacker.CompareTag(tag)) _currentHealth -= damage;
 
         GeneralAudioControl.Instance.PlayAudio(
             ConstantSettings.hurtTag, transform.position, _characterControl.IsPlayer ? float.NaN : 0.2f);
@@ -72,7 +78,7 @@ public class HealthControl : MonoBehaviour
         GeneralAudioControl.Instance.PlayAudio(ConstantSettings.reviveTag, transform.position, 0.2f);
     }
 
-   private void ZeroHealth()
+    private void ZeroHealth()
     {
         if (!_characterControl.IsNeutral)
         {
