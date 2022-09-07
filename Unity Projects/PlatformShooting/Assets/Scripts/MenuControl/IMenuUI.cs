@@ -10,4 +10,6 @@ public interface IMenuUI
     public void ShowNotification(string noteType);
 
     public void SwitchWeaponIcon(int num);
+
+    public void UpdateCharacterStats(TotalStats newStat, string teamTag, bool isPlayer = false);
 }

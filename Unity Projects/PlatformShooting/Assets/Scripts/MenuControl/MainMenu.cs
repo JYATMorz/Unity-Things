@@ -50,6 +50,11 @@ public class MainMenu : MonoBehaviour, IMenuUI {
         RotateText();
     }
 
+    public void UpdateCharacterStats(TotalStats newStat, string teamTag, bool isPlayer)
+    {
+        RotateText();
+    }
+
     private void RotateText()
     {
         _titleTexts[Random.Range(0, _titleTexts.Length)].rectTransform.rotation

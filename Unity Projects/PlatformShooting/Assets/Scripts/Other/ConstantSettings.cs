@@ -23,7 +23,7 @@ public class ConstantSettings
     public const string grenadeTag = "GrenadeLauncher";
     public const string explosiveTag = "ExplosivePayload";
 
-    // Tags for audio management (haven't been reused)
+    // Tags for audio management (not reused)
     public const string jumpTag = "Jump";
     public const string explodeTag = "Explode";
     public const string hurtTag = "Hurt";
@@ -32,6 +32,11 @@ public class ConstantSettings
     public const string themeTag = "Theme";
     public const string inGameTag = "Game";
     public const string endTag = "GameOver";
+
+    // Tags for score recording
+    public const string totalKill = "Kill";
+    public const string totalDamage = "Damage";
+    public const string totalAmmo = "Ammo";
 
     // Const number variables for character setting
     public const int barrelRotateSpeed = 45;

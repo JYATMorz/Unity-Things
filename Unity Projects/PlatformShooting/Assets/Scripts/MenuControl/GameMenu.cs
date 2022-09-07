@@ -219,4 +219,10 @@ public class GameMenu : MonoBehaviour, IMenuUI {
             else _weaponButtons[i].GetComponent<ButtonResize>().SizeToMin();
         }
     }
+
+    public void UpdateCharacterStats(TotalStats newStat, string teamTag, bool isPlayer = false)
+    {
+        // TODO: Design the Stats Panel & Record highest stats for 2 teams & 3 types
+        Debug.Log("New " + teamTag + " record :\n" + newStat);
+    }
 }

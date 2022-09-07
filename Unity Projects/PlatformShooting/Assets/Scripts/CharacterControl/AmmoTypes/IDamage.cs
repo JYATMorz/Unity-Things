@@ -42,7 +42,7 @@ public interface IDamage
     {
         if (!owner.CompareTag(ConstantSettings.deadTag))
         {
-            owner.GetComponent<WeaponControl>().CausedDamage(damage);
+            owner.GetComponent<WeaponControl>().TotalStat.NewDamage(damage);
         }
     }
 

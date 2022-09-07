@@ -284,10 +284,11 @@ public class CharacterControl : MonoBehaviour
 
     public void BecomeDead()
     {
-        _npcAgent.enabled = false;
-        _characterBody.isKinematic = false;
-        _characterBody.freezeRotation = false;
-        _characterBody.constraints = RigidbodyConstraints.None;
+        // Notify Game Menu someone is dead
+        _gameMenu.CharacterDie(tag);
+
+        // Stop any weapon movement since I'm dead
+        _weaponControl.ClearWeaponStatus(IsPlayer);
 
         if (IsPlayer)
         {
@@ -296,17 +297,21 @@ public class CharacterControl : MonoBehaviour
 
             enemyDirection.SetActive(false);
             enemyDirection.GetComponent<EnemyInstruction>().StopAllCoroutines();
-
-            // TODO: Tell _gameMenu to add previous player data, and dead counts ++;
-            Debug.Log("Total Damage: " + _weaponControl.TotalDamage + "; Total Kill: " + _weaponControl.TotalKill + "; Total Ammo Fired: " + _weaponControl.TotalAmmo);
-        } else
-        {
-            // TODO: Tell _gameMenu to update previous NPC data;
-            Debug.Log("Total Damage: " + _weaponControl.TotalDamage + "; Total Kill: " + _weaponControl.TotalKill + "; Total Ammo Fired: " + _weaponControl.TotalAmmo);
         }
 
         StopAllCoroutines();
 
+        // Free the Physics
+        _npcAgent.enabled = false;
+        _characterBody.isKinematic = false;
+        _characterBody.freezeRotation = false;
+        _characterBody.constraints = RigidbodyConstraints.None;
+
+        // Switch to Dead tag & layer
+        tag = ConstantSettings.deadTag;
+        gameObject.layer = ConstantSettings.deadLayer;
+
+        // Random fall down force
         _characterBody.position = new Vector3(_characterBody.position.x, _characterBody.position.y, UnityEngine.Random.Range(0, 2) - 0.5f);
         _characterBody.AddTorque(
             new Vector3(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value) * 0.1f, 

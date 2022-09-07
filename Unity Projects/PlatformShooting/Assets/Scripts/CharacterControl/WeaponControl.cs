@@ -31,10 +31,8 @@ public class WeaponControl : MonoBehaviour
 
     public bool IsBarrelIdle { get; set; } = false;
     public int AvoidLayer { get; set; } = -1;
-    public int TotalDamage { get; private set;} = 0;
-    public int TotalAmmo { get; private set;} = 0;
-    public int TotalKill { get; private set;} = 0;
     public AmmoData CurrentAmmo { get; private set; }
+    public TotalStats TotalStat { get; private set; } = new TotalStats();
 
     [Header("In Game Components")]
     public GameObject sceneMenu;
@@ -113,7 +111,7 @@ public class WeaponControl : MonoBehaviour
 
         newAmmo.AddForce(_barrelTransform.up * ammoType.AmmoSpeed, ForceMode.VelocityChange);
 
-        TotalAmmo ++;
+        TotalStat.NewAmmo();
     }
 
     IEnumerator RepeatShooting(AmmoData ammoType)
@@ -241,11 +239,16 @@ public class WeaponControl : MonoBehaviour
         _isFiring = false;
         _fireConfirm = false;
 
-        // TODO: Tell _gameMenu to update previous NPC data;
-        Debug.Log("Total Damage: " + TotalDamage + "; Total Kill: " + TotalKill + "; Total Ammo Fired: " + TotalAmmo);
-        TotalDamage = 0;
-        TotalKill = 0;
-        TotalAmmo = 0;
+        _gameMenu.UpdateCharacterStats(TotalStat, tag);
+        TotalStat.Clear();
+    }
+
+    public void ClearWeaponStatus(bool isPlayer)
+    {
+        StopShoot();
+        StopAllCoroutines();
+
+        _gameMenu.UpdateCharacterStats(TotalStat, tag, isPlayer);
     }
 
     private void SwitchCurrentAmmo(int ammoNum)
@@ -263,7 +266,4 @@ public class WeaponControl : MonoBehaviour
         _ammoInfos.Add(ammoData.Tag, ammoData);
     }
 
-    public void CausedDamage(int damage) => TotalDamage += damage;
-
-    public void CausedDeath() => TotalKill ++;
 }

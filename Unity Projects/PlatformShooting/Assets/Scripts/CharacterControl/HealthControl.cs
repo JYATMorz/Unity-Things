@@ -5,7 +5,6 @@ public class HealthControl : MonoBehaviour
     private const int _healthScalar = 2;
 
     private HealthBar _healthBar;
-    private WeaponControl _weaponControl;
     private CharacterControl _characterControl;
     private TargetControl _targetControl;
     private IMenuUI _gameMenu;
@@ -19,7 +18,6 @@ public class HealthControl : MonoBehaviour
 
     void Awake()
     {
-        _weaponControl = GetComponent<WeaponControl>();
         _targetControl = GetComponent<TargetControl>();
         _characterControl = GetComponent<CharacterControl>();
 
@@ -44,7 +42,7 @@ public class HealthControl : MonoBehaviour
             return;
         } else
         {
-            attacker.GetComponent<WeaponControl>().CausedDeath();
+            attacker.GetComponent<WeaponControl>().TotalStat.NewKill();
 
             // Dead character won't be benefited from killing anything
             if (attacker.CompareTag(ConstantSettings.deadTag)) return;
@@ -105,21 +103,10 @@ public class HealthControl : MonoBehaviour
     {
         IsDead = true;
 
-        _gameMenu.CharacterDie(tag);
-        _weaponControl.StopShoot();
-        _weaponControl.StopAllCoroutines();
-
         GeneralAudioControl.Instance.PlayAudio(
             ConstantSettings.deadTag, transform.position, _characterControl.IsPlayer ? float.NaN : 0.2f);
-
-        DeadTagAndLayer();
 
         _characterControl.BecomeDead();
     }
 
-    private void DeadTagAndLayer()
-    {
-        tag = ConstantSettings.deadTag;
-        gameObject.layer = ConstantSettings.deadLayer;
-    }
 }
