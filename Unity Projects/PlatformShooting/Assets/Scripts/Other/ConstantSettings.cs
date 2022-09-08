@@ -8,6 +8,7 @@ public class ConstantSettings
     public const string neutralTag = "Neutral";
     public const string blueTeamTag = "BlueTeam";
     public const string redTeamTag = "RedTeam";
+    public const string playerTag = "Player";
     public const string floorTag = "Floor";
     public const string elevatorTag = "Elevator";
 
@@ -32,11 +33,6 @@ public class ConstantSettings
     public const string themeTag = "Theme";
     public const string inGameTag = "Game";
     public const string endTag = "GameOver";
-
-    // Tags for score recording
-    public const string totalKill = "Kill";
-    public const string totalDamage = "Damage";
-    public const string totalAmmo = "Ammo";
 
     // Const number variables for character setting
     public const int barrelRotateSpeed = 45;

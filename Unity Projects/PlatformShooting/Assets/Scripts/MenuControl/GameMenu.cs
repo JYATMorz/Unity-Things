@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 
 public class GameMenu : MonoBehaviour, IMenuUI {
@@ -21,24 +22,42 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     public Animator pauseToResume;
     [Header("Game Over UI Elements")]
     public GameObject endGameUI;
+    public GameObject statsTabPanel;
 
     private int _redTeamNum = 0;
     private int _blueTeamNum = 0;
     private int _neutralNum = 0;
+    private Dictionary<string, TotalStats> _maxStatsRecord;
     private TextMeshProUGUI _gameOverText;
     private Button[] _weaponButtons;
+    private Button[] _tabButtons;
 
     void Awake()
     {
         _weaponButtons = weaponPanel.GetComponentsInChildren<Button>();
-
         for (int i = 0; i < _weaponButtons.Length; i++)
         {
             int buttonIndex = i;
             _weaponButtons[i].onClick.AddListener(() => CurrentWeaponControl.ChangeWeapon(buttonIndex));
         }
 
+        _tabButtons = statsTabPanel.GetComponentsInChildren<Button>();
+        for (int i = 0; i < _tabButtons.Length; i++)
+        {
+            int buttonIndex = i;
+            _tabButtons[i].onClick.AddListener(() => ChangeStatsTab(buttonIndex));
+        }
+
+        // FIXME: Use Unity Inspector event assignment and remove this
         pauseButton.onClick.AddListener(() => PauseGame());
+
+        _maxStatsRecord = new Dictionary<string, TotalStats>()
+        {
+            [ConstantSettings.blueTeamTag] = new TotalStats(),
+            [ConstantSettings.redTeamTag] = new TotalStats(),
+            [ConstantSettings.neutralTag] = new TotalStats(),
+            [ConstantSettings.playerTag] = new TotalStats()
+        };
     }
 
     void Start()
@@ -222,7 +241,63 @@ public class GameMenu : MonoBehaviour, IMenuUI {
 
     public void UpdateCharacterStats(TotalStats newStat, string teamTag, bool isPlayer = false)
     {
-        // TODO: Design the Stats Panel & Record highest stats for 2 teams & 3 types
-        Debug.Log("New " + teamTag + " record :\n" + newStat);
+        if (MainCamera.IsGameOver) return;
+
+        // TODO: Design the Stats Panel
+        if (isPlayer) _maxStatsRecord[ConstantSettings.playerTag] += newStat;
+
+        _maxStatsRecord[teamTag].Max(newStat);
+    }
+
+    private void SortCharacterStats()
+    {
+        /*
+        TODO: sort _maxStatsRecord DSC for each stats,
+        eg. Highest Kill Count: Blue: 5, Red: 4, Player (Blue): 3
+
+            StatsPanel
+            --- Stats Title (TextMeshPro)
+            --- Tab Buttons (Most Kill / Most Damage / Most Ammo) (Transition Animation ? Color Difference ?)
+            --- StatsRank (Vertical Layout Group)
+                --- PlayerPanel
+                    --- Image (Character Default Image)
+                    --- TextMeshPro (Amount in Number) (Transition Animation ? Flash to Black and Return)
+                +-- Blue: 3
+                +-- Red: 3
+        */
+    }
+
+    private void ChangeStatsTab(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                DisplayKillStats();
+                break;
+            case 1:
+                DisplayDamageStats();
+                break;
+            case 2:
+                DisplayAmmoStats();
+                break;
+            default:
+                Debug.Log("Wrong button to change stats tab !");
+                break;
+        }
+    }
+
+    private void DisplayKillStats()
+    {
+        string textPlayer = _maxStatsRecord[ConstantSettings.playerTag].TotalKill.ToString();
+    }
+
+    private void DisplayDamageStats()
+    {
+        string textPlayer = _maxStatsRecord[ConstantSettings.playerTag].TotalDamage.ToString();
+    }
+
+    private void DisplayAmmoStats()
+    {
+        string textPlayer = _maxStatsRecord[ConstantSettings.playerTag].TotalAmmo.ToString();
     }
 }
