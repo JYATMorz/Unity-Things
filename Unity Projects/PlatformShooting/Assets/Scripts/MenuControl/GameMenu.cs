@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using System.Linq;
 
 public class GameMenu : MonoBehaviour, IMenuUI {
     
@@ -23,6 +24,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     [Header("Game Over UI Elements")]
     public GameObject endGameUI;
     public GameObject statsTabPanel;
+    public GameObject statsRankPanel;
 
     private int _redTeamNum = 0;
     private int _blueTeamNum = 0;
@@ -31,6 +33,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
     private TextMeshProUGUI _gameOverText;
     private Button[] _weaponButtons;
     private Button[] _tabButtons;
+    private TextMeshProUGUI[] _statsText;
 
     void Awake()
     {
@@ -41,6 +44,7 @@ public class GameMenu : MonoBehaviour, IMenuUI {
             _weaponButtons[i].onClick.AddListener(() => CurrentWeaponControl.ChangeWeapon(buttonIndex));
         }
 
+        // FIXME: Use Unity Inspector event assignment and remove this
         _tabButtons = statsTabPanel.GetComponentsInChildren<Button>();
         for (int i = 0; i < _tabButtons.Length; i++)
         {
@@ -257,8 +261,9 @@ public class GameMenu : MonoBehaviour, IMenuUI {
 
             StatsPanel
             --- Stats Title (TextMeshPro)
-            --- Tab Buttons (Most Kill / Most Damage / Most Ammo) (Transition Animation ? Color Difference ?)
-            --- StatsRank (Vertical Layout Group)
+            --- Tab Buttons (statsTabPanel)
+                --- (Most Kill / Most Damage / Most Ammo) (Transition Animation ? Color Difference ?)
+            --- StatsRank (statsRankPanel) (Vertical Layout Group)
                 --- PlayerPanel
                     --- Image (Character Default Image)
                     --- TextMeshPro (Amount in Number) (Transition Animation ? Flash to Black and Return)
@@ -288,16 +293,60 @@ public class GameMenu : MonoBehaviour, IMenuUI {
 
     private void DisplayKillStats()
     {
-        string textPlayer = _maxStatsRecord[ConstantSettings.playerTag].TotalKill.ToString();
+        // playerStatText.text =
+        //     ConstantSettings.purpleColor + "Player's Total Kills : " +
+        //     _maxStatsRecord[ConstantSettings.playerTag].TotalKill.ToString();
+        // blueStatText.text =
+        //     ConstantSettings.blueColor + "Blue Team's Most Kills : " +
+        //     _maxStatsRecord[ConstantSettings.blueTeamTag].TotalKill.ToString();
+        // redStatText.text =
+        //     ConstantSettings.redColor + "Red Team's Most Kills : " +
+        //     _maxStatsRecord[ConstantSettings.redTeamTag].TotalKill.ToString();
+        Dictionary<string, int> totalStat = new (3)
+        {
+            [ConstantSettings.blueTeamTag] = _maxStatsRecord[ConstantSettings.blueTeamTag].TotalKill,
+            [ConstantSettings.redTeamTag] = _maxStatsRecord[ConstantSettings.redTeamTag].TotalKill,
+            [ConstantSettings.playerTag] = _maxStatsRecord[ConstantSettings.playerTag].TotalKill,
+        };
+        int index = 0;
+        foreach(KeyValuePair<string, int> statItem in totalStat.OrderByDescending(item => item.Value))
+        {
+            _statsText[index ++].text = statItem.Key switch 
+            {
+                ConstantSettings.playerTag => ConstantSettings.purpleColor + "Player's Total Kills : " +
+                    _maxStatsRecord[ConstantSettings.playerTag].TotalKill.ToString(),
+                ConstantSettings.blueTeamTag => ConstantSettings.blueColor + "Blue Team's Most Kills : " +
+                    _maxStatsRecord[ConstantSettings.blueTeamTag].TotalKill.ToString(),
+                ConstantSettings.redTeamTag => ConstantSettings.redColor + "Red Team's Most Kills : " +
+                    _maxStatsRecord[ConstantSettings.redTeamTag].TotalKill.ToString(),
+                _ => "Wrong Stat Key! Check sortedStat"
+            };
+        }
     }
 
     private void DisplayDamageStats()
     {
-        string textPlayer = _maxStatsRecord[ConstantSettings.playerTag].TotalDamage.ToString();
+        // playerStatText.text =
+        //     ConstantSettings.purpleColor + "Player's Total Damages : " +
+        //     _maxStatsRecord[ConstantSettings.playerTag].TotalDamage.ToString();
+        // blueStatText.text =
+        //     ConstantSettings.blueColor + "Blue Team's Most Damages : " +
+        //     _maxStatsRecord[ConstantSettings.blueTeamTag].TotalDamage.ToString();
+        // redStatText.text =
+        //     ConstantSettings.redColor + "Red Team's Most Damages : " +
+        //     _maxStatsRecord[ConstantSettings.redTeamTag].TotalDamage.ToString();
     }
 
     private void DisplayAmmoStats()
     {
-        string textPlayer = _maxStatsRecord[ConstantSettings.playerTag].TotalAmmo.ToString();
+        // playerStatText.text =
+        //     ConstantSettings.purpleColor + "Player's Total Ammo Fired : " +
+        //     _maxStatsRecord[ConstantSettings.playerTag].TotalAmmo.ToString();
+        // blueStatText.text =
+        //     ConstantSettings.blueColor + "Blue Team's Most Ammo Fired : " +
+        //     _maxStatsRecord[ConstantSettings.blueTeamTag].TotalAmmo.ToString();
+        // redStatText.text =
+        //     ConstantSettings.redColor + "Red Team's Most Ammo Fired : " +
+        //     _maxStatsRecord[ConstantSettings.redTeamTag].TotalAmmo.ToString();
     }
 }
